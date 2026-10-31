@@ -42,10 +42,10 @@ export function Logo({ compact }: { compact?: boolean }) {
   const { tx } = useT();
   return (
     <Link href="/" className="group flex items-center gap-3" aria-label="HUMRAAH home">
-      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)] shadow-md shadow-primary/30 transition-transform duration-200 group-hover:scale-105">
+      <span className="relative flex size-10 items-center justify-center rounded-xl bg-lime">
         <svg viewBox="0 0 32 32" className="size-6" aria-hidden>
-          <path d="M9 7v18M23 7v18M9 16h14" stroke="#04211e" strokeWidth="3.4" strokeLinecap="round" />
-          <circle cx="16" cy="16" r="2.6" fill="#F4B544" />
+          <path d="M9 7v18M23 7v18M9 16h14" stroke="#080A08" strokeWidth="3.6" strokeLinecap="round" />
+          <circle cx="16" cy="16" r="2.6" fill="#080A08" />
         </svg>
       </span>
       {!compact && (
@@ -81,17 +81,15 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-[0.93rem] font-medium transition-all duration-150",
-                      active
-                        ? "bg-primary-soft text-primary font-bold shadow-soft"
-                        : "text-muted hover:bg-surface-2 hover:text-fg",
+                      "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.93rem] font-medium transition-colors",
+                      active ? "bg-surface-3 text-fg font-semibold" : "text-muted hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    {active && <span className="absolute start-0 top-2 bottom-2 w-1 rounded-full bg-primary" aria-hidden />}
+                    {active && <span className="absolute end-3 top-1/2 size-1.5 -translate-y-1/2 rounded-full bg-lime ring-2 ring-primary/30" aria-hidden />}
                     <n.icon
                       className={cn(
-                        "size-5 shrink-0 transition-transform duration-150 group-hover:scale-110",
-                        active ? "text-primary" : danger ? "text-danger" : "text-subtle group-hover:text-primary",
+                        "size-5 shrink-0",
+                        active ? "text-fg" : danger ? "text-danger" : "text-subtle group-hover:text-fg",
                       )}
                       aria-hidden
                     />
@@ -198,7 +196,7 @@ function SearchBox() {
             if (e.key === "Enter" && results.pages[0]) go(results.pages[0].href);
           }}
           placeholder={t("top.search")}
-          className="h-11 w-full rounded-2xl border border-line bg-surface-2 ps-10 pe-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
+          className="h-11 w-full rounded-full border border-line bg-surface ps-10 pe-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
           role="combobox"
           aria-expanded={open}
           aria-controls="search-results"
@@ -254,10 +252,10 @@ function Notifications() {
         }}
         aria-label={`${t("top.notifications")}${unread ? ` (${unread} new)` : ""}`}
         aria-expanded={open}
-        className="relative flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted hover:text-fg cursor-pointer"
+        className="relative flex size-11 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-fg cursor-pointer"
       >
         <Bell className="size-5" aria-hidden />
-        {unread > 0 && <span className="absolute end-2 top-2 flex size-4 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-navy">{unread}</span>}
+        {unread > 0 && <span className="absolute end-2 top-2 flex size-4 items-center justify-center rounded-full bg-lime text-[10px] font-bold text-on-lime">{unread}</span>}
       </button>
       {open && (
         <div className="absolute end-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
@@ -321,7 +319,7 @@ function QuickSettings() {
           onClick={() => setOpen((o) => !o)}
           aria-label="Language and accessibility"
           aria-expanded={open}
-          className="flex h-11 items-center gap-2 rounded-2xl border border-line bg-surface-2 px-3 text-sm font-semibold text-muted hover:text-fg cursor-pointer"
+          className="flex h-11 items-center gap-2 rounded-full border border-line bg-surface px-3.5 text-sm font-semibold text-muted hover:text-fg cursor-pointer"
         >
           <Languages className="size-5" aria-hidden />
           <span className="hidden md:inline">{LANG_OPTIONS.find((l) => l.value === prefs.lang)?.short}</span>
@@ -349,7 +347,7 @@ function QuickSettings() {
           </div>
         )}
       </div>
-      <button onClick={toggleTheme} aria-label={t("top.theme")} className="flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted hover:text-fg cursor-pointer">
+      <button onClick={toggleTheme} aria-label={t("top.theme")} className="flex size-11 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-fg cursor-pointer">
         {prefs.theme === "dark" ? <Sun className="size-5" aria-hidden /> : <Moon className="size-5" aria-hidden />}
       </button>
     </div>
@@ -381,7 +379,7 @@ function Avatar() {
   const { prefs } = usePrefs();
   const initials = (prefs.name || "You").split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
   return (
-    <Link href="/settings" aria-label="Your profile and settings" className="flex size-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#9B87E8,#4D9EFF)] font-display text-sm font-bold text-white shadow-soft">
+    <Link href="/settings" aria-label="Your profile and settings" className="flex size-11 items-center justify-center rounded-full bg-carbon font-display text-sm font-bold text-lime dark:bg-lime dark:text-on-lime">
       {initials}
     </Link>
   );
@@ -406,7 +404,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="pointer-events-none fixed right-1/4 bottom-1/3 size-[350px] rounded-full bg-lavender/5 blur-[120px]" aria-hidden />
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 start-0 z-40 hidden w-[17rem] flex-col border-e border-line bg-surface/95 backdrop-blur-md px-4 py-5 lg:flex">
+      <aside className="fixed inset-y-0 start-0 z-40 hidden w-[17rem] flex-col border-e border-line bg-surface px-4 py-5 lg:flex">
         <div className="px-2">
           <Logo />
         </div>
@@ -419,7 +417,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {/* Mobile drawer */}
       {drawer && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
-          <button className="absolute inset-0 bg-navy/60 backdrop-blur-sm" aria-label="Close menu" onClick={() => setDrawer(false)} />
+          <button className="absolute inset-0 bg-carbon/60 backdrop-blur-sm" aria-label="Close menu" onClick={() => setDrawer(false)} />
           <div className="absolute inset-y-0 start-0 flex w-[min(20rem,85vw)] flex-col bg-elevated px-4 py-5 shadow-float animate-fade-up">
             <div className="flex items-center justify-between px-2">
               <Logo />
@@ -436,9 +434,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       )}
 
       <div className="lg:ps-[17rem]">
-        <header className="glass sticky top-0 z-30 border-b border-line">
-          <div className="mx-auto flex h-[4.5rem] max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8">
-            <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted lg:hidden cursor-pointer">
+        <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5 lg:px-7">
+          <div className="glass mx-auto flex h-16 max-w-[1400px] items-center gap-3 rounded-full border border-line px-3 shadow-float sm:px-4">
+            <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-full border border-line bg-surface text-muted lg:hidden cursor-pointer">
               <Menu className="size-5" />
             </button>
             <div className="lg:hidden">
@@ -448,7 +446,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SearchBox />
             </div>
             <div className="ms-auto flex items-center gap-2">
-              <Link href="/emergency" className="hidden h-11 items-center gap-2.5 rounded-2xl border border-rose-500/25 bg-danger-soft px-3.5 text-sm font-bold text-danger hover:brightness-105 transition-all shadow-soft md:flex">
+              <Link href="/emergency" className="hidden h-11 items-center gap-2.5 rounded-full border border-danger/25 bg-danger-soft px-4 text-sm font-bold text-danger hover:brightness-105 transition-colors md:flex">
                 <span className="relative flex size-2">
                   <span className="absolute inline-flex size-full animate-ping rounded-full bg-danger opacity-75" />
                   <span className="relative inline-flex size-2 rounded-full bg-danger" />
@@ -460,7 +458,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <Avatar />
             </div>
           </div>
-          <div className="px-4 pb-3 sm:hidden">
+          <div className="mt-2 sm:hidden">
             <SearchBox />
           </div>
         </header>
@@ -478,7 +476,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             const active = isActive(pathname, href);
             return (
               <li key={href}>
-                <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold", active ? "text-primary" : "text-subtle")}>
+                <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold", active ? "text-fg" : "text-subtle")}>
                   <n.icon className="size-6" aria-hidden />
                   <span className="max-w-[4.5rem] truncate">{t(n.key)}</span>
                 </Link>

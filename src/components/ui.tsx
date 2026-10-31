@@ -21,17 +21,18 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "soft";
 type Size = "sm" | "md" | "lg" | "xl";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-gradient-to-r from-primary to-[#0e8a7d] text-on-primary shadow-sm hover:shadow-md hover:shadow-primary/20 hover:brightness-105 active:scale-[0.98]",
-  secondary: "bg-surface text-fg border border-line/90 hover:border-line-strong hover:bg-surface-2 active:scale-[0.98]",
+  // Lime fill + carbon text: the Elevate call-to-action.
+  primary: "bg-lime text-on-lime font-bold shadow-soft hover:brightness-95 active:scale-[0.98]",
+  secondary: "bg-surface text-fg border border-line hover:border-line-strong hover:bg-surface-2 active:scale-[0.98]",
   ghost: "text-muted hover:text-fg hover:bg-surface-2 active:scale-[0.98]",
-  danger: "bg-gradient-to-r from-[#d9303c] to-[#b7242f] text-white shadow-sm hover:shadow-md hover:shadow-danger/25 hover:brightness-105 active:scale-[0.98]",
-  soft: "bg-primary-soft text-primary hover:bg-primary-soft/80 active:scale-[0.98]",
+  danger: "bg-danger text-white hover:brightness-110 active:scale-[0.98]",
+  soft: "bg-primary-soft text-primary hover:bg-surface-3 active:scale-[0.98]",
 };
 const SIZES: Record<Size, string> = {
-  sm: "h-9 px-3.5 text-sm gap-1.5 rounded-xl",
-  md: "h-11 px-4.5 text-[0.95rem] gap-2 rounded-xl",
-  lg: "h-12 px-5.5 text-base gap-2.5 rounded-2xl",
-  xl: "min-h-14 px-6 text-lg gap-3 rounded-2xl",
+  sm: "h-9 px-4 text-sm gap-1.5 rounded-full",
+  md: "h-11 px-5 text-[0.95rem] gap-2 rounded-full",
+  lg: "h-12 px-6 text-base gap-2 rounded-full",
+  xl: "min-h-14 px-7 text-lg gap-3 rounded-full",
 };
 const BUTTON_BASE =
   "inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
@@ -66,10 +67,10 @@ export function ButtonLink({ href, variant = "primary", size = "md", icon: Icon,
 
 // ── Surfaces ─────────────────────────────────────────────
 
-/** Plain surface. `glow` gives a refined primary accent tint to mark the primary card. */
+/** Plain white surface. `glow` gives the one main card on a page a slightly stronger edge. */
 export function Card({ className, children, glow, as: Tag = "div", ...rest }: React.HTMLAttributes<HTMLDivElement> & { glow?: boolean; as?: "div" | "section" | "article" }) {
   return (
-    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface shadow-card transition-all duration-200", glow ? "border-primary/50 shadow-md shadow-primary/5 ring-1 ring-primary/20" : "border-line/80", className)} {...rest}>
+    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface shadow-card transition-all duration-200", glow ? "border-line-strong" : "border-line", className)} {...rest}>
       {children}
     </Tag>
   );
@@ -93,23 +94,13 @@ export function Section({ title, description, action, children, className }: { t
   );
 }
 
-const GLOW_TONE: Record<Tone, string> = {
-  teal: "glow-teal",
-  danger: "glow-danger",
-  warning: "glow-warning",
-  info: "glow-info",
-  success: "glow-success",
-  lavender: "glow-lavender",
-  neutral: "",
-};
-
 /** Clickable tile: icon, title, one-line description. Used for menus of choices. */
 export function ActionCard({ href, onClick, icon, tone = "teal", title, description, meta, className, disabled }: { href?: string; onClick?: () => void; icon: LucideIcon; tone?: Tone; title: string; description?: string; meta?: React.ReactNode; className?: string; disabled?: boolean }) {
   const body = (
     <>
-      <IconTile icon={icon} tone={tone} size="md" className="transition-transform duration-200 group-hover:scale-105" />
+      <IconTile icon={icon} tone={tone} size="md" />
       <span className="min-w-0 flex-1">
-        <span className="block font-display font-semibold leading-snug text-fg group-hover:text-primary transition-colors">{title}</span>
+        <span className="block font-display font-semibold leading-snug text-fg ">{title}</span>
         {description && <span className="mt-1 block text-sm text-muted leading-relaxed">{description}</span>}
         {meta && <span className="mt-2 block">{meta}</span>}
       </span>
@@ -117,8 +108,7 @@ export function ActionCard({ href, onClick, icon, tone = "teal", title, descript
     </>
   );
   const cls = cn(
-    "group flex w-full items-start gap-4 rounded-[var(--radius-lg)] border border-line/80 bg-surface p-4 sm:p-5 text-left shadow-card card-hover hover:border-primary/50 hover:bg-surface-2/90 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
-    GLOW_TONE[tone],
+    "group flex w-full items-start gap-4 rounded-[var(--radius-lg)] border border-line bg-surface p-4 sm:p-5 text-start shadow-card card-hover cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
     className,
   );
   return href ? (
@@ -135,7 +125,7 @@ export function Stat({ label, value, hint, icon, tone = "teal" }: { label: strin
       {icon && <IconTile icon={icon} tone={tone} size="sm" />}
       <div className="min-w-0">
         <p className="text-xs font-medium text-muted">{label}</p>
-        <p className="font-display text-xl font-bold leading-tight">{value}</p>
+        <p className="font-display text-xl font-extrabold leading-tight tracking-tight">{value}</p>
         {hint && <p className="truncate text-xs text-subtle">{hint}</p>}
       </div>
     </div>
@@ -167,12 +157,12 @@ const TONES: Record<Tone, string> = {
   danger: "bg-danger-soft text-danger",
   info: "bg-info-soft text-info",
   lavender: "bg-lavender-soft text-lavender",
-  neutral: "bg-surface-3 text-muted",
+  neutral: "bg-surface text-muted ring-1 ring-inset ring-line",
 };
 
 export function Badge({ tone = "neutral", icon: Icon, children, className }: { tone?: Tone; icon?: LucideIcon; children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-current/15", TONES[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold", TONES[tone], className)}>
       {Icon && <Icon className="size-3.5" aria-hidden />}
       {children}
     </span>
@@ -182,7 +172,7 @@ export function Badge({ tone = "neutral", icon: Icon, children, className }: { t
 export function IconTile({ icon: Icon, tone = "teal", size = "md", className }: { icon: LucideIcon; tone?: Tone; size?: "sm" | "md" | "lg"; className?: string }) {
   const s = size === "lg" ? "size-12 rounded-2xl [&>svg]:size-6" : size === "sm" ? "size-8 rounded-xl [&>svg]:size-4" : "size-10 rounded-2xl [&>svg]:size-5";
   return (
-    <span className={cn("inline-flex shrink-0 items-center justify-center shadow-soft", TONES[tone], s, className)}>
+    <span className={cn("inline-flex shrink-0 items-center justify-center", TONES[tone], s, className)}>
       <Icon aria-hidden />
     </span>
   );
@@ -234,14 +224,14 @@ export function ModeBadge({ mode, className }: { mode: AiMode; className?: strin
 export function Notice({ tone = "info", title, children, className, icon }: { tone?: "info" | "warning" | "danger" | "success"; title?: string; children: React.ReactNode; className?: string; icon?: LucideIcon }) {
   const Icon = icon ?? (tone === "success" ? CheckCircle2 : tone === "info" ? Info : AlertTriangle);
   const styles = {
-    info: "bg-info-soft/70 border-info/30",
-    warning: "bg-warning-soft/70 border-warning/30",
-    danger: "bg-danger-soft/70 border-danger/30",
-    success: "bg-success-soft/70 border-success/30",
+    info: "bg-info-soft border-info/20",
+    warning: "bg-warning-soft border-warning/25",
+    danger: "bg-danger-soft border-danger/25",
+    success: "bg-success-soft border-success/25",
   }[tone];
   const color = { info: "text-info", warning: "text-warning", danger: "text-danger", success: "text-success" }[tone];
   return (
-    <div role={tone === "danger" ? "alert" : "status"} className={cn("flex gap-3.5 rounded-2xl border p-4 text-sm shadow-sm backdrop-blur-sm", styles, className)}>
+    <div role={tone === "danger" ? "alert" : "status"} className={cn("flex gap-3 rounded-2xl border p-4 text-sm", styles, className)}>
       <Icon className={cn("mt-0.5 size-5 shrink-0", color)} aria-hidden />
       <div className="space-y-0.5">
         {title && <p className="font-semibold text-fg">{title}</p>}
@@ -252,7 +242,7 @@ export function Notice({ tone = "info", title, children, className, icon }: { to
 }
 
 export function ProgressBar({ value, tone = "teal", className, label }: { value: number; tone?: "teal" | "amber" | "danger"; className?: string; label?: string }) {
-  const fill = tone === "amber" ? "bg-amber" : tone === "danger" ? "bg-danger" : "bg-primary";
+  const fill = tone === "amber" ? "bg-amber" : tone === "danger" ? "bg-danger" : "bg-lime";
   return (
     <div className={cn("h-2 w-full overflow-hidden rounded-full bg-surface-3", className)} role="progressbar" aria-valuenow={Math.round(value)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
       <div className={cn("h-full rounded-full transition-[width] duration-500", fill)} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
@@ -268,10 +258,10 @@ export function ScoreRing({ value, size = 120, stroke = 10, label, sub }: { valu
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90" aria-hidden>
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--surface-3)" strokeWidth={stroke} fill="none" />
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--primary)" strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * v) / 100} style={{ transition: "stroke-dashoffset 700ms ease-out" }} />
+        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--chart)" strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * v) / 100} style={{ transition: "stroke-dashoffset 700ms ease-out" }} />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-        <span className="font-display text-3xl font-bold">{value === null ? "—" : value}</span>
+        <span className="font-display text-3xl font-extrabold tracking-tight">{value === null ? "—" : value}</span>
         {label && <span className="text-[11px] font-medium text-subtle">{label}</span>}
         {sub && <span className="text-[11px] text-subtle">{sub}</span>}
       </div>
@@ -303,7 +293,7 @@ export function EmptyState({ icon: Icon, title, body, action }: { icon: LucideIc
 
 export function Segmented<T extends string>({ value, onChange, options, className, label }: { value: T; onChange: (v: T) => void; options: { value: T; label: string; icon?: LucideIcon }[]; className?: string; label: string }) {
   return (
-    <div role="radiogroup" aria-label={label} className={cn("inline-flex flex-wrap gap-1 rounded-xl bg-surface-2 p-1", className)}>
+    <div role="radiogroup" aria-label={label} className={cn("inline-flex flex-wrap gap-1 rounded-full border border-line bg-surface-2 p-1", className)}>
       {options.map((o) => (
         <button
           key={o.value}
@@ -311,7 +301,7 @@ export function Segmented<T extends string>({ value, onChange, options, classNam
           aria-checked={value === o.value}
           onClick={() => onChange(o.value)}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium transition-colors cursor-pointer",
+            "inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors cursor-pointer",
             value === o.value ? "bg-surface text-fg shadow-soft" : "text-muted hover:text-fg",
           )}
         >
@@ -338,7 +328,7 @@ export function SpeakButton({ text, id, className, size = "sm" }: { text: string
   );
 }
 
-const FIELD = "w-full rounded-xl border border-line bg-surface-2 text-base text-fg placeholder:text-subtle transition focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15";
+const FIELD = "w-full rounded-xl border border-line bg-surface text-base text-fg placeholder:text-subtle transition focus:border-primary focus:outline-none focus:ring-3 focus:ring-primary/15";
 
 export function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return <textarea {...props} className={cn(FIELD, "resize-y p-3.5 leading-relaxed", props.className)} />;

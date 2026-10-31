@@ -152,7 +152,7 @@ export default function AssistantPage() {
               messages.map((m) =>
                 m.role === "user" ? (
                   <div key={m.id} className="flex justify-end">
-                    <div className={cn("max-w-[85%] rounded-3xl rounded-ee-md bg-gradient-to-r from-primary to-[#0e8a7d] px-5 py-3 text-on-primary shadow-md", lang === "ur" && "urdu")}>
+                    <div className={cn("max-w-[85%] rounded-3xl rounded-ee-md bg-carbon px-5 py-3 text-white dark:bg-surface-3 dark:text-fg", lang === "ur" && "urdu")}>
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
                   </div>
@@ -274,10 +274,10 @@ function CompactMic({ onTranscript }: { onTranscript: (text: string) => void }) 
         aria-label={listening ? "Stop listening" : "Speak"}
         title={error ?? undefined}
         className={cn(
-          "relative flex size-12 items-center justify-center rounded-2xl text-white transition-all duration-200 cursor-pointer",
+          "relative flex size-12 items-center justify-center rounded-full transition-transform duration-200 cursor-pointer",
           listening
-            ? "bg-gradient-to-tr from-danger to-[#ff5364] shadow-md shadow-danger/40 ring-4 ring-danger/30"
-            : "bg-gradient-to-tr from-primary to-[#23d1bf] shadow-md shadow-primary/30 hover:scale-105 active:scale-95 ring-2 ring-primary/20",
+            ? "bg-danger text-white ring-4 ring-danger/25"
+            : "bg-lime text-on-lime hover:scale-105 active:scale-95 ring-2 ring-lime/25",
         )}
       >
         {listening && <span className="absolute inset-0 rounded-2xl bg-danger/40 animate-pulse-ring" aria-hidden />}

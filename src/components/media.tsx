@@ -149,7 +149,7 @@ export function Waveform({ active, bars = 28, className, tone = "teal" }: { acti
     };
   }, [active, bars]);
 
-  const gradient = tone === "amber" ? "bg-amber" : "bg-primary";
+  const gradient = tone === "amber" ? "bg-amber" : "bg-chart";
   return (
     <div className={cn("flex h-10 items-center justify-center gap-[3px]", className)} aria-hidden>
       {levels.map((l, i) => (
@@ -192,11 +192,11 @@ export function VoiceMic({ onTranscript, size = "lg", labels }: { onTranscript: 
           aria-pressed={listening}
           aria-label={listening ? L.listening : stt ? L.idle : L.unsupported}
           className={cn(
-            "relative flex items-center justify-center rounded-full text-white transition-all duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
+            "relative flex items-center justify-center rounded-full transition-transform duration-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
             dim,
             listening
-              ? "bg-gradient-to-tr from-danger to-[#ff5364] shadow-lg shadow-danger/40 hover:scale-105 active:scale-95 ring-4 ring-danger/30"
-              : "bg-gradient-to-tr from-primary to-[#23d1bf] shadow-lg shadow-primary/30 hover:shadow-xl hover:shadow-primary/50 hover:scale-105 active:scale-95 ring-4 ring-primary/20",
+              ? "bg-danger text-white ring-4 ring-danger/25 active:scale-95"
+              : "bg-lime text-on-lime ring-4 ring-lime/25 hover:scale-105 active:scale-95",
           )}
         >
           {!stt ? <MicOff className="size-8" /> : listening ? <Square className="size-7 fill-current" /> : <Mic className={size === "lg" ? "size-9" : "size-6"} />}

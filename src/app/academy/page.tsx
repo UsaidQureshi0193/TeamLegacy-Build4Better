@@ -47,7 +47,7 @@ function PhoneFrame({ room, children }: { room: EscapeRoom; children: React.Reac
   const wa = room.channel === "whatsapp";
   return (
     <div className="mx-auto w-full max-w-[22rem]" dir="ltr">
-      <div className="relative rounded-[2.8rem] bg-gradient-to-b from-[#1c2438] via-[#0b101a] to-[#04060a] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_35px_rgba(30,174,152,0.15)] ring-1 ring-white/15">
+      <div className="relative rounded-[2.8rem] bg-gradient-to-b from-[#1c2438] via-[#0b101a] to-[#04060a] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.35)] ring-1 ring-white/15">
         {/* Sleek speaker notch */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/90 rounded-full z-20 flex items-center justify-center gap-2 ring-1 ring-white/10 shadow-inner">
           <div className="size-2 rounded-full bg-[#182030] ring-1 ring-white/5" />

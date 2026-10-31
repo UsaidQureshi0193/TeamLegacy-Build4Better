@@ -89,46 +89,43 @@ export default function HomePage() {
       {ready && !prefs.onboarded && <Onboarding />}
 
       {/* Greeting + voice */}
-      <section className="hero-gradient relative flex flex-col gap-8 rounded-3xl p-6 sm:p-9 text-white lg:flex-row lg:items-center shadow-xl">
-        {/* Subtle decorative background glow */}
-        <div className="pointer-events-none absolute -end-20 -top-20 size-80 rounded-full bg-primary/20 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-20 start-10 size-60 rounded-full bg-info/15 blur-2xl" aria-hidden />
+      <section className="hero-gradient relative flex flex-col gap-8 rounded-3xl p-6 text-white sm:p-9 lg:flex-row lg:items-center">
 
         <div className="relative z-10 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
             <span className="inline-flex items-center gap-1.5 rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-white/95 backdrop-blur-md ring-1 ring-white/20">
-              <span className="size-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
+              <span className="size-2 rounded-full bg-lime" aria-hidden />
               {tx({ en: "AI Companion · Voice First", roman: "AI Saathi · Awaz Se Chalta Hai", ur: "ڈیجیٹل ساتھی · آواز سے مدد" })}
             </span>
             {status && <ModeBadge mode={status.mode} className={status.mode === "live" ? "bg-white/15 text-white ring-1 ring-white/25" : ""} />}
           </div>
 
-          <h1 className={cn("mt-4 font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-white", lang === "ur" && "leading-[1.6] tracking-normal")}>
+          <h1 className={cn("mt-4 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl", lang === "ur" && "leading-[1.6] tracking-normal")}>
             {t("home.greeting")}
             {prefs.name ? (lang === "ur" ? `، ${prefs.name}` : `, ${prefs.name}`) : ""}
           </h1>
-          <p className="mt-2 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
+          <p className="mt-3 max-w-xl text-base leading-relaxed text-white/75 sm:text-lg">
             {t("home.tagline")}
           </p>
 
           <div className="mt-6 flex flex-wrap items-center gap-3">
             <Link
               href="/shield"
-              className="inline-flex h-12 items-center gap-2.5 rounded-xl bg-white px-5 font-semibold text-[#0B1422] shadow-md transition-all hover:bg-white/90 hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-flex h-12 items-center gap-2.5 rounded-full bg-lime px-6 font-bold text-on-lime transition hover:brightness-95 active:scale-[0.98]"
             >
-              <ShieldAlert className="size-5 text-[#0B1422]" aria-hidden /> {t("home.check")}
+              <ShieldAlert className="size-5" aria-hidden /> {t("home.check")}
             </Link>
             <Link
               href="/emergency"
-              className="inline-flex h-12 items-center gap-2.5 rounded-xl border border-rose-400/40 bg-rose-500/20 px-5 font-semibold text-white backdrop-blur-md transition-all hover:bg-rose-500/30 hover:border-rose-400/60 active:scale-[0.98]"
+              className="inline-flex h-12 items-center gap-2.5 rounded-full border border-white/20 px-6 font-semibold text-white transition hover:bg-white/10 active:scale-[0.98]"
             >
-              <Siren className="size-5 text-rose-300" aria-hidden /> {t("nav.emergency")}
+              <Siren className="size-5 text-[#f2707a]" aria-hidden /> {t("nav.emergency")}
             </Link>
           </div>
         </div>
 
-        <div className="relative z-10 flex flex-col items-center rounded-3xl border border-white/20 bg-white/[0.08] px-7 py-6 shadow-2xl backdrop-blur-xl transition-all hover:border-white/30 [&_p]:!text-white/90">
-          <span className="mb-2 text-[11px] font-bold uppercase tracking-wider text-teal-300">
+        <div className="relative z-10 flex flex-col items-center rounded-3xl border border-white/10 bg-white/[0.04] px-7 py-6 [&_p]:!text-white/80">
+          <span className="mb-2 text-[11px] font-bold uppercase tracking-wider text-lime">
             {tx({ en: "Instant Voice", roman: "Fori Awaz", ur: "فوری آواز" })}
           </span>
           <VoiceMic
@@ -156,11 +153,11 @@ export default function HomePage() {
 
       {!prefs.elder && (
         <div className="grid gap-4 lg:grid-cols-2">
-          <Card className="flex items-center gap-5 p-5 sm:p-6 card-hover glow-teal border border-primary/20 bg-gradient-to-br from-surface via-surface to-primary/5">
+          <Card className="flex items-center gap-5 p-5 sm:p-6">
             <ScoreRing value={score.score} size={100} stroke={8} />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
-                <span className="size-2 rounded-full bg-emerald-400 animate-pulse" aria-hidden />
+                <span className="size-2 rounded-full bg-lime" aria-hidden />
                 <p className="font-display font-bold text-lg text-fg">{tx({ en: "Digital Independence Score", roman: "Digital Independence Score", ur: "ڈیجیٹل آزادی کا اسکور" })}</p>
               </div>
               <p className="mt-1 text-sm text-muted leading-relaxed">
@@ -173,8 +170,8 @@ export default function HomePage() {
               </ButtonLink>
             </div>
           </Card>
-          <Card className="flex gap-4.5 p-5 sm:p-6 card-hover glow-warning border border-amber-500/20 bg-gradient-to-br from-surface via-surface to-amber-500/5">
-            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-warning-soft text-warning shadow-soft animate-pulse-subtle">
+          <Card className="flex gap-4 p-5 sm:p-6">
+            <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-warning-soft text-warning">
               <Lightbulb className="size-6" aria-hidden />
             </span>
             <div className="min-w-0 flex-1">
