@@ -1,0 +1,448 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  Accessibility, Bell, BookOpenCheck, Bot, ChevronRight, Eye, FileText, GraduationCap, Home, Languages, LifeBuoy, Map,
+  Menu, Moon, Search, Settings, ShieldAlert, ShieldCheck, Siren, Sun, TrendingUp, X, type LucideIcon,
+} from "lucide-react";
+import { DICTIONARY } from "@/data/help";
+import { useT, type StringKey } from "@/lib/i18n";
+import { usePrefs } from "@/lib/prefs";
+import { markNoticesRead, useProgress } from "@/lib/progress";
+import type { Lang } from "@/lib/types";
+import { ModeBadge, cn, useAiStatus } from "./ui";
+
+export interface NavItem {
+  href: string;
+  key: StringKey;
+  icon: LucideIcon;
+  group: "nav.understand" | "nav.protect" | "nav.learn" | "nav.you";
+  keywords: string;
+}
+
+export const NAV: NavItem[] = [
+  { href: "/", key: "nav.home", icon: Home, group: "nav.understand", keywords: "home dashboard start" },
+  { href: "/assistant", key: "nav.assistant", icon: Bot, group: "nav.understand", keywords: "chat voice speak talk ask question baat" },
+  { href: "/vision", key: "nav.vision", icon: Eye, group: "nav.understand", keywords: "screenshot screen explain point" },
+  { href: "/document", key: "nav.document", icon: FileText, group: "nav.understand", keywords: "bill challan notice letter form document" },
+  { href: "/shield", key: "nav.shield", icon: ShieldAlert, group: "nav.protect", keywords: "scam fraud sms whatsapp message link qr otp dhoka" },
+  { href: "/guardian", key: "nav.guardian", icon: ShieldCheck, group: "nav.protect", keywords: "privacy permission password 2fa checkup" },
+  { href: "/emergency", key: "nav.emergency", icon: Siren, group: "nav.protect", keywords: "emergency help hacked otp shared stolen lost sos" },
+  { href: "/guide", key: "nav.guide", icon: Map, group: "nav.learn", keywords: "guide steps task learn how whatsapp email bill" },
+  { href: "/academy", key: "nav.academy", icon: GraduationCap, group: "nav.learn", keywords: "practice escape room mission quiz game" },
+  { href: "/progress", key: "nav.progress", icon: TrendingUp, group: "nav.you", keywords: "progress score independence skills" },
+  { href: "/settings", key: "nav.settings", icon: Settings, group: "nav.you", keywords: "settings theme language elder mode voice" },
+];
+
+const GROUPS: NavItem["group"][] = ["nav.understand", "nav.protect", "nav.learn", "nav.you"];
+
+export function Logo({ compact }: { compact?: boolean }) {
+  return (
+    <Link href="/" className="flex items-center gap-3" aria-label="HUMRAAH home">
+      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)] shadow-[0_8px_24px_-8px_rgb(24_185_168/0.8)]">
+        <svg viewBox="0 0 32 32" className="size-6" aria-hidden>
+          <path d="M9 7v18M23 7v18M9 16h14" stroke="#04211e" strokeWidth="3.4" strokeLinecap="round" />
+          <circle cx="16" cy="16" r="2.6" fill="#F4B544" />
+        </svg>
+      </span>
+      {!compact && (
+        <span className="leading-none">
+          <span className="block font-display text-lg font-extrabold tracking-[0.08em]">HUMRAAH</span>
+          <span className="mt-0.5 block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-subtle">Digital companion</span>
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function isActive(pathname: string, href: string) {
+  return href === "/" ? pathname === "/" : pathname.startsWith(href);
+}
+
+function SideNav({ onNavigate }: { onNavigate?: () => void }) {
+  const pathname = usePathname();
+  const { t } = useT();
+  return (
+    <nav aria-label="Main" className="flex flex-col gap-5">
+      {GROUPS.map((g) => (
+        <div key={g}>
+          <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-[0.14em] text-subtle">{t(g)}</p>
+          <ul className="flex flex-col gap-0.5">
+            {NAV.filter((n) => n.group === g).map((n) => {
+              const active = isActive(pathname, n.href);
+              const danger = n.href === "/emergency";
+              return (
+                <li key={n.href}>
+                  <Link
+                    href={n.href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.95rem] font-semibold transition-all",
+                      active ? "bg-primary-soft text-fg" : "text-muted hover:bg-surface-2 hover:text-fg",
+                    )}
+                  >
+                    {active && <span className="absolute inset-y-2 left-0 w-1 rounded-full bg-[linear-gradient(var(--brand-teal),var(--brand-emerald))]" aria-hidden />}
+                    <n.icon className={cn("size-5 shrink-0", active ? "text-primary" : danger ? "text-danger" : "text-subtle group-hover:text-primary")} aria-hidden />
+                    {t(n.key)}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </nav>
+  );
+}
+
+function SidebarFooter() {
+  const status = useAiStatus();
+  return (
+    <div className="rounded-2xl border border-line bg-surface-2 p-3.5">
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-bold text-muted">AI engine</span>
+        {status && <ModeBadge mode={status.mode} />}
+      </div>
+      <p className="mt-1.5 text-[11.5px] leading-snug text-subtle">
+        {status?.mode === "live" ? `Powered by ${status.provider}` : "Built-in safety rules. Add an AI key for full intelligence."}
+      </p>
+      <p className="mt-2 flex items-center gap-1.5 text-[11px] text-subtle">
+        <ShieldCheck className="size-3.5 text-success" aria-hidden /> Never asks for OTP, PIN or passwords
+      </p>
+    </div>
+  );
+}
+
+const LANG_OPTIONS: { value: Lang; label: string; short: string }[] = [
+  { value: "en", label: "English", short: "EN" },
+  { value: "roman", label: "Roman Urdu", short: "RU" },
+  { value: "ur", label: "اردو", short: "اردو" },
+];
+
+function useOutside(ref: React.RefObject<HTMLElement | null>, onClose: () => void, open: boolean) {
+  useEffect(() => {
+    if (!open) return;
+    const h = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && onClose();
+    const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    document.addEventListener("mousedown", h);
+    document.addEventListener("keydown", k);
+    return () => {
+      document.removeEventListener("mousedown", h);
+      document.removeEventListener("keydown", k);
+    };
+  }, [ref, onClose, open]);
+}
+
+function SearchBox() {
+  const { t, lang } = useT();
+  const router = useRouter();
+  const [q, setQ] = useState("");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  useOutside(ref, () => setOpen(false), open);
+
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+        setOpen(true);
+      }
+    };
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, []);
+
+  const results = useMemo(() => {
+    const s = q.trim().toLowerCase();
+    if (!s) return { pages: NAV.slice(1, 6), terms: DICTIONARY.slice(0, 3) };
+    return {
+      pages: NAV.filter((n) => t(n.key).toLowerCase().includes(s) || n.keywords.includes(s)).slice(0, 6),
+      terms: DICTIONARY.filter((d) => d.term.toLowerCase().includes(s) || d.aliases.some((a) => a.includes(s))).slice(0, 4),
+    };
+  }, [q, t]);
+
+  const go = (href: string) => {
+    setOpen(false);
+    setQ("");
+    router.push(href);
+  };
+
+  return (
+    <div ref={ref} className="relative w-full max-w-md">
+      <label className="relative block">
+        <span className="sr-only">Search</span>
+        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-subtle" aria-hidden />
+        <input
+          ref={inputRef}
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && results.pages[0]) go(results.pages[0].href);
+          }}
+          placeholder={t("top.search")}
+          className="h-11 w-full rounded-2xl border border-line bg-surface-2 pl-10 pr-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
+          role="combobox"
+          aria-expanded={open}
+          aria-controls="search-results"
+        />
+        <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-subtle sm:block">Ctrl K</kbd>
+      </label>
+      {open && (
+        <div id="search-results" className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
+          {results.pages.length > 0 && (
+            <div className="p-2">
+              <p className="px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-subtle">Go to</p>
+              {results.pages.map((p) => (
+                <button key={p.href} onClick={() => go(p.href)} className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-sm font-semibold hover:bg-surface-2 cursor-pointer">
+                  <p.icon className="size-4.5 text-primary" aria-hidden /> {t(p.key)}
+                  <ChevronRight className="ml-auto size-4 text-subtle" aria-hidden />
+                </button>
+              ))}
+            </div>
+          )}
+          {results.terms.length > 0 && (
+            <div className="border-t border-line p-2">
+              <p className="flex items-center gap-1.5 px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-subtle">
+                <BookOpenCheck className="size-3.5" aria-hidden /> Digital Dictionary
+              </p>
+              {results.terms.map((d) => (
+                <div key={d.term} className="rounded-xl px-2.5 py-2">
+                  <p className="text-sm font-bold">{d.term}</p>
+                  <p className={cn("text-xs text-muted", lang === "ur" && "urdu")}>{lang === "en" ? d.en : lang === "ur" ? d.ur : d.roman}</p>
+                </div>
+              ))}
+            </div>
+          )}
+          {!results.pages.length && !results.terms.length && <p className="p-4 text-sm text-muted">No matches. Try “scam”, “bill” or “OTP”.</p>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function Notifications() {
+  const { notices } = useProgress();
+  const { t } = useT();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useOutside(ref, () => setOpen(false), open);
+  const unread = notices.filter((n) => !n.read).length;
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => {
+          setOpen((o) => !o);
+          if (!open && unread) setTimeout(markNoticesRead, 1200);
+        }}
+        aria-label={`${t("top.notifications")}${unread ? ` (${unread} new)` : ""}`}
+        aria-expanded={open}
+        className="relative flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted hover:text-fg cursor-pointer"
+      >
+        <Bell className="size-5" aria-hidden />
+        {unread > 0 && <span className="absolute right-2 top-2 flex size-4 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-navy">{unread}</span>}
+      </button>
+      {open && (
+        <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
+          <p className="border-b border-line px-4 py-3 text-sm font-bold">{t("top.notifications")}</p>
+          <ul className="max-h-80 overflow-y-auto scrollbar-thin">
+            {notices.length === 0 && <li className="p-4 text-sm text-muted">You&apos;re all caught up.</li>}
+            {notices.map((n) => (
+              <li key={n.id} className="border-b border-line last:border-0">
+                <Link href={n.href ?? "#"} onClick={() => setOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-surface-2">
+                  <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.read ? "bg-surface-3" : "bg-primary")} aria-hidden />
+                  <span>
+                    <span className="block text-sm font-semibold">{n.title}</span>
+                    <span className="block text-xs text-muted">{n.body}</span>
+                  </span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function QuickSettings() {
+  const { prefs, update, toggleTheme } = usePrefs();
+  const { t } = useT();
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  useOutside(ref, () => setOpen(false), open);
+  return (
+    <div className="flex items-center gap-2">
+      <div ref={ref} className="relative">
+        <button
+          onClick={() => setOpen((o) => !o)}
+          aria-label="Language and accessibility"
+          aria-expanded={open}
+          className="flex h-11 items-center gap-2 rounded-2xl border border-line bg-surface-2 px-3 text-sm font-semibold text-muted hover:text-fg cursor-pointer"
+        >
+          <Languages className="size-5" aria-hidden />
+          <span className="hidden md:inline">{LANG_OPTIONS.find((l) => l.value === prefs.lang)?.short}</span>
+          <Accessibility className="hidden size-5 md:block" aria-hidden />
+        </button>
+        {open && (
+          <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-72 rounded-2xl border border-line bg-elevated p-3 shadow-float animate-fade-up">
+            <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-subtle">Language · Zabaan</p>
+            <div className="grid grid-cols-3 gap-1.5">
+              {LANG_OPTIONS.map((l) => (
+                <button
+                  key={l.value}
+                  onClick={() => update({ lang: l.value })}
+                  aria-pressed={prefs.lang === l.value}
+                  className={cn("rounded-xl border px-2 py-2 text-sm font-semibold cursor-pointer", prefs.lang === l.value ? "border-primary bg-primary-soft text-fg" : "border-line text-muted hover:text-fg")}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+            <p className="px-1 pb-2 pt-4 text-[11px] font-bold uppercase tracking-wider text-subtle">Accessibility</p>
+            <Toggle label="Elder Mode — bigger text & buttons" checked={prefs.elder} onChange={(v) => update({ elder: v })} />
+            <Toggle label="Reduce motion" checked={prefs.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
+            <Toggle label="Read answers aloud automatically" checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
+          </div>
+        )}
+      </div>
+      <button onClick={toggleTheme} aria-label={t("top.theme")} className="flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted hover:text-fg cursor-pointer">
+        {prefs.theme === "dark" ? <Sun className="size-5" aria-hidden /> : <Moon className="size-5" aria-hidden />}
+      </button>
+    </div>
+  );
+}
+
+export function Toggle({ label, checked, onChange, description }: { label: string; checked: boolean; onChange: (v: boolean) => void; description?: string }) {
+  return (
+    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-1 py-2">
+      <span>
+        <span className="block text-sm font-semibold">{label}</span>
+        {description && <span className="block text-xs text-muted">{description}</span>}
+      </span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        aria-label={label}
+        onClick={() => onChange(!checked)}
+        className={cn("relative h-7 w-12 shrink-0 rounded-full transition-colors cursor-pointer", checked ? "bg-primary" : "bg-surface-3 ring-1 ring-line")}
+      >
+        <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", checked ? "left-6" : "left-1")} />
+      </button>
+    </label>
+  );
+}
+
+function Avatar() {
+  const { prefs } = usePrefs();
+  const initials = (prefs.name || "You").split(" ").map((p) => p[0]).join("").slice(0, 2).toUpperCase();
+  return (
+    <Link href="/settings" aria-label="Your profile and settings" className="flex size-11 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#9B87E8,#4D9EFF)] font-display text-sm font-bold text-white shadow-soft">
+      {initials}
+    </Link>
+  );
+}
+
+const MOBILE_TABS = ["/", "/assistant", "/shield", "/academy", "/progress"];
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  const [drawer, setDrawer] = useState(false);
+  const pathname = usePathname();
+  const { t } = useT();
+
+  return (
+    <div className="ambient min-h-dvh">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary">
+        Skip to content
+      </a>
+
+      {/* Desktop sidebar */}
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[17rem] flex-col border-r border-line bg-surface/80 px-4 py-5 backdrop-blur-xl lg:flex">
+        <div className="px-2">
+          <Logo />
+        </div>
+        <div className="mt-7 flex-1 overflow-y-auto scrollbar-thin pr-1">
+          <SideNav />
+        </div>
+        <SidebarFooter />
+      </aside>
+
+      {/* Mobile drawer */}
+      {drawer && (
+        <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+          <button className="absolute inset-0 bg-navy/60 backdrop-blur-sm" aria-label="Close menu" onClick={() => setDrawer(false)} />
+          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,85vw)] flex-col bg-elevated px-4 py-5 shadow-float animate-fade-up">
+            <div className="flex items-center justify-between px-2">
+              <Logo />
+              <button onClick={() => setDrawer(false)} aria-label="Close menu" className="flex size-10 items-center justify-center rounded-xl text-muted hover:bg-surface-2 cursor-pointer">
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="mt-6 flex-1 overflow-y-auto">
+              <SideNav onNavigate={() => setDrawer(false)} />
+            </div>
+            <SidebarFooter />
+          </div>
+        </div>
+      )}
+
+      <div className="lg:pl-[17rem]">
+        <header className="glass sticky top-0 z-30 border-b border-line">
+          <div className="mx-auto flex h-[4.5rem] max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8">
+            <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted lg:hidden cursor-pointer">
+              <Menu className="size-5" />
+            </button>
+            <div className="lg:hidden">
+              <Logo compact />
+            </div>
+            <div className="hidden flex-1 sm:block">
+              <SearchBox />
+            </div>
+            <div className="ml-auto flex items-center gap-2">
+              <Link href="/emergency" className="hidden h-11 items-center gap-2 rounded-2xl bg-danger-soft px-3.5 text-sm font-bold text-danger hover:brightness-105 md:flex">
+                <LifeBuoy className="size-5" aria-hidden /> SOS
+              </Link>
+              <QuickSettings />
+              <Notifications />
+              <Avatar />
+            </div>
+          </div>
+          <div className="px-4 pb-3 sm:hidden">
+            <SearchBox />
+          </div>
+        </header>
+
+        <main id="main" className="mx-auto max-w-[1400px] px-4 pb-28 pt-6 sm:px-6 lg:px-8 lg:pb-12 lg:pt-8">
+          {children}
+        </main>
+      </div>
+
+      {/* Mobile bottom navigation */}
+      <nav aria-label="Quick" className="glass fixed inset-x-0 bottom-0 z-30 border-t border-line pb-[env(safe-area-inset-bottom)] lg:hidden">
+        <ul className="mx-auto grid max-w-lg grid-cols-5">
+          {MOBILE_TABS.map((href) => {
+            const n = NAV.find((x) => x.href === href)!;
+            const active = isActive(pathname, href);
+            return (
+              <li key={href}>
+                <Link href={href} aria-current={active ? "page" : undefined} className={cn("flex flex-col items-center gap-1 py-2.5 text-[11px] font-semibold", active ? "text-primary" : "text-subtle")}>
+                  <n.icon className="size-6" aria-hidden />
+                  <span className="max-w-[4.5rem] truncate">{t(n.key)}</span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </div>
+  );
+}

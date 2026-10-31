@@ -1,0 +1,276 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ───────────────────────── HUMRAAH design tokens ─────────────────────────
+   Brand: Midnight Navy #0B1422 · Signature Teal #18B9A8 · Trust Emerald #16A36A
+   Warm Amber #F4B544 · Soft Cloud #F3F7F6 · Electric Blue #4D9EFF · Lavender #9B87E8
+   Both themes share one set of semantic tokens; only the values change. */
+
+:root {
+  --brand-navy: #0b1422;
+  --brand-teal: #18b9a8;
+  --brand-emerald: #16a36a;
+  --brand-amber: #f4b544;
+  --brand-cloud: #f3f7f6;
+  --brand-blue: #4d9eff;
+  --brand-lavender: #9b87e8;
+
+  /* Light theme (default) */
+  --bg: #f3f7f6;
+  --bg-elevated: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f6faf9;
+  --surface-3: #ebf2f1;
+  --border: #dde7e6;
+  --border-strong: #c5d4d3;
+  --text: #0b1422;
+  --text-muted: #4a5a6a;
+  --text-subtle: #6b7b8a;
+  --primary: #0f9f90;
+  --primary-strong: #0b8577;
+  --primary-soft: #e0f5f2;
+  --on-primary: #ffffff;
+  --success: #12844f;
+  --success-soft: #e2f5ea;
+  --warning: #9a6200;
+  --warning-soft: #fdf3dc;
+  --danger: #c52f3a;
+  --danger-soft: #fde8ea;
+  --info: #2a72d4;
+  --info-soft: #e5effd;
+  --lavender: #6f5cc9;
+  --lavender-soft: #efebfc;
+  --ring: #18b9a8;
+  --shadow-sm: 0 1px 2px rgb(11 20 34 / 0.05), 0 1px 3px rgb(11 20 34 / 0.04);
+  --shadow-md: 0 4px 20px -6px rgb(11 20 34 / 0.1), 0 2px 6px -2px rgb(11 20 34 / 0.05);
+  --shadow-lg: 0 18px 50px -18px rgb(11 20 34 / 0.22);
+  --glow: 0 0 0 0 transparent;
+  --ambient-1: rgb(24 185 168 / 0.12);
+  --ambient-2: rgb(77 158 255 / 0.08);
+  --ambient-3: rgb(22 163 106 / 0.07);
+  --glass: rgb(255 255 255 / 0.72);
+  --hero-from: #0b1422;
+  --hero-to: #0d4a49;
+
+  --font-scale: 1;
+  --radius-sm: 10px;
+  --radius: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: #0b1422;
+  --bg-elevated: #0f1b2d;
+  --surface: #111e31;
+  --surface-2: #14243a;
+  --surface-3: #1a2d47;
+  --border: #1f3350;
+  --border-strong: #2a4466;
+  --text: #eef4f6;
+  --text-muted: #a7b6c7;
+  --text-subtle: #7c8ea3;
+  --primary: #18b9a8;
+  --primary-strong: #2fd3c1;
+  --primary-soft: rgb(24 185 168 / 0.14);
+  --on-primary: #04211e;
+  --success: #34d08a;
+  --success-soft: rgb(22 163 106 / 0.16);
+  --warning: #f4b544;
+  --warning-soft: rgb(244 181 68 / 0.14);
+  --danger: #ff6b75;
+  --danger-soft: rgb(255 107 117 / 0.13);
+  --info: #6fb0ff;
+  --info-soft: rgb(77 158 255 / 0.14);
+  --lavender: #b3a3f2;
+  --lavender-soft: rgb(155 135 232 / 0.15);
+  --ring: #2fd3c1;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 8px 30px -10px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 24px 60px -20px rgb(0 0 0 / 0.7);
+  --glow: 0 0 0 1px rgb(24 185 168 / 0.25), 0 8px 32px -8px rgb(24 185 168 / 0.45);
+  --ambient-1: rgb(24 185 168 / 0.16);
+  --ambient-2: rgb(77 158 255 / 0.1);
+  --ambient-3: rgb(155 135 232 / 0.07);
+  --glass: rgb(17 30 49 / 0.72);
+  --hero-from: #0e2238;
+  --hero-to: #0b4a47;
+  color-scheme: dark;
+}
+
+/* Elder Mode — bigger type and tap targets, stronger contrast */
+.elder {
+  --font-scale: 1.18;
+  --text-muted: #2f3d4b;
+  --border: #c9d6d5;
+}
+.dark.elder {
+  --text-muted: #c9d5e2;
+  --border: #2d4668;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-elevated: var(--bg-elevated);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-fg: var(--text);
+  --color-muted: var(--text-muted);
+  --color-subtle: var(--text-subtle);
+  --color-primary: var(--primary);
+  --color-primary-strong: var(--primary-strong);
+  --color-primary-soft: var(--primary-soft);
+  --color-on-primary: var(--on-primary);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-lavender: var(--lavender);
+  --color-lavender-soft: var(--lavender-soft);
+  --color-navy: var(--brand-navy);
+  --color-teal: var(--brand-teal);
+  --color-emerald: var(--brand-emerald);
+  --color-amber: var(--brand-amber);
+  --color-cloud: var(--brand-cloud);
+  --color-blue: var(--brand-blue);
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-urdu: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  --shadow-card: var(--shadow-md);
+  --shadow-soft: var(--shadow-sm);
+  --shadow-float: var(--shadow-lg);
+  --shadow-glow: var(--glow);
+  --animate-wave: wave 1s ease-in-out infinite;
+  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-up: fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-pulse-ring: pulse-ring 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+
+  @keyframes wave {
+    0%, 100% { transform: scaleY(0.35); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-ring {
+    0% { transform: scale(0.9); opacity: 0.65; }
+    100% { transform: scale(1.65); opacity: 0; }
+  }
+}
+
+html {
+  font-size: calc(16px * var(--font-scale));
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.015em;
+}
+
+[lang="ur"], .urdu {
+  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  line-height: 2.1;
+  letter-spacing: 0;
+}
+
+/* Layered ambient lighting behind the app */
+.ambient {
+  background:
+    radial-gradient(900px 500px at 8% -10%, var(--ambient-1), transparent 60%),
+    radial-gradient(700px 420px at 100% 0%, var(--ambient-2), transparent 60%),
+    radial-gradient(800px 500px at 60% 110%, var(--ambient-3), transparent 60%),
+    var(--bg);
+}
+
+.glass {
+  background: var(--glass);
+  backdrop-filter: saturate(160%) blur(14px);
+  -webkit-backdrop-filter: saturate(160%) blur(14px);
+}
+
+.hero-gradient {
+  background:
+    radial-gradient(600px 300px at 85% 0%, rgb(24 185 168 / 0.35), transparent 70%),
+    radial-gradient(500px 260px at 0% 100%, rgb(77 158 255 / 0.22), transparent 70%),
+    linear-gradient(135deg, var(--hero-from), var(--hero-to));
+}
+
+.text-gradient {
+  background: linear-gradient(100deg, var(--primary) 10%, var(--brand-emerald) 60%, var(--brand-blue) 110%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Gradient hairline border for premium cards */
+.gradient-border {
+  position: relative;
+}
+.gradient-border::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgb(24 185 168 / 0.55), rgb(77 158 255 / 0.15) 45%, rgb(22 163 106 / 0.4));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.grid-dots {
+  background-image: radial-gradient(rgb(148 163 184 / 0.18) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+::selection {
+  background: rgb(24 185 168 / 0.3);
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+.reduce-motion *, .reduce-motion *::before, .reduce-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
