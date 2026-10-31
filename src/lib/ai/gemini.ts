@@ -3,11 +3,21 @@ import { ApiError, GoogleGenAI, type Content, type Part } from "@google/genai";
 import { z } from "zod";
 import { AiUnavailableError, type StructuredCall } from "./types";
 
-// Free-tier models, tried in order. The newest "latest" Flash is often overloaded on the free tier
-// (measured 2026-10-31: 503s and 45 s+ hangs), so we start from a stable Flash and fall back to Flash-Lite.
-export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
-const FALLBACK_MODEL = "gemini-flash-lite-latest";
-const PER_MODEL_TIMEOUT_MS = 25_000;
+// Free-tier models tried in order. Each model has its own separate quota and rate limit.
+// If one model is busy, slow, or reaches its daily quota (429), HUMRAAH automatically
+// cascades to the next candidate model so it never drops to demo mode unnecessarily.
+export const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash-lite";
+
+const CANDIDATE_MODELS = [
+  process.env.GEMINI_MODEL,
+  "gemini-3.5-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-3.5-flash",
+  "gemini-3.7-flash",
+  "gemini-3.8-flash",
+].filter(Boolean) as string[];
+
+const PER_MODEL_TIMEOUT_MS = 20_000;
 
 let client: GoogleGenAI | null = null;
 
@@ -27,22 +37,24 @@ function toGeminiSchema(schema: z.ZodType): unknown {
   return json;
 }
 
-/** Overloaded (500/503), retired (404), timed out or dropped connection — worth trying the next model. */
+/** Overloaded (500/503), retired (404), quota limit (429), timed out or dropped connection — try next model. */
 function isBusy(e: unknown): boolean {
-  if (e instanceof ApiError) return e.status === 503 || e.status === 500 || e.status === 404;
-  return e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError" || /fetch failed/i.test(e.message));
+  if (e instanceof ApiError) {
+    return e.status === 503 || e.status === 500 || e.status === 404 || e.status === 429;
+  }
+  return e instanceof Error && (e.name === "AbortError" || e.name === "TimeoutError" || /fetch failed|quota|rate limit|busy/i.test(e.message));
 }
 
-/** Try the main model, then the lighter fallback, so a busy free tier doesn't fail the request. */
+/** Try candidate models in order so busy or quota-exhausted models don't fail the user request. */
 async function withBusyRetry<R>(run: (model: string) => Promise<R>): Promise<R> {
-  const models = GEMINI_MODEL === FALLBACK_MODEL ? [GEMINI_MODEL] : [GEMINI_MODEL, FALLBACK_MODEL];
+  const models = Array.from(new Set(CANDIDATE_MODELS));
   let last: unknown;
   for (const model of models) {
     try {
       return await run(model);
     } catch (error) {
       if (!isBusy(error)) throw error;
-      console.warn("[humraah] Gemini model busy or unavailable:", model);
+      console.warn(`[humraah] Model ${model} busy or quota reached (${error instanceof ApiError ? error.status : "timeout"}), trying fallback model...`);
       last = error;
     }
   }
