@@ -18,7 +18,7 @@ function SimLabel({ className }: { className?: string }) {
   const { tx } = useT();
   return (
     <Badge tone="warning" icon={FlaskConical} className={className}>
-      {tx({ en: "Simulation · fictional data", roman: "Simulation · farzi data" })}
+      {tx({ en: "Simulation · fictional data", roman: "Simulation · farzi data", ur: "مشق · فرضی ڈیٹا" })}
     </Badge>
   );
 }
@@ -26,7 +26,7 @@ function SimLabel({ className }: { className?: string }) {
 /** Shared style for answer buttons in rooms and missions. */
 function choiceClass(state: "idle" | "wrong" | "right", dimmed = false) {
   return cn(
-    "flex min-h-14 w-full items-center gap-3 rounded-xl border px-4 py-3 text-left font-medium transition-colors cursor-pointer disabled:cursor-default",
+    "flex min-h-14 w-full items-center gap-3 rounded-xl border px-4 py-3 text-start font-medium transition-colors cursor-pointer disabled:cursor-default",
     state === "right" ? "border-success bg-success-soft" : state === "wrong" ? "border-danger/30 bg-danger-soft text-muted" : "border-line hover:border-primary hover:bg-primary-soft",
     dimmed && "opacity-60",
   );
@@ -36,7 +36,7 @@ function Takeaway({ text }: { text: string }) {
   const { tx } = useT();
   return (
     <p className="rounded-xl bg-primary-soft p-3.5 text-sm">
-      <span className="font-semibold text-primary">{tx({ en: "Remember: ", roman: "Yaad rakhein: " })}</span>
+      <span className="font-semibold text-primary">{tx({ en: "Remember: ", roman: "Yaad rakhein: ", ur: "یاد رکھیں: " })}</span>
       {text}
     </p>
   );
@@ -46,7 +46,7 @@ function Takeaway({ text }: { text: string }) {
 function PhoneFrame({ room, children }: { room: EscapeRoom; children: React.ReactNode }) {
   const wa = room.channel === "whatsapp";
   return (
-    <div className="mx-auto w-full max-w-[22rem]">
+    <div className="mx-auto w-full max-w-[22rem]" dir="ltr">
       <div className="relative rounded-[2.8rem] bg-gradient-to-b from-[#1c2438] via-[#0b101a] to-[#04060a] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_35px_rgba(30,174,152,0.15)] ring-1 ring-white/15">
         {/* Sleek speaker notch */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/90 rounded-full z-20 flex items-center justify-center gap-2 ring-1 ring-white/10 shadow-inner">
@@ -160,21 +160,21 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
   };
 
   const stages = [
-    { id: "clues", label: tx({ en: "1 · Find the clues", roman: "1 · Nishaniyan" }) },
-    { id: "decide", label: tx({ en: "2 · Decide", roman: "2 · Faisla" }) },
-    { id: "result", label: tx({ en: "3 · Escape", roman: "3 · Nikal jayein" }) },
+    { id: "clues", label: tx({ en: "1 · Find the clues", roman: "1 · Nishaniyan", ur: "1 · نشانیاں ڈھونڈیں" }) },
+    { id: "decide", label: tx({ en: "2 · Decide", roman: "2 · Faisla", ur: "2 · فیصلہ کریں" }) },
+    { id: "result", label: tx({ en: "3 · Escape", roman: "3 · Nikal jayein", ur: "3 · باہر نکلیں" }) },
   ];
   const stageIdx = stages.findIndex((s) => s.id === phase);
 
   return (
     <div className="space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={onExit}>{tx({ en: "Escape Room hub", roman: "Escape Room hub" })}</Button>
+        <Button variant="ghost" size="sm" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" onClick={onExit}>{tx({ en: "Escape Room hub", roman: "Escape Room hub", ur: "ایسکیپ روم مینو" })}</Button>
         <SimLabel />
       </div>
       <div>
         <h1 className="text-2xl font-bold">{pick(room.title, lang)}</h1>
-        <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Room stages">
+        <div className="mt-2 flex flex-wrap gap-1.5" aria-label={tx({ en: "Room stages", roman: "Kamre ke marahil", ur: "کمرے کے مراحل" })}>
           {stages.map((s, i) => (
             <span key={s.id} className={cn("rounded-md px-2 py-0.5 text-xs font-semibold", i < stageIdx ? "bg-success-soft text-success" : i === stageIdx ? "bg-primary-soft text-primary" : "bg-surface-3 text-subtle")}>
               {s.label}
@@ -221,14 +221,14 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
             <Card glow className="p-5">
               <p className="font-semibold">
                 {genuine
-                  ? tx({ en: "Tap the signs that this message could be REAL", roman: "Woh hissay dabayein jo is message ko ASLI dikhate hain" })
-                  : tx({ en: "Tap the suspicious parts of the message", roman: "Message ke mashkook hisson par tap karein" })}
+                  ? tx({ en: "Tap the signs that this message could be REAL", roman: "Woh hissay dabayein jo is message ko ASLI dikhate hain", ur: "وہ حصے دبائیں جو اس پیغام کو اصلی ظاہر کرتے ہیں" })
+                  : tx({ en: "Tap the suspicious parts of the message", roman: "Message ke mashkook hisson par tap karein", ur: "پیغام کے مشکوک حصوں پر ٹیپ کریں" })}
               </p>
               <div className="mb-2 mt-4 flex items-center justify-between text-sm">
-                <span>{tx({ en: `${cluesFound} of ${clues.length} clues found`, roman: `${clues.length} mein se ${cluesFound} nishaniyan mili` })}</span>
-                <span className="text-subtle">{tx({ en: `Hints: ${hints}`, roman: `Ishare: ${hints}` })}</span>
+                <span>{tx({ en: `${cluesFound} of ${clues.length} clues found`, roman: `${clues.length} mein se ${cluesFound} nishaniyan mili`, ur: `${clues.length} میں سے ${cluesFound} نشانیاں ملیں` })}</span>
+                <span className="text-subtle">{tx({ en: `Hints: ${hints}`, roman: `Ishare: ${hints}`, ur: `اشارے: ${hints}` })}</span>
               </div>
-              <ProgressBar value={(cluesFound / clues.length) * 100} label="Clues found" />
+              <ProgressBar value={(cluesFound / clues.length) * 100} label={tx({ en: "Clues found", roman: "Mili hui nishaniyan", ur: "ملی ہوئی نشانیاں" })} />
 
               {found.length > 0 && (
                 <ul className="mt-4 space-y-2" role="status">
@@ -243,8 +243,8 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
               {missMsg && !allFound && (
                 <p className="mt-3 text-sm text-muted" role="status">
                   {genuine
-                    ? tx({ en: "That part is ordinary. Look at what the message asks you to do.", roman: "Yeh aam hissa hai. Dekhein message kya karne ko kehta hai." })
-                    : tx({ en: "That part looks normal. Look for requests, pressure, links or odd numbers.", roman: "Yeh aam hai. Darkhwast, dabao, links ya ajeeb numbers dhoondein." })}
+                    ? tx({ en: "That part is ordinary. Look at what the message asks you to do.", roman: "Yeh aam hissa hai. Dekhein message kya karne ko kehta hai.", ur: "یہ عام حصہ ہے۔ دیکھیں پیغام آپ سے کیا کرنے کو کہتا ہے۔" })
+                    : tx({ en: "That part looks normal. Look for requests, pressure, links or odd numbers.", roman: "Yeh aam hai. Darkhwast, dabao, links ya ajeeb numbers dhoondein.", ur: "یہ عام حصہ ہے۔ درخواست، دباؤ، لنک یا عجیب نمبر ڈھونڈیں۔" })}
                 </p>
               )}
               {hintShown && (
@@ -255,11 +255,11 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
 
               <div className="mt-5 flex flex-wrap gap-2">
                 {allFound ? (
-                  <Button size="lg" icon={ArrowRight} onClick={() => setPhase("decide")}>{tx({ en: "All found — now decide", roman: "Sab mil gayi — ab faisla" })}</Button>
+                  <Button size="lg" icon={ArrowRight} className="[&>svg]:rtl:rotate-180" onClick={() => setPhase("decide")}>{tx({ en: "All found — now decide", roman: "Sab mil gayi — ab faisla", ur: "سب مل گئیں — اب فیصلہ کریں" })}</Button>
                 ) : (
                   <>
-                    <Button variant="secondary" size="sm" icon={Lightbulb} onClick={showHint} disabled={hintShown}>{tx({ en: "Hint", roman: "Ishara" })}</Button>
-                    <Button variant="ghost" size="sm" icon={Eye} onClick={revealAll}>{tx({ en: "Reveal remaining", roman: "Baqi dikhayein" })}</Button>
+                    <Button variant="secondary" size="sm" icon={Lightbulb} onClick={showHint} disabled={hintShown}>{tx({ en: "Hint", roman: "Ishara", ur: "اشارہ" })}</Button>
+                    <Button variant="ghost" size="sm" icon={Eye} onClick={revealAll}>{tx({ en: "Reveal remaining", roman: "Baqi dikhayein", ur: "باقی دکھائیں" })}</Button>
                   </>
                 )}
               </div>
@@ -278,7 +278,7 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
                   return (
                     <div key={c.id}>
                       <button onClick={() => choose(c.id, c.correct)} disabled={isWrong} className={choiceClass(isWrong ? "wrong" : "idle")}>
-                        {isWrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary" aria-hidden />}
+                        {isWrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden />}
                         {pick(c.text, lang)}
                       </button>
                       {isWrong && <p className="mt-1.5 px-1 text-sm text-danger" role="status">{pick(c.feedback, lang)}</p>}
@@ -286,7 +286,7 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
                   );
                 })}
               </div>
-              {wrong.length > 0 && <p className="mt-3 text-sm text-muted">{tx({ en: "Mistakes here are safe — try another option.", roman: "Yahan ghalti mehfooz hai — koi aur option chunein." })}</p>}
+              {wrong.length > 0 && <p className="mt-3 text-sm text-muted">{tx({ en: "Mistakes here are safe — try another option.", roman: "Yahan ghalti mehfooz hai — koi aur option chunein.", ur: "یہاں غلطی سے کوئی نقصان نہیں — کوئی اور جواب چنیں۔" })}</p>}
             </Card>
           )}
 
@@ -295,28 +295,28 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
               <div className="flex items-center gap-3">
                 <IconTile icon={DoorOpen} tone="success" />
                 <div>
-                  <p className="text-sm font-semibold text-muted">{tx({ en: "You escaped!", roman: "Aap nikal gaye!" })}</p>
+                  <p className="text-sm font-semibold text-muted">{tx({ en: "You escaped!", roman: "Aap nikal gaye!", ur: "آپ باہر نکل گئے!" })}</p>
                   <p className="font-display text-3xl font-bold">{score} <span className="text-base font-medium text-subtle">/ {maxScore}</span></p>
                 </div>
               </div>
               {chosen && (
-                <Notice tone="success" title={firstTry ? tx({ en: "Right on the first try", roman: "Pehli koshish mein sahi" }) : tx({ en: "You got there", roman: "Aap pohanch gaye" })}>
+                <Notice tone="success" title={firstTry ? tx({ en: "Right on the first try", roman: "Pehli koshish mein sahi", ur: "پہلی کوشش میں درست" }) : tx({ en: "You got there", roman: "Aap pohanch gaye", ur: "آپ نے کر دکھایا" })}>
                   {pick(room.choices.find((c) => c.id === chosen)!.feedback, lang)}
                 </Notice>
               )}
               <div className="grid grid-cols-3 gap-2">
-                <Stat label={tx({ en: "Clues", roman: "Nishaniyan" })} value={`${cluesFound}/${clues.length}`} />
-                <Stat label={tx({ en: "Hints", roman: "Ishare" })} value={hints} />
-                <Stat label={tx({ en: "First try", roman: "Pehli dafa" })} value={firstTry ? "✓" : "—"} />
+                <Stat label={tx({ en: "Clues", roman: "Nishaniyan", ur: "نشانیاں" })} value={`${cluesFound}/${clues.length}`} />
+                <Stat label={tx({ en: "Hints", roman: "Ishare", ur: "اشارے" })} value={hints} />
+                <Stat label={tx({ en: "First try", roman: "Pehli dafa", ur: "پہلی بار" })} value={firstTry ? "✓" : "—"} />
               </div>
               <p className="text-xs text-subtle">
-                {tx({ en: "Score = 10 per clue + 40 for a first-try safe decision (20 after a retry) − 5 per hint.", roman: "Score = har nishani 10 + pehli koshish mein sahi faisla 40 (dobara 20) − har ishara 5." })}
+                {tx({ en: "Score = 10 per clue + 40 for a first-try safe decision (20 after a retry) − 5 per hint.", roman: "Score = har nishani 10 + pehli koshish mein sahi faisla 40 (dobara 20) − har ishara 5.", ur: "اسکور = ہر نشانی 10 + پہلی کوشش میں درست فیصلہ 40 (دوبارہ پر 20) − ہر اشارہ 5۔" })}
               </p>
               <Takeaway text={pick(room.takeaway, lang)} />
               <div className="flex flex-wrap gap-2">
-                {onNext && <Button icon={ArrowRight} onClick={onNext}>{tx({ en: "Next room", roman: "Agla kamra" })}</Button>}
-                <ButtonLink href="/progress" variant="secondary" icon={TrendingUp}>{tx({ en: "See progress", roman: "Progress dekhein" })}</ButtonLink>
-                <Button variant="ghost" icon={ArrowLeft} onClick={onExit}>{tx({ en: "Back", roman: "Wapas" })}</Button>
+                {onNext && <Button icon={ArrowRight} className="[&>svg]:rtl:rotate-180" onClick={onNext}>{tx({ en: "Next room", roman: "Agla kamra", ur: "اگلا کمرہ" })}</Button>}
+                <ButtonLink href="/progress" variant="secondary" icon={TrendingUp}>{tx({ en: "See progress", roman: "Progress dekhein", ur: "پیش رفت دیکھیں" })}</ButtonLink>
+                <Button variant="ghost" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" onClick={onExit}>{tx({ en: "Back", roman: "Wapas", ur: "واپس" })}</Button>
               </div>
             </Card>
           )}
@@ -328,10 +328,11 @@ function RoomPlayer({ room, onExit, onNext }: { room: EscapeRoom; onExit: () => 
 
 // ── Mission visuals (fictional content, styled like the real thing) ──
 function MissionVisual({ kind }: { kind: TaskStep["visual"] }) {
+  const { tx } = useT();
   if (!kind) return null;
   if (kind === "bill")
     return (
-      <div className="mx-auto w-full max-w-md overflow-hidden rounded-xl border border-[#e5e1d6] bg-[#fffdf7] text-[#111]">
+      <div dir="ltr" className="mx-auto w-full max-w-md overflow-hidden rounded-xl border border-[#e5e1d6] bg-[#fffdf7] text-[#111]">
         <div className="flex items-center justify-between bg-[#16324f] px-4 py-2.5 text-white">
           <span className="text-sm font-bold tracking-wide">ROSHNI POWER CO.</span>
           <span className="rounded bg-white/15 px-2 py-0.5 text-[10px] font-bold">SAMPLE</span>
@@ -351,16 +352,19 @@ function MissionVisual({ kind }: { kind: TaskStep["visual"] }) {
   if (kind === "urls")
     return (
       <div className="mx-auto w-full max-w-md rounded-xl border border-line bg-surface-2 p-4">
-        <div className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-muted">
+        <div dir="ltr" className="flex items-center gap-2 rounded-lg border border-line bg-surface px-3 py-2.5 text-sm text-muted">
           <Lock className="size-4 text-success" aria-hidden />
-          <span className="truncate">which address is the real Sitara Bank?</span>
+          <span className="truncate">https://</span>
         </div>
-        <p className="mt-3 flex items-center gap-2 text-xs text-subtle"><Globe className="size-3.5" aria-hidden /> Tip: read the address from the right, up to the first single “/”.</p>
+        <p className="mt-3 flex items-center gap-2 text-xs text-subtle">
+          <Globe className="size-3.5 shrink-0" aria-hidden />
+          {tx({ en: "Tip: read the address from the right, up to the first single “/”.", roman: "Mashwara: pata daayein se parhein, pehle akele “/” tak.", ur: "مشورہ: ویب ایڈریس کو دائیں طرف سے، پہلے اکیلے “/” تک پڑھیں۔" })}
+        </p>
       </div>
     );
   if (kind === "permission")
     return (
-      <div className="mx-auto w-full max-w-xs rounded-[1.75rem] bg-[#2b2f36] p-5 text-white">
+      <div dir="ltr" className="mx-auto w-full max-w-xs rounded-[1.75rem] bg-[#2b2f36] p-5 text-white">
         <div className="mx-auto mb-3 flex size-10 items-center justify-center rounded-full bg-[#8ab4f8]/20 text-[#8ab4f8]">
           <Sparkles className="size-5" aria-hidden />
         </div>
@@ -372,7 +376,7 @@ function MissionVisual({ kind }: { kind: TaskStep["visual"] }) {
       </div>
     );
   return (
-    <div className="mx-auto w-full max-w-xs overflow-hidden rounded-[1.75rem] border border-line bg-white text-[#111]">
+    <div dir="ltr" className="mx-auto w-full max-w-xs overflow-hidden rounded-[1.75rem] border border-line bg-white text-[#111]">
       <div className="bg-[#0b8577] px-5 py-3 text-white">
         <p className="text-sm font-bold">Sitara Bank</p>
         <p className="text-[11px] text-white/75">Practice app</p>
@@ -444,17 +448,17 @@ function MissionPlayer({ mission, onExit }: { mission: TaskMission; onExit: () =
         <div className="flex items-center gap-3">
           <IconTile icon={Trophy} tone="success" />
           <div>
-            <p className="font-semibold">{tx({ en: "Mission complete!", roman: "Mission mukammal!" })} · <span className="text-muted">{pick(mission.title, lang)}</span></p>
+            <p className="font-semibold">{tx({ en: "Mission complete!", roman: "Mission mukammal!", ur: "مشن مکمل!" })} · <span className="text-muted">{pick(mission.title, lang)}</span></p>
             <p className="font-display text-3xl font-bold">{finished.score}<span className="text-base font-medium text-subtle"> / {finished.max}</span></p>
           </div>
         </div>
         <p className="text-sm text-muted">
-          {tx({ en: `${finished.correct} of ${total} right on the first try · ${hints} hints. Score = 20 per first-try answer, 10 after a retry, −5 per hint.`, roman: `${total} mein se ${finished.correct} pehli dafa sahi · ${hints} ishare. Score = pehli dafa 20, dobara 10, har ishara −5.` })}
+          {tx({ en: `${finished.correct} of ${total} right on the first try · ${hints} hints. Score = 20 per first-try answer, 10 after a retry, −5 per hint.`, roman: `${total} mein se ${finished.correct} pehli dafa sahi · ${hints} ishare. Score = pehli dafa 20, dobara 10, har ishara −5.`, ur: `${total} میں سے ${finished.correct} پہلی بار درست · ${hints} اشارے۔ اسکور = پہلی بار 20، دوبارہ 10، ہر اشارہ −5۔` })}
         </p>
         <Takeaway text={pick(mission.takeaway, lang)} />
         <div className="flex flex-wrap gap-2">
-          <ButtonLink href="/progress" icon={TrendingUp}>{tx({ en: "See progress", roman: "Progress dekhein" })}</ButtonLink>
-          <Button variant="secondary" icon={ArrowLeft} onClick={onExit}>{tx({ en: "Back to Academy", roman: "Academy wapas" })}</Button>
+          <ButtonLink href="/progress" icon={TrendingUp}>{tx({ en: "See progress", roman: "Progress dekhein", ur: "پیش رفت دیکھیں" })}</ButtonLink>
+          <Button variant="secondary" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" onClick={onExit}>{tx({ en: "Back to Academy", roman: "Academy wapas", ur: "اکیڈمی پر واپس" })}</Button>
         </div>
       </Card>
     );
@@ -462,7 +466,7 @@ function MissionPlayer({ mission, onExit }: { mission: TaskMission; onExit: () =
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={onExit}>{tx({ en: "Academy", roman: "Academy" })}</Button>
+        <Button variant="ghost" size="sm" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" onClick={onExit}>{tx({ en: "Academy", roman: "Academy", ur: "اکیڈمی" })}</Button>
         <SimLabel />
       </div>
       <div>
@@ -472,10 +476,10 @@ function MissionPlayer({ mission, onExit }: { mission: TaskMission; onExit: () =
 
       <Card glow className="p-5 sm:p-6">
         <div className="mb-2 flex items-center justify-between text-sm">
-          <span className="font-semibold">{tx({ en: `Question ${idx + 1} of ${total}`, roman: `Sawal ${idx + 1} / ${total}` })}</span>
-          <span className="text-subtle">{tx({ en: `Hints: ${hints}`, roman: `Ishare: ${hints}` })}</span>
+          <span className="font-semibold">{tx({ en: `Question ${idx + 1} of ${total}`, roman: `Sawal ${idx + 1} / ${total}`, ur: `سوال ${idx + 1} از ${total}` })}</span>
+          <span className="text-subtle">{tx({ en: `Hints: ${hints}`, roman: `Ishare: ${hints}`, ur: `اشارے: ${hints}` })}</span>
         </div>
-        <ProgressBar value={((idx + (solved ? 1 : 0)) / total) * 100} label="Mission progress" />
+        <ProgressBar value={((idx + (solved ? 1 : 0)) / total) * 100} label={tx({ en: "Mission progress", roman: "Mission ki progress", ur: "مشن کی پیش رفت" })} />
 
         {step.visual && <div className="mt-6"><MissionVisual kind={step.visual} /></div>}
 
@@ -495,7 +499,7 @@ function MissionPlayer({ mission, onExit }: { mission: TaskMission; onExit: () =
                   disabled={isWrong || Boolean(solved)}
                   className={choiceClass(isRight ? "right" : isWrong ? "wrong" : "idle", Boolean(solved) && !isRight && !isWrong)}
                 >
-                  {isRight ? <CheckCircle2 className="size-5 shrink-0 text-success" aria-hidden /> : isWrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary" aria-hidden />}
+                  {isRight ? <CheckCircle2 className="size-5 shrink-0 text-success" aria-hidden /> : isWrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden />}
                   <span className="break-all sm:break-normal">{pick(c.text, lang)}</span>
                 </button>
                 {(isWrong || isRight) && <p className={cn("mt-1.5 px-1 text-sm", isRight ? "text-success" : "text-danger")} role="status">{pick(c.feedback, lang)}</p>}
@@ -521,11 +525,11 @@ function MissionPlayer({ mission, onExit }: { mission: TaskMission; onExit: () =
               setHintShown(true);
             }}
           >
-            {tx({ en: "Hint", roman: "Ishara" })}
+            {tx({ en: "Hint", roman: "Ishara", ur: "اشارہ" })}
           </Button>
           {solved && (
-            <Button size="lg" icon={idx < total - 1 ? ArrowRight : CheckCircle2} onClick={next}>
-              {idx < total - 1 ? tx({ en: "Next question", roman: "Agla sawal" }) : tx({ en: "Finish mission", roman: "Mission mukammal" })}
+            <Button size="lg" icon={idx < total - 1 ? ArrowRight : CheckCircle2} className={idx < total - 1 ? "[&>svg]:rtl:rotate-180" : undefined} onClick={next}>
+              {idx < total - 1 ? tx({ en: "Next question", roman: "Agla sawal", ur: "اگلا سوال" }) : tx({ en: "Finish mission", roman: "Mission mukammal", ur: "مشن مکمل کریں" })}
             </Button>
           )}
         </div>
@@ -584,24 +588,24 @@ export default function AcademyPage() {
       <PageHeader
         icon={GraduationCap}
         tone="lavender"
-        title={tx({ en: "Academy", roman: "Academy" })}
-        subtitle={tx({ en: "Practise safely — every bank, person and rupee here is pretend.", roman: "Mehfooz mashq — yahan har bank, shakhs aur paisa farzi hai." })}
+        title={tx({ en: "Academy", roman: "Academy", ur: "اکیڈمی" })}
+        subtitle={tx({ en: "Practise safely — every bank, person and rupee here is pretend.", roman: "Mehfooz mashq — yahan har bank, shakhs aur paisa farzi hai.", ur: "محفوظ مشق — یہاں ہر بینک، شخص اور پیسہ فرضی ہے۔" })}
         actions={<SimLabel />}
       />
 
       <Section
-        title="Scam Escape Room"
-        description={tx({ en: "Find the clues in each message, then pick the safe action. One room is a genuine alert.", roman: "Har message mein nishaniyan dhoondein, phir mehfooz qadam chunein. Ek kamra asli alert hai." })}
+        title={tx({ en: "Scam Escape Room", roman: "Scam Escape Room", ur: "اسکیم ایسکیپ روم" })}
+        description={tx({ en: "Find the clues in each message, then pick the safe action. One room is a genuine alert.", roman: "Har message mein nishaniyan dhoondein, phir mehfooz qadam chunein. Ek kamra asli alert hai.", ur: "ہر پیغام میں نشانیاں ڈھونڈیں، پھر محفوظ قدم چنیں۔ ایک کمرے میں اصلی پیغام ہے۔" })}
         action={
           <Button icon={DoorOpen} onClick={() => openRoom(nextUp.id)}>
-            {roomsDone ? tx({ en: "Continue", roman: "Jaari rakhein" }) : tx({ en: "Enter the first room", roman: "Pehle kamre mein jayein" })}
+            {roomsDone ? tx({ en: "Continue", roman: "Jaari rakhein", ur: "جاری رکھیں" }) : tx({ en: "Enter the first room", roman: "Pehle kamre mein jayein", ur: "پہلے کمرے میں جائیں" })}
           </Button>
         }
       >
         <Card className="overflow-hidden">
           <div className="flex items-center gap-3 border-b border-line px-5 py-3.5 text-sm">
-            <span className="font-semibold">{tx({ en: "Rooms escaped", roman: "Kamre paar" })}</span>
-            <ProgressBar value={(roomsDone / ESCAPE_ROOMS.length) * 100} className="max-w-48" label="Rooms escaped" />
+            <span className="font-semibold">{tx({ en: "Rooms escaped", roman: "Kamre paar", ur: "پار کیے گئے کمرے" })}</span>
+            <ProgressBar value={(roomsDone / ESCAPE_ROOMS.length) * 100} className="max-w-48" label={tx({ en: "Rooms escaped", roman: "Kamre paar", ur: "پار کیے گئے کمرے" })} />
             <span className="text-muted">{roomsDone} / {ESCAPE_ROOMS.length}</span>
           </div>
           <ol className="divide-y divide-line">
@@ -609,14 +613,14 @@ export default function AcademyPage() {
               const s = bestOf("escape-room", "room", r.id);
               return (
                 <li key={r.id}>
-                  <button onClick={() => openRoom(r.id)} className="flex w-full items-center gap-4 px-5 py-3.5 text-left transition-colors hover:bg-surface-2 cursor-pointer">
+                  <button onClick={() => openRoom(r.id)} className="flex w-full items-center gap-4 px-5 py-3.5 text-start transition-colors hover:bg-surface-2 cursor-pointer">
                     <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-lg text-sm font-bold", s.done ? "bg-success-soft text-success" : "bg-surface-3 text-muted")}>
                       {s.done ? <CheckCircle2 className="size-4" aria-hidden /> : i + 1}
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block font-medium">{pick(r.title, lang)}</span>
                       <span className="block text-xs text-subtle">
-                        {r.channel === "whatsapp" ? "WhatsApp" : "SMS"} · {r.segments.filter((x) => x.clue).length} {tx({ en: "clues", roman: "nishaniyan" })}
+                        {r.channel === "whatsapp" ? "WhatsApp" : "SMS"} · {r.segments.filter((x) => x.clue).length} {tx({ en: "clues", roman: "nishaniyan", ur: "نشانیاں" })}
                       </span>
                     </span>
                     {s.done ? <Badge tone="success">{s.best}/{s.max}</Badge> : <ArrowRight className="size-4 text-subtle rtl:rotate-180" aria-hidden />}
@@ -628,7 +632,7 @@ export default function AcademyPage() {
         </Card>
       </Section>
 
-      <Section title={tx({ en: "Practice missions", roman: "Mashq missions" })}>
+      <Section title={tx({ en: "Practice missions", roman: "Mashq missions", ur: "مشق کے مشن" })}>
         <div className="grid gap-3 md:grid-cols-3">
           {TASK_MISSIONS.map((m) => {
             const s = bestOf("mission", "mission", m.id);
@@ -639,7 +643,7 @@ export default function AcademyPage() {
                 tone="lavender"
                 title={pick(m.title, lang)}
                 description={pick(m.intro, lang)}
-                meta={s.done ? <Badge tone="success" icon={CheckCircle2}>{tx({ en: "Best", roman: "Behtareen" })} {s.best}/{s.max}</Badge> : <span className="text-xs text-subtle">{m.steps.length} {tx({ en: "questions", roman: "sawal" })}</span>}
+                meta={s.done ? <Badge tone="success" icon={CheckCircle2}>{tx({ en: "Best", roman: "Behtareen", ur: "بہترین" })} {s.best}/{s.max}</Badge> : <span className="text-xs text-subtle">{m.steps.length} {tx({ en: "questions", roman: "sawal", ur: "سوال" })}</span>}
                 onClick={() => {
                   setRoomId(null);
                   setMissionId(m.id);

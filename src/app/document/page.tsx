@@ -101,11 +101,11 @@ export default function DocumentPage() {
             <Section title={tx({ en: "What I look for", roman: "Main kya dhoondta hoon", ur: "میں کیا ڈھونڈتا ہوں" })}>
               <ul className="space-y-2.5 text-sm text-muted">
                 {[
-                  { icon: Wallet, en: "Amount to pay", roman: "Kitni raqam deni hai" },
-                  { icon: CalendarClock, en: "Due date and late charges", roman: "Aakhri tareekh aur jurmana" },
-                  { icon: Hash, en: "Reference / consumer number", roman: "Reference / consumer number" },
-                  { icon: BookOpen, en: "Difficult words explained", roman: "Mushkil alfaaz ki wazahat" },
-                  { icon: ListChecks, en: "A checklist of what to do", roman: "Kya karna hai ki checklist" },
+                  { icon: Wallet, en: "Amount to pay", roman: "Kitni raqam deni hai", ur: "کتنی رقم دینی ہے" },
+                  { icon: CalendarClock, en: "Due date and late charges", roman: "Aakhri tareekh aur jurmana", ur: "آخری تاریخ اور جرمانہ" },
+                  { icon: Hash, en: "Reference / consumer number", roman: "Reference / consumer number", ur: "ریفرنس / صارف نمبر" },
+                  { icon: BookOpen, en: "Difficult words explained", roman: "Mushkil alfaaz ki wazahat", ur: "مشکل الفاظ کی وضاحت" },
+                  { icon: ListChecks, en: "A checklist of what to do", roman: "Kya karna hai ki checklist", ur: "کیا کرنا ہے، اس کی فہرست" },
                 ].map((x) => (
                   <li key={x.en} className="flex items-center gap-2.5">
                     <x.icon className="size-4 shrink-0 text-primary" aria-hidden /> {tx(x)}
@@ -126,7 +126,7 @@ export default function DocumentPage() {
                   <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
                     <div className="rounded-xl bg-elevated px-5 py-4">
                       <Spinner label={phase === "ocr" ? tx({ en: "Reading the document…", roman: "Document parh raha hoon…", ur: "دستاویز پڑھ رہا ہوں…" }) : tx({ en: "Understanding it…", roman: "Samajh raha hoon…", ur: "سمجھ رہا ہوں…" })} />
-                      {phase === "ocr" && <ProgressBar value={progress * 100} className="mt-3 w-52" label="OCR progress" />}
+                      {phase === "ocr" && <ProgressBar value={progress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
                     </div>
                   </div>
                 )}
@@ -191,7 +191,7 @@ export default function DocumentPage() {
                       title={tx({ en: "What to do", roman: "Kya karna hai", ur: "کیا کرنا ہے" })}
                       action={<span className="text-xs text-subtle">{done.size}/{result.checklist.length}</span>}
                     >
-                      <ProgressBar value={(done.size / result.checklist.length) * 100} label="Checklist progress" />
+                      <ProgressBar value={(done.size / result.checklist.length) * 100} label={tx({ en: "Checklist progress", roman: "Checklist ki progress", ur: "فہرست کی پیش رفت" })} />
                       <ul>
                         {result.checklist.map((c, i) => {
                           const checked = done.has(i);
@@ -206,7 +206,7 @@ export default function DocumentPage() {
                                   else n.add(i);
                                   return n;
                                 })}
-                                className="flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-surface-2 cursor-pointer"
+                                className="flex w-full items-start gap-3 rounded-lg px-2 py-2 text-start transition-colors hover:bg-surface-2 cursor-pointer"
                               >
                                 {checked ? <CheckSquare className="mt-0.5 size-5 shrink-0 text-success" aria-hidden /> : <Square className="mt-0.5 size-5 shrink-0 text-subtle" aria-hidden />}
                                 <span dir="auto" className={cn("text-sm", checked && "text-muted line-through")}>{c}</span>
@@ -235,12 +235,12 @@ export default function DocumentPage() {
 
               {result.warnings.length > 0 && (
                 <Notice tone="danger" title={tx({ en: "Please note", roman: "Dhyaan dein", ur: "توجہ دیں" })}>
-                  <ul className="list-disc space-y-1 pl-4">{result.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
+                  <ul className="list-disc space-y-1 ps-4">{result.warnings.map((w, i) => <li key={i}>{w}</li>)}</ul>
                 </Notice>
               )}
               {result.limitations.length > 0 && (
                 <Notice tone="info" title={tx({ en: "Limits of this reading", roman: "Is jaanch ki hudood", ur: "اس جانچ کی حدود" })}>
-                  <ul className="list-disc space-y-1 pl-4">{result.limitations.map((w, i) => <li key={i}>{w}</li>)}</ul>
+                  <ul className="list-disc space-y-1 ps-4">{result.limitations.map((w, i) => <li key={i}>{w}</li>)}</ul>
                 </Notice>
               )}
             </div>

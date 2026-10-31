@@ -18,8 +18,8 @@ interface LibraryCard {
   id: string;
   icon: "zap" | "video" | "mail" | "file" | "landmark" | "calendar";
   category: string;
-  title: { en: string; roman: string };
-  blurb: { en: string; roman: string };
+  title: { en: string; roman: string; ur: string };
+  blurb: { en: string; roman: string; ur: string };
   minutes: number;
   steps: number;
 }
@@ -38,6 +38,9 @@ interface Session {
 }
 
 const SESSION_KEY = "humraah.guide.session";
+// Error keys stored in state and translated at render time (keeps callbacks stable).
+const START_FAILED = "__start_failed";
+const LIBRARY_FAILED = "__library_failed";
 
 function saveSession(s: Session | null) {
   try {
@@ -129,7 +132,7 @@ export default function GuidePage() {
         update({ task, step: 0, hints: 0, stuck: 0, attempt, revealed: [] });
         window.scrollTo({ top: 0, behavior: "smooth" });
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Could not start this guide.");
+        setError(e instanceof Error ? e.message : START_FAILED);
       } finally {
         setLoading(false);
       }
@@ -147,7 +150,7 @@ export default function GuidePage() {
         const data = (await res.json()) as LibraryCard[];
         if (alive) setLibrary(data);
       } catch {
-        if (alive) setLibError("The task library could not load. You can still type your own goal below.");
+        if (alive) setLibError(LIBRARY_FAILED);
       }
       if (!alive || handoffDone.current) return;
       handoffDone.current = true;
@@ -218,7 +221,7 @@ export default function GuidePage() {
       setRescue(r);
       update({ ...session, stuck: session.stuck + 1 });
     } catch (e) {
-      setRescue({ mode: "demo", message: e instanceof Error ? e.message : "Could not load help.", recovery_steps: [] });
+      setRescue({ mode: "demo", message: e instanceof Error ? e.message : tx({ en: "Could not load help.", roman: "Madad load nahi ho saki.", ur: "مدد لوڈ نہیں ہو سکی۔" }), recovery_steps: [] });
     } finally {
       setRescueLoading(false);
     }
@@ -292,7 +295,7 @@ export default function GuidePage() {
     return (
       <div className="mx-auto max-w-3xl space-y-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={exit}>{tx({ en: "All tasks", roman: "Tamam kaam", ur: "تمام کام" })}</Button>
+          <Button variant="ghost" size="sm" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" onClick={exit}>{tx({ en: "All tasks", roman: "Tamam kaam", ur: "تمام کام" })}</Button>
           <div className="flex items-center gap-2">
             <Badge tone="neutral">{task.source === "library" ? tx({ en: "Reviewed guide", roman: "Jaancha hua guide", ur: "جانچی ہوئی رہنمائی" }) : task.source === "ai" ? tx({ en: "AI plan", roman: "AI plan", ur: "AI منصوبہ" }) : tx({ en: "General plan", roman: "Aam plan", ur: "عام منصوبہ" })}</Badge>
             <ModeBadge mode={task.mode} />
@@ -313,7 +316,7 @@ export default function GuidePage() {
             <span className="font-semibold">{tx({ en: `Step ${session.step + 1} of ${n}`, roman: `Step ${session.step + 1} / ${n}`, ur: `قدم ${session.step + 1} از ${n}` })}</span>
             <span className="text-subtle">{tx({ en: `Hints: ${session.hints}`, roman: `Ishare: ${session.hints}`, ur: `اشارے: ${session.hints}` })}</span>
           </div>
-          <ProgressBar value={((session.step + (mustPredict ? 0 : 1)) / n) * 100} label="Task progress" />
+          <ProgressBar value={((session.step + (mustPredict ? 0 : 1)) / n) * 100} label={tx({ en: "Task progress", roman: "Kaam ki progress", ur: "کام کی پیش رفت" })} />
 
           {mustPredict ? (
             <div className="mt-6">
@@ -330,11 +333,11 @@ export default function GuidePage() {
                       onClick={() => pickChoice(c)}
                       disabled={wrong}
                       className={cn(
-                        "flex min-h-14 items-center gap-3 rounded-xl border px-4 py-3 text-left font-medium transition-colors cursor-pointer",
+                        "flex min-h-14 items-center gap-3 rounded-xl border px-4 py-3 text-start font-medium transition-colors cursor-pointer",
                         wrong ? "border-danger/30 bg-danger-soft text-muted line-through" : "border-line hover:border-primary hover:bg-primary-soft",
                       )}
                     >
-                      {wrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary" aria-hidden />}
+                      {wrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary rtl:rotate-180" aria-hidden />}
                       {c}
                     </button>
                   );
@@ -371,7 +374,7 @@ export default function GuidePage() {
 
           {rescueOpen && (
             <div className="mt-4 space-y-3 rounded-xl bg-danger-soft p-4">
-              <p className="font-semibold">Rescue Mode</p>
+              <p className="font-semibold">{tx({ en: "Rescue Mode", roman: "Rescue Mode", ur: "مدد موڈ" })}</p>
               <Textarea rows={2} value={problem} onChange={(e) => setProblem(e.target.value)} placeholder={tx({ en: "What went wrong? (optional — never type codes)", roman: "Kya ghalat hua? (zaroori nahi — code na likhein)", ur: "کیا غلط ہوا؟ (ضروری نہیں — کوئی کوڈ نہ لکھیں)" })} />
               <div className="flex flex-wrap gap-2">
                 <Button size="sm" icon={Wand2} loading={rescueLoading} onClick={askRescue}>{tx({ en: "Help me get unstuck", roman: "Madad karein", ur: "میری مدد کریں" })}</Button>
@@ -390,7 +393,7 @@ export default function GuidePage() {
           )}
 
           <div className="mt-6 flex items-center justify-between gap-3 border-t border-line pt-5">
-            <Button variant="ghost" icon={ArrowLeft} disabled={session.step === 0} onClick={() => goTo(session.step - 1)}>{t("common.previous")}</Button>
+            <Button variant="ghost" icon={ArrowLeft} className="[&>svg]:rtl:rotate-180" disabled={session.step === 0} onClick={() => goTo(session.step - 1)}>{t("common.previous")}</Button>
             {!mustPredict &&
               (isLast ? (
                 <Button size="lg" icon={CheckCircle2} onClick={() => setFinishing(true)}>{tx({ en: "I did it — finish", roman: "Ho gaya — mukammal", ur: "ہو گیا — مکمل" })}</Button>
@@ -421,7 +424,7 @@ export default function GuidePage() {
           <summary className="flex cursor-pointer items-center gap-2 font-semibold">
             <ShieldCheck className="size-4 text-success" aria-hidden /> {tx({ en: "Stay safe", roman: "Mehfooz rahein", ur: "محفوظ رہیں" })}
           </summary>
-          <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
+          <ul className="mt-2 list-disc space-y-1 ps-5 text-muted">
             {task.safety_notes.map((s) => <li key={s}>{s}</li>)}
             <li>{tx({ en: "You do every step yourself. HUMRAAH never needs your passwords, PINs or codes.", roman: "Har step aap khud karte hain. HUMRAAH ko kabhi password, PIN ya code nahi chahiye.", ur: "ہر قدم آپ خود کرتے ہیں۔ ہمراہ کو کبھی پاس ورڈ، PIN یا کوڈ نہیں چاہیے۔" })}</li>
           </ul>
@@ -439,7 +442,7 @@ export default function GuidePage() {
         subtitle={tx({ en: "Learn any task one simple step at a time.", roman: "Koi bhi kaam ek ek aasaan qadam mein seekhein.", ur: "کوئی بھی کام ایک ایک آسان قدم میں سیکھیں۔" })}
       />
 
-      {error && <Notice tone="danger">{error}</Notice>}
+      {error && <Notice tone="danger">{error === START_FAILED ? tx({ en: "Could not start this guide.", roman: "Yeh guide shuru nahi ho saka.", ur: "یہ رہنمائی شروع نہیں ہو سکی۔" }) : error}</Notice>}
 
       <Card glow className="flex flex-col gap-4 p-5 md:flex-row md:items-center">
         <form
@@ -449,7 +452,7 @@ export default function GuidePage() {
             if (goal.trim()) start({ goal: goal.trim() });
           }}
         >
-          <Input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={tx({ en: "What do you want to learn? e.g. send a voice note", roman: "Kya seekhna hai? maslan voice note bhejna", ur: "کیا سیکھنا ہے؟ مثلاً وائس نوٹ بھیجنا" })} aria-label="Your goal" maxLength={300} />
+          <Input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={tx({ en: "What do you want to learn? e.g. send a voice note", roman: "Kya seekhna hai? maslan voice note bhejna", ur: "کیا سیکھنا ہے؟ مثلاً وائس نوٹ بھیجنا" })} aria-label={tx({ en: "Your goal", roman: "Aap ka maqsad", ur: "آپ کا مقصد" })} maxLength={300} />
           <Button type="submit" size="lg" icon={Sparkles} loading={loading} disabled={!goal.trim()} className="shrink-0">
             {tx({ en: "Make my guide", roman: "Guide banayein", ur: "رہنمائی بنائیں" })}
           </Button>
@@ -468,7 +471,7 @@ export default function GuidePage() {
         title={tx({ en: "Popular tasks", roman: "Mashhoor kaam", ur: "مقبول کام" })}
         description={tx({ en: "Help fades as you improve: full hints first, then on request, then you choose the next step.", roman: "Seekhne ke saath madad kam hoti hai: pehle poore ishare, phir maangne par, phir agla step aap chunte hain.", ur: "سیکھنے کے ساتھ مدد کم ہوتی ہے: پہلے پورے اشارے، پھر مانگنے پر، پھر اگلا قدم آپ خود چنتے ہیں۔" })}
       >
-        {libError && <Notice tone="warning">{libError}</Notice>}
+        {libError && <Notice tone="warning">{tx({ en: "The task library could not load. You can still type your own goal above.", roman: "Kaamon ki list load nahi hui. Aap upar apna maqsad likh sakte hain.", ur: "کاموں کی فہرست لوڈ نہیں ہوئی۔ آپ اوپر اپنا مقصد لکھ سکتے ہیں۔" })}</Notice>}
         {!library && !libError && <Spinner label={tx({ en: "Loading tasks…", roman: "Kaam load ho rahe hain…", ur: "کام لوڈ ہو رہے ہیں…" })} />}
         {loading && <Spinner label={tx({ en: "Preparing your guide…", roman: "Guide tayyar ho raha hai…", ur: "رہنمائی تیار ہو رہی ہے…" })} />}
         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -479,7 +482,7 @@ export default function GuidePage() {
               tone={TONES[i % TONES.length]}
               title={tx(c.title)}
               description={tx(c.blurb)}
-              meta={<span className="text-xs text-subtle">~{c.minutes} min · {c.steps} {tx({ en: "steps", roman: "steps", ur: "قدم" })}</span>}
+              meta={<span className="text-xs text-subtle">~{c.minutes} {tx({ en: "min", roman: "minute", ur: "منٹ" })} · {c.steps} {tx({ en: "steps", roman: "steps", ur: "قدم" })}</span>}
               onClick={() => !loading && start({ task_id: c.id })}
             />
           ))}

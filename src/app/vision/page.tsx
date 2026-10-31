@@ -26,11 +26,11 @@ const KIND_STYLE: Record<ElementKind, { icon: LucideIcon; label: string; text: s
 };
 const KIND_ORDER: ElementKind[] = ["error", "warning", "button", "input", "link", "heading", "label", "info"];
 
-const SAFE: Record<ExplainResult["safe_to_tap"], { tone: "success" | "warning" | "danger" | "neutral"; en: string; roman: string }> = {
-  yes: { tone: "success", en: "Safe to tap", roman: "Dabana mehfooz" },
-  caution: { tone: "warning", en: "Tap with care", roman: "Ehtiyat se dabayein" },
-  no: { tone: "danger", en: "Don't tap", roman: "Na dabayein" },
-  unknown: { tone: "neutral", en: "Not sure", roman: "Yaqeen nahi" },
+const SAFE: Record<ExplainResult["safe_to_tap"], { tone: "success" | "warning" | "danger" | "neutral"; en: string; roman: string; ur: string }> = {
+  yes: { tone: "success", en: "Safe to tap", roman: "Dabana mehfooz", ur: "دبانا محفوظ ہے" },
+  caution: { tone: "warning", en: "Tap with care", roman: "Ehtiyat se dabayein", ur: "احتیاط سے دبائیں" },
+  no: { tone: "danger", en: "Don't tap", roman: "Na dabayein", ur: "نہ دبائیں" },
+  unknown: { tone: "neutral", en: "Not sure", roman: "Yaqeen nahi", ur: "یقین نہیں" },
 };
 
 type Phase = "idle" | "ocr" | "analysing" | "done";
@@ -166,7 +166,7 @@ export default function VisionPage() {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div className="space-y-4">
             <Card className="overflow-hidden p-3 sm:p-4">
-              <div className="relative mx-auto w-fit max-w-full">
+              <div dir="ltr" className="relative mx-auto w-fit max-w-full">
                 {/* eslint-disable-next-line @next/next/no-img-element -- local data URL preview */}
                 <img src={image} alt={tx({ en: "Your screenshot", roman: "Aap ka screenshot", ur: "آپ کا اسکرین شاٹ" })} className="block max-h-[70vh] w-auto max-w-full rounded-xl" />
                 {ocr &&
@@ -179,7 +179,7 @@ export default function VisionPage() {
                       <button
                         key={`${el.line_id}-${i}`}
                         onClick={() => pointExplain(el)}
-                        aria-label={`Explain: ${el.text}`}
+                        aria-label={`${tx({ en: "Explain", roman: "Samjhayein", ur: "سمجھائیں" })}: ${el.text}`}
                         title={el.text}
                         className={cn(
                           "absolute rounded border-2 transition-colors cursor-pointer focus-visible:outline-offset-1",
@@ -199,7 +199,7 @@ export default function VisionPage() {
                   <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
                     <div className="rounded-xl bg-elevated px-5 py-4">
                       <Spinner label={phase === "ocr" ? tx({ en: "Reading the text…", roman: "Text parh raha hoon…", ur: "متن پڑھ رہا ہوں…" }) : tx({ en: "Understanding the screen…", roman: "Screen samajh raha hoon…", ur: "اسکرین سمجھ رہا ہوں…" })} />
-                      {phase === "ocr" && <ProgressBar value={ocrProgress * 100} className="mt-3 w-52" label="OCR progress" />}
+                      {phase === "ocr" && <ProgressBar value={ocrProgress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
                     </div>
                   </div>
                 )}
@@ -231,7 +231,7 @@ export default function VisionPage() {
           </div>
 
           <div className="space-y-4">
-            {!result && !busy && phase !== "idle" && !error && <EmptyState icon={Eye} title="No result yet" />}
+            {!result && !busy && phase !== "idle" && !error && <EmptyState icon={Eye} title={tx({ en: "No result yet", roman: "Abhi koi nateeja nahi", ur: "ابھی کوئی نتیجہ نہیں" })} />}
             {result && (
               <>
                 <Card className="p-4 sm:p-5">
@@ -259,7 +259,7 @@ export default function VisionPage() {
                 <div ref={explainRef}>
                   {selected && (
                     <Card className="border-amber/50 p-4 sm:p-5">
-                      <p className="text-xs text-subtle">Point &amp; Explain</p>
+                      <p className="text-xs text-subtle">{tx({ en: "Point & Explain", roman: "Point & Explain", ur: "اشارہ کریں اور سمجھیں" })}</p>
                       <p className="mt-0.5 font-semibold">“{selected.text}”</p>
                       {explaining ? (
                         <div className="mt-3"><Spinner label={tx({ en: "Explaining…", roman: "Samjha raha hoon…", ur: "سمجھا رہا ہوں…" })} /></div>
@@ -285,7 +285,7 @@ export default function VisionPage() {
                 {grouped.length > 0 && (
                   <Card className="p-4 sm:p-5">
                     <Section title={tx({ en: "What I can see", roman: "Mujhe kya nazar aa raha hai", ur: "مجھے کیا نظر آ رہا ہے" })}>
-                    <div className="max-h-[26rem] space-y-4 overflow-y-auto pr-1 scrollbar-thin">
+                    <div className="max-h-[26rem] space-y-4 overflow-y-auto pe-1 scrollbar-thin">
                       {grouped.map(({ kind, items }) => {
                         const s = KIND_STYLE[kind];
                         return (
@@ -298,7 +298,7 @@ export default function VisionPage() {
                                 <li key={`${kind}-${i}`}>
                                   <button
                                     onClick={() => pointExplain(el)}
-                                    className={cn("w-full rounded-lg px-2.5 py-2 text-left transition-colors cursor-pointer", selected === el ? "bg-warning-soft" : "hover:bg-surface-2")}
+                                    className={cn("w-full rounded-lg px-2.5 py-2 text-start transition-colors cursor-pointer", selected === el ? "bg-warning-soft" : "hover:bg-surface-2")}
                                   >
                                     <span className="block text-sm font-semibold">{el.text}</span>
                                     <span dir="auto" className="mt-0.5 block text-xs text-muted">{el.explanation}</span>
@@ -316,7 +316,7 @@ export default function VisionPage() {
 
                 {result.limitations.length > 0 && (
                   <Notice tone="info" title={tx({ en: "What I can't be sure about", roman: "Jis ka mujhe yaqeen nahi", ur: "جس کا مجھے یقین نہیں" })}>
-                    <ul className="list-disc space-y-1 pl-4">
+                    <ul className="list-disc space-y-1 ps-4">
                       {result.limitations.map((l, i) => <li key={i}>{l}</li>)}
                     </ul>
                   </Notice>
@@ -360,10 +360,10 @@ export default function VisionPage() {
 function HowItWorks() {
   const { tx } = useT();
   const steps = [
-    { en: "I read the visible text on your device.", roman: "Main aap ke device par text parhta hoon." },
-    { en: "I explain what the screen is asking.", roman: "Main batata hoon screen kya keh rahi hai." },
-    { en: "Tap any highlighted part to learn more.", roman: "Kisi highlighted hissay par tap karein." },
-    { en: "Stuck? Rescue Mode helps you recover.", roman: "Atak gaye? Rescue Mode madad karega." },
+    { en: "I read the visible text on your device.", roman: "Main aap ke device par text parhta hoon.", ur: "میں آپ کے فون پر نظر آنے والا متن پڑھتا ہوں۔" },
+    { en: "I explain what the screen is asking.", roman: "Main batata hoon screen kya keh rahi hai.", ur: "میں بتاتا ہوں کہ اسکرین کیا کہہ رہی ہے۔" },
+    { en: "Tap any highlighted part to learn more.", roman: "Kisi highlighted hissay par tap karein.", ur: "مزید جاننے کے لیے کسی نمایاں حصے پر ٹیپ کریں۔" },
+    { en: "Stuck? Rescue Mode helps you recover.", roman: "Atak gaye? Rescue Mode madad karega.", ur: "اٹک گئے؟ ریسکیو موڈ مدد کرے گا۔" },
   ];
   return (
     <Card className="h-fit p-4 sm:p-5">

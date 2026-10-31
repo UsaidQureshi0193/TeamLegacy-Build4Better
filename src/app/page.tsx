@@ -25,11 +25,11 @@ const ACTIONS: { href: string; key: StringKey; icon: LucideIcon; tone: Tone; des
 ];
 
 const TIPS = [
-  { en: "Your bank will never ask for your OTP — not by call, SMS or WhatsApp.", roman: "Aap ka bank kabhi OTP nahi maangta — na call, na SMS, na WhatsApp par." },
-  { en: "A relative asking for money from a 'new number'? Call their old number first.", roman: "'Naye number' se rishtedar paise maange? Pehle purane number par call karein." },
-  { en: "Read web addresses from the right: bank.com.pk.verify.top is really verify.top.", roman: "Website ka pata daayein se parhein: bank.com.pk.verify.top asal mein verify.top hai." },
-  { en: "If a message makes you panic, pause. Real problems can wait 5 minutes.", roman: "Agar message se ghabrahat ho to ruk jayein. Asli masla 5 minute intezar kar sakta hai." },
-  { en: "A torch app doesn't need your contacts. Say 'Don't allow'.", roman: "Torch app ko contacts nahi chahiye. 'Don't allow' dabayein." },
+  { en: "Your bank will never ask for your OTP — not by call, SMS or WhatsApp.", roman: "Aap ka bank kabhi OTP nahi maangta — na call, na SMS, na WhatsApp par.", ur: "آپ کا بینک کبھی OTP نہیں مانگتا — نہ کال پر، نہ SMS پر، نہ WhatsApp پر۔" },
+  { en: "A relative asking for money from a 'new number'? Call their old number first.", roman: "'Naye number' se rishtedar paise maange? Pehle purane number par call karein.", ur: "'نئے نمبر' سے رشتہ دار پیسے مانگے؟ پہلے ان کے پرانے نمبر پر کال کریں۔" },
+  { en: "Read web addresses from the right: bank.com.pk.verify.top is really verify.top.", roman: "Website ka pata daayein se parhein: bank.com.pk.verify.top asal mein verify.top hai.", ur: "ویب سائٹ کا پتہ آخر سے پڑھیں: bank.com.pk.verify.top دراصل verify.top ہے۔" },
+  { en: "If a message makes you panic, pause. Real problems can wait 5 minutes.", roman: "Agar message se ghabrahat ho to ruk jayein. Asli masla 5 minute intezar kar sakta hai.", ur: "اگر پیغام سے گھبراہٹ ہو تو رک جائیں۔ اصل مسئلہ پانچ منٹ انتظار کر سکتا ہے۔" },
+  { en: "A torch app doesn't need your contacts. Say 'Don't allow'.", roman: "Torch app ko contacts nahi chahiye. 'Don't allow' dabayein.", ur: "ٹارچ ایپ کو آپ کے رابطوں کی ضرورت نہیں۔ 'Don't allow' دبائیں۔" },
 ];
 
 const noopSubscribe = () => () => {};
@@ -42,11 +42,11 @@ function Onboarding() {
     <Card glow className="mb-6 p-5 sm:p-6">
       <h2 className="text-xl font-bold">{tx({ en: "Welcome! Let's set things up", roman: "Khush aamdeed! Chaliye set up karein", ur: "خوش آمدید! آئیے سیٹ اپ کریں" })}</h2>
       <p className="mt-1 text-sm text-muted">
-        {tx({ en: "HUMRAAH never asks for passwords, PINs or OTPs. Your progress stays on this device.", roman: "HUMRAAH kabhi password, PIN ya OTP nahi maangta. Progress isi device par rehti hai." })}
+        {tx({ en: "HUMRAAH never asks for passwords, PINs or OTPs. Your progress stays on this device.", roman: "HUMRAAH kabhi password, PIN ya OTP nahi maangta. Progress isi device par rehti hai.", ur: "ہمراہ کبھی پاس ورڈ، PIN یا OTP نہیں مانگتا۔ آپ کی پیش رفت اسی فون میں رہتی ہے۔" })}
       </p>
       <div className="mt-5 grid gap-5 md:grid-cols-3">
         <label className="block">
-          <span className="mb-1.5 block text-sm font-medium">{tx({ en: "Your name (optional)", roman: "Aap ka naam (ikhtiyari)" })}</span>
+          <span className="mb-1.5 block text-sm font-medium">{tx({ en: "Your name (optional)", roman: "Aap ka naam (ikhtiyari)", ur: "آپ کا نام (اختیاری)" })}</span>
           <input value={name} onChange={(e) => setName(e.target.value.slice(0, 40))} placeholder="e.g. Abu" className="h-11 w-full rounded-xl border border-line bg-surface-2 px-4 focus:border-primary focus:outline-none" />
         </label>
         <div>
@@ -60,8 +60,8 @@ function Onboarding() {
           </div>
         </div>
         <div>
-          <Toggle label={tx({ en: "Bigger text (Elder Mode)", roman: "Bara text (Elder Mode)" })} checked={prefs.elder} onChange={(v) => update({ elder: v })} />
-          <Toggle label={tx({ en: "Read answers aloud", roman: "Jawab sunayein" })} checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
+          <Toggle label={tx({ en: "Bigger text (Elder Mode)", roman: "Bara text (Elder Mode)", ur: "بڑا متن (بزرگ موڈ)" })} checked={prefs.elder} onChange={(v) => update({ elder: v })} />
+          <Toggle label={tx({ en: "Read answers aloud", roman: "Jawab sunayein", ur: "جواب سنائیں" })} checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
         </div>
       </div>
       <Button className="mt-5" icon={Sparkles} onClick={() => update({ onboarded: true, name: name.trim() })}>
@@ -91,8 +91,8 @@ export default function HomePage() {
       {/* Greeting + voice */}
       <section className="hero-gradient relative flex flex-col gap-8 rounded-3xl p-6 sm:p-9 text-white lg:flex-row lg:items-center shadow-xl">
         {/* Subtle decorative background glow */}
-        <div className="pointer-events-none absolute -right-20 -top-20 size-80 rounded-full bg-primary/20 blur-3xl" aria-hidden />
-        <div className="pointer-events-none absolute -bottom-20 left-10 size-60 rounded-full bg-info/15 blur-2xl" aria-hidden />
+        <div className="pointer-events-none absolute -end-20 -top-20 size-80 rounded-full bg-primary/20 blur-3xl" aria-hidden />
+        <div className="pointer-events-none absolute -bottom-20 start-10 size-60 rounded-full bg-info/15 blur-2xl" aria-hidden />
 
         <div className="relative z-10 flex-1">
           <div className="flex flex-wrap items-center gap-2.5">
@@ -103,11 +103,11 @@ export default function HomePage() {
             {status && <ModeBadge mode={status.mode} className={status.mode === "live" ? "bg-white/15 text-white ring-1 ring-white/25" : ""} />}
           </div>
 
-          <h1 className={cn("mt-4 font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-white", lang === "ur" && "urdu leading-[1.7]")}>
+          <h1 className={cn("mt-4 font-display text-2xl sm:text-4xl font-extrabold tracking-tight text-white", lang === "ur" && "leading-[1.6] tracking-normal")}>
             {t("home.greeting")}
             {prefs.name ? (lang === "ur" ? `، ${prefs.name}` : `, ${prefs.name}`) : ""}
           </h1>
-          <p className={cn("mt-2 max-w-xl text-base sm:text-lg text-white/85 leading-relaxed", lang === "ur" && "urdu")}>
+          <p className="mt-2 max-w-xl text-base leading-relaxed text-white/85 sm:text-lg">
             {t("home.tagline")}
           </p>
 

@@ -62,7 +62,7 @@ export function useT() {
     lang,
     t: (key: StringKey) => STRINGS[key][lang],
     /** Pick from an inline {en, roman, ur?} literal. Urdu falls back to Roman Urdu when not provided. */
-    tx: (v: { en: string; roman: string; ur?: string }) => (lang === "en" ? v.en : lang === "ur" ? (v.ur ?? v.roman) : v.roman),
+    tx: (v: { en: string; roman: string; ur: string }) => (lang === "en" ? v.en : lang === "ur" ? v.ur : v.roman),
   };
 }
 

@@ -23,10 +23,10 @@ interface Message {
 
 const SUGGESTIONS: { en: string; roman: string; ur: string }[] = [
   { en: "I want to make a WhatsApp video call", roman: "Mujhe WhatsApp par video call karni hai", ur: "مجھے واٹس ایپ پر ویڈیو کال کرنی ہے" },
-  { en: "Is this SMS a scam?", roman: "Kya yeh SMS dhoka hai?", ur: "کیا یہ ایس ایم ایس دھوکہ ہے؟" },
-  { en: "What is OTP?", roman: "OTP kya hota hai?", ur: "او ٹی پی کیا ہے؟" },
+  { en: "Is this SMS a scam?", roman: "Kya yeh SMS dhoka hai?", ur: "کیا یہ SMS دھوکہ ہے؟" },
+  { en: "What is OTP?", roman: "OTP kya hota hai?", ur: "OTP کیا ہوتا ہے؟" },
   { en: "Teach me to pay my electricity bill online", roman: "Bijli ka bill online jama karna sikhayein", ur: "بجلی کا بل آن لائن جمع کرنا سکھائیں" },
-  { en: "I shared my OTP with a caller", roman: "Main ne caller ko OTP bata diya", ur: "میں نے کال کرنے والے کو او ٹی پی بتا دیا" },
+  { en: "I shared my OTP with a caller", roman: "Main ne caller ko OTP bata diya", ur: "میں نے کال کرنے والے کو OTP بتا دیا" },
 ];
 
 const LANGS: { value: Lang; label: string }[] = [
@@ -107,7 +107,7 @@ export default function AssistantPage() {
         subtitle={tx({ en: "Speak or type — I'll explain simply.", roman: "Bolein ya likhein — main aasaan alfaaz mein samjhaunga.", ur: "بولیں یا لکھیں — میں آسان الفاظ میں سمجھاؤں گا۔" })}
         actions={
           <>
-            <Segmented label="Language" value={prefs.lang} onChange={(v) => update({ lang: v })} options={LANGS} />
+            <Segmented label={tx({ en: "Language", roman: "Zabaan", ur: "زبان" })} value={prefs.lang} onChange={(v) => update({ lang: v })} options={LANGS} />
             {!empty && (
               <Button variant="secondary" icon={Eraser} onClick={() => { stop(); setMessages([]); setError(null); }}>
                 {tx({ en: "Clear chat", roman: "Chat saaf karein", ur: "چیٹ صاف کریں" })}
@@ -152,7 +152,7 @@ export default function AssistantPage() {
               messages.map((m) =>
                 m.role === "user" ? (
                   <div key={m.id} className="flex justify-end">
-                    <div className={cn("max-w-[85%] rounded-3xl rounded-br-md bg-gradient-to-r from-primary to-[#0e8a7d] px-5 py-3 text-on-primary shadow-md", lang === "ur" && "urdu")}>
+                    <div className={cn("max-w-[85%] rounded-3xl rounded-ee-md bg-gradient-to-r from-primary to-[#0e8a7d] px-5 py-3 text-on-primary shadow-md", lang === "ur" && "urdu")}>
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ export default function AssistantPage() {
                   className="max-h-40 min-h-12 w-full resize-none rounded-2xl border border-line bg-surface-2 px-4.5 py-3 text-base text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 transition-all shadow-inner"
                 />
               </label>
-              <Button type="submit" size="lg" icon={Send} disabled={!input.trim()} loading={busy} aria-label="Send" className="h-12 px-5 rounded-2xl shadow-sm">
+              <Button type="submit" size="lg" icon={Send} disabled={!input.trim()} loading={busy} aria-label={tx({ en: "Send", roman: "Bhejein", ur: "بھیجیں" })} className="h-12 px-5 rounded-2xl shadow-sm">
                 <span className="hidden sm:inline">{tx({ en: "Send", roman: "Bhejein", ur: "بھیجیں" })}</span>
               </Button>
             </div>
@@ -242,7 +242,7 @@ export default function AssistantPage() {
               value={prefs.voiceRate}
               onChange={(e) => update({ voiceRate: Number(e.target.value) })}
               className="mt-2 w-full accent-[var(--primary)]"
-              aria-label="Speaking speed"
+              aria-label={tx({ en: "Speaking speed", roman: "Bolne ki raftaar", ur: "بولنے کی رفتار" })}
             />
           </div>
           <label className="flex cursor-pointer items-center gap-2.5 text-sm">
@@ -322,7 +322,7 @@ function AssistantBubble({
             {reply && <ModeBadge mode={reply.mode} />}
             {m.simpler && <Badge tone="lavender" icon={Sparkles}>{t("common.simpler")}</Badge>}
           </div>
-          <p dir="auto" className={cn("whitespace-pre-wrap leading-relaxed text-fg text-[0.95rem]", urdu && "urdu text-right text-base")}>{m.content}</p>
+          <p dir="auto" className={cn("whitespace-pre-wrap leading-relaxed text-fg text-[0.95rem]", urdu && "text-start text-base")}>{m.content}</p>
           {reply?.notice && <p className="mt-2 text-xs font-semibold text-warning">{reply.notice}</p>}
           {!!reply?.redactions && (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
@@ -342,7 +342,7 @@ function AssistantBubble({
           </div>
         )}
 
-        <div className="mt-2 flex flex-wrap items-center gap-1" role="group" aria-label="Patient voice controls">
+        <div className="mt-2 flex flex-wrap items-center gap-1" role="group" aria-label={tx({ en: "Patient voice controls", roman: "Sabr wale controls", ur: "صبر والے کنٹرولز" })}>
           <Button size="sm" variant="ghost" icon={speaking ? VolumeX : Volume2} onClick={() => (speaking ? onStop() : onSpeak())} className="rounded-xl">
             {speaking ? t("common.stop") : t("common.listen")}
           </Button>

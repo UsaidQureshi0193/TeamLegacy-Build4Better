@@ -143,7 +143,7 @@ function pcmToWav(pcm: Buffer, sampleRate: number): Buffer {
   return Buffer.concat([header, pcm]);
 }
 
-export async function geminiSpeak(text: string, lang: "roman" | "ur"): Promise<Buffer> {
+export async function geminiSpeak(text: string): Promise<Buffer> {
   const clean = text.trim();
   if (!clean) throw new AiUnavailableError("No text provided for speech.");
 

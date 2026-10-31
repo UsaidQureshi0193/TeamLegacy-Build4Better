@@ -98,6 +98,7 @@ npm run build && npm start
 | Variable | Required | Purpose |
 |---|---|---|
 | `GEMINI_API_KEY` | No | **Free** Live AI via Google Gemini — get a key at https://aistudio.google.com ("Get API key"). |
+| `GEMINI_TTS_MODEL` | No | Override the Urdu voice model (default `gemini-3.8-flash-tts`, with automatic fallbacks). |
 | `GEMINI_MODEL` | No | Main Gemini model (default `gemini-3.5-flash`). When the free tier is busy, HUMRAAH falls back to `gemini-flash-lite-latest` automatically. |
 | `ANTHROPIC_API_KEY` | No | Live AI via Anthropic Claude (paid). Takes priority over Gemini if both are set. |
 | `HUMRAAH_MODEL` | No | Override the Claude model (default `claude-opus-5-5`). |
@@ -123,8 +124,9 @@ Tested responsible-AI cases (Demo Mode): an obvious OTP scam → **high**; a leg
 ## Known limitations
 
 - **Voice:** speech recognition depends on the browser (best in Chrome/Edge; Urdu uses `ur-PK` where supported). Text input always works. Speech may misrecognise names and numbers, so check transcripts.
+- **Urdu / Roman Urdu read-aloud** uses Gemini text-to-speech (`/api/tts`), because most browsers have no Urdu voice. It needs `GEMINI_API_KEY`; without it, Roman Urdu falls back to the browser voice and Urdu shows a short message instead of staying silent. English always uses the browser voice.
 - **OCR:** reads English text. The first use downloads ~10 MB of language data from a CDN (then cached). Low-contrast or white-on-colour text can be missed. Live AI vision does not have this limitation.
-- **Urdu script:** the UI chrome and rule engines support Urdu script. Curated library and scenario content is English and Roman Urdu (Urdu mode shows Roman Urdu there). Live AI answers in Urdu script.
+- **Urdu script:** the whole UI, curated content and rule engines are available in English, Roman Urdu and Urdu script (RTL layout, Noto Sans Arabic font). Live AI answers in the selected language.
 - **Not verification:** HUMRAAH does not check URLs against a reputation service, verify senders, or detect deepfakes.
 - **Progress is per device:** clearing browser data resets it (Export is available).
 - **Family Circle** (consent-based sharing) and Supabase sync are roadmap items, not built.

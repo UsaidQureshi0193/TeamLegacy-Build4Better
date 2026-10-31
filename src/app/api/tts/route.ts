@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     const key = createHash("sha256").update(`${lang}:${text}`).digest("hex");
     let audio = cache.get(key);
     if (!audio) {
-      audio = await geminiSpeak(text, lang);
+      audio = await geminiSpeak(text);
       if (cache.size >= MAX_CACHE) cache.delete(cache.keys().next().value!);
       cache.set(key, audio);
     }

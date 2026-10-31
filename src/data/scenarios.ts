@@ -1,8 +1,8 @@
 // HUMRAAH Academy — fictional practice scenarios only.
 // Every bank, person, number and amount below is invented for training.
 
-/** Bilingual text plus Urdu script. `ur` falls back to Roman Urdu if missing. */
-export type Bi = { en: string; roman: string; ur?: string };
+/** Text in English, Roman Urdu and Urdu script. */
+export type Bi = { en: string; roman: string; ur: string };
 
 export interface Segment {
   text: string;
@@ -271,5 +271,5 @@ export const TASK_MISSIONS: TaskMission[] = [
 ];
 
 export function pick(bi: Bi, lang: string) {
-  return lang === "en" ? bi.en : lang === "ur" ? (bi.ur ?? bi.roman) : bi.roman;
+  return lang === "en" ? bi.en : lang === "ur" ? bi.ur : bi.roman;
 }
