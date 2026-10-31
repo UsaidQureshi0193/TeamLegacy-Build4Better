@@ -1,13 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, Clock, FileText, GraduationCap, HelpCircle, Landmark, Lightbulb,
-  LifeBuoy, Mail, Map, PartyPopper, Repeat, ShieldCheck, Sparkles, Target, TrendingUp, Video, Wand2, X, Zap, type LucideIcon,
+  ArrowLeft, ArrowRight, CalendarDays, Check, CheckCircle2, FileText, GraduationCap, HelpCircle, Landmark, Lightbulb,
+  LifeBuoy, Mail, Map, PartyPopper, Repeat, ShieldCheck, Sparkles, TrendingUp, Video, Wand2, X, Zap, type LucideIcon,
 } from "lucide-react";
 import { VoiceMic } from "@/components/media";
-import { Badge, Button, ButtonLink, Card, IconTile, Input, ModeBadge, Notice, PageHeader, ProgressBar, Spinner, Textarea, cn } from "@/components/ui";
+import { ActionCard, Badge, Button, ButtonLink, Card, IconTile, Input, ModeBadge, Notice, PageHeader, ProgressBar, Section, Spinner, Stat, StepList, Textarea, cn } from "@/components/ui";
 import { postJSON, takeHandoff } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { usePrefs } from "@/lib/prefs";
@@ -250,50 +249,37 @@ export default function GuidePage() {
   };
 
   const levelInfo = {
-    1: { name: tx({ en: "Level 1 · Full guidance", roman: "Level 1 · Poori rehnumai" }), body: tx({ en: "First time: hints are shown under every step.", roman: "Pehli dafa: har step ke neeche ishara dikhaya jata hai." }) },
-    2: { name: tx({ en: "Level 2 · Hints on request", roman: "Level 2 · Ishara maangne par" }), body: tx({ en: "You've done this before, so hints stay hidden until you ask.", roman: "Aap yeh pehle kar chuke hain, is liye ishara sirf maangne par milega." }) },
-    3: { name: tx({ en: "Level 3 · Practice mode", roman: "Level 3 · Mashq mode" }), body: tx({ en: "You choose the next step yourself. Wrong guesses count as a hint — that's okay!", roman: "Agla step aap khud chunte hain. Ghalat andaza ishara ginna jata hai — koi baat nahi!" }) },
+    1: { name: tx({ en: "Level 1 · Full guidance", roman: "Level 1 · Poori rehnumai", ur: "لیول 1 · مکمل رہنمائی" }), body: tx({ en: "hints shown", roman: "ishare dikhte hain", ur: "اشارے نظر آتے ہیں" }) },
+    2: { name: tx({ en: "Level 2 · Hints on request", roman: "Level 2 · Ishara maangne par", ur: "لیول 2 · مانگنے پر اشارہ" }), body: tx({ en: "ask when you need one", roman: "zaroorat par maangein", ur: "ضرورت ہو تو مانگیں" }) },
+    3: { name: tx({ en: "Level 3 · Practice mode", roman: "Level 3 · Mashq mode", ur: "لیول 3 · مشق موڈ" }), body: tx({ en: "you choose the next step", roman: "agla step aap chunein", ur: "اگلا قدم آپ خود چنیں" }) },
   }[lvl];
 
   // ── Completion screen ───────────────────────────────────
   if (done) {
     const independent = done.hints === 0 && done.stuck === 0;
     return (
-      <div className="mx-auto max-w-3xl animate-fade-up">
-        <Card glow className="overflow-hidden">
-          <div className="hero-gradient px-6 py-10 text-center text-white sm:px-10">
-            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-3xl bg-white/15 animate-float">
-              <PartyPopper className="size-8" aria-hidden />
-            </div>
-            <h1 className="text-2xl font-extrabold sm:text-3xl">{tx({ en: "Well done — you did it yourself!", roman: "Shabaash — aap ne khud kar dikhaya!" })}</h1>
-            <p className="mt-2 text-white/80">{done.task.title}</p>
-          </div>
-          <div className="grid grid-cols-2 gap-3 p-6 sm:grid-cols-4">
-            {[
-              { label: tx({ en: "Steps", roman: "Steps" }), value: done.task.steps.length },
-              { label: tx({ en: "Hints used", roman: "Ishare" }), value: done.hints },
-              { label: tx({ en: "Times stuck", roman: "Atke" }), value: done.stuck },
-              { label: tx({ en: "Attempt", roman: "Koshish" }), value: `#${done.attempt}` },
-            ].map((s) => (
-              <div key={s.label} className="rounded-2xl border border-line bg-surface-2 p-4 text-center">
-                <p className="font-display text-2xl font-extrabold">{s.value}</p>
-                <p className="text-xs font-semibold text-subtle">{s.label}</p>
-              </div>
-            ))}
-          </div>
-          <div className="px-6 pb-6">
-            <Notice tone={independent ? "success" : "info"} title={independent ? tx({ en: "Independent completion!", roman: "Khud-mukhtar takmeel!" }) : tx({ en: "Next time, try with fewer hints", roman: "Agli dafa kam isharon ke saath koshish karein" })}>
-              {independent
-                ? tx({ en: "You needed no help at all. This counts towards your Digital Independence Score.", roman: "Aap ko koi madad nahi chahiye thi. Yeh aap ke Digital Independence Score mein shamil hai." })
-                : tx({ en: "HUMRAAH will give a little less help on your next attempt — that's how confidence grows.", roman: "Agli koshish par HUMRAAH thori kam madad dega — isi tarah aitemaad barhta hai." })}
-            </Notice>
-            <div className="mt-5 flex flex-wrap gap-2">
-              <ButtonLink href="/progress" icon={TrendingUp}>{tx({ en: "See your Independence Score update", roman: "Apna Independence Score dekhein" })}</ButtonLink>
-              <ButtonLink href="/academy" variant="secondary" icon={GraduationCap}>{tx({ en: "Practise in the Academy", roman: "Academy mein mashq" })}</ButtonLink>
-              <Button variant="ghost" icon={Map} onClick={() => setDone(null)}>{tx({ en: "Choose another task", roman: "Koi aur kaam chunein" })}</Button>
-            </div>
-          </div>
+      <div className="mx-auto max-w-2xl space-y-6">
+        <Card glow className="p-6 text-center sm:p-8">
+          <IconTile icon={PartyPopper} tone="success" size="lg" className="mx-auto" />
+          <h1 className="mt-4 text-2xl font-bold">{tx({ en: "Well done — you did it yourself!", roman: "Shabaash — aap ne khud kar dikhaya!", ur: "شاباش — آپ نے خود کر دکھایا!" })}</h1>
+          <p className="mt-1 text-muted">{done.task.title}</p>
         </Card>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label={tx({ en: "Steps", roman: "Steps", ur: "قدم" })} value={done.task.steps.length} />
+          <Stat label={tx({ en: "Hints used", roman: "Ishare", ur: "اشارے" })} value={done.hints} />
+          <Stat label={tx({ en: "Times stuck", roman: "Atke", ur: "اٹکے" })} value={done.stuck} />
+          <Stat label={tx({ en: "Attempt", roman: "Koshish", ur: "کوشش" })} value={`#${done.attempt}`} />
+        </div>
+        <Notice tone={independent ? "success" : "info"} title={independent ? tx({ en: "Independent completion!", roman: "Khud-mukhtar takmeel!", ur: "خود مکمل کیا!" }) : tx({ en: "Next time, try with fewer hints", roman: "Agli dafa kam isharon ke saath koshish karein", ur: "اگلی بار کم اشاروں کے ساتھ کوشش کریں" })}>
+          {independent
+            ? tx({ en: "No help needed — this counts towards your Independence Score.", roman: "Koi madad nahi chahiye thi — yeh aap ke score mein shamil hai.", ur: "کوئی مدد نہیں چاہیے تھی — یہ آپ کے اسکور میں شامل ہے۔" })
+            : tx({ en: "Next time HUMRAAH will give a little less help.", roman: "Agli dafa HUMRAAH thori kam madad dega.", ur: "اگلی بار ہمراہ تھوڑی کم مدد دے گا۔" })}
+        </Notice>
+        <div className="flex flex-wrap gap-2">
+          <ButtonLink href="/progress" icon={TrendingUp}>{tx({ en: "See your progress", roman: "Progress dekhein", ur: "اپنی پیش رفت دیکھیں" })}</ButtonLink>
+          <ButtonLink href="/academy" variant="secondary" icon={GraduationCap}>{tx({ en: "Practise in the Academy", roman: "Academy mein mashq", ur: "اکیڈمی میں مشق کریں" })}</ButtonLink>
+          <Button variant="ghost" icon={Map} onClick={() => setDone(null)}>{tx({ en: "Another task", roman: "Koi aur kaam", ur: "کوئی اور کام" })}</Button>
+        </div>
       </div>
     );
   }
@@ -304,47 +290,38 @@ export default function GuidePage() {
     const isLast = session.step === n - 1;
     const showHint = lvl === 1 || hintOpen;
     return (
-      <div className="mx-auto max-w-4xl">
-        <div className="mb-5 flex flex-wrap items-center justify-between gap-3 animate-fade-up">
-          <Button variant="ghost" icon={ArrowLeft} onClick={exit}>{tx({ en: "All tasks", roman: "Tamam kaam" })}</Button>
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="neutral">{task.source === "library" ? tx({ en: "Reviewed guide", roman: "Jaancha hua guide" }) : task.source === "ai" ? tx({ en: "AI-generated plan", roman: "AI ka banaya plan" }) : tx({ en: "General safe plan", roman: "Aam mehfooz plan" })}</Badge>
+      <div className="mx-auto max-w-3xl space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Button variant="ghost" size="sm" icon={ArrowLeft} onClick={exit}>{tx({ en: "All tasks", roman: "Tamam kaam", ur: "تمام کام" })}</Button>
+          <div className="flex items-center gap-2">
+            <Badge tone="neutral">{task.source === "library" ? tx({ en: "Reviewed guide", roman: "Jaancha hua guide", ur: "جانچی ہوئی رہنمائی" }) : task.source === "ai" ? tx({ en: "AI plan", roman: "AI plan", ur: "AI منصوبہ" }) : tx({ en: "General plan", roman: "Aam plan", ur: "عام منصوبہ" })}</Badge>
             <ModeBadge mode={task.mode} />
           </div>
         </div>
 
-        <div className="mb-4 animate-fade-up">
-          <p className="text-xs font-bold uppercase tracking-[0.14em] text-primary">{task.category} · No Confusion Mode</p>
-          <h1 className="mt-1 text-2xl font-extrabold sm:text-3xl">{task.title}</h1>
+        <div>
+          <h1 className="text-2xl font-bold">{task.title}</h1>
+          <p className="mt-1 text-sm text-muted">
+            <span className="font-semibold text-fg">{levelInfo.name}</span> · {levelInfo.body} · {tx({ en: `Attempt #${session.attempt}`, roman: `Koshish #${session.attempt}`, ur: `کوشش #${session.attempt}` })}
+          </p>
         </div>
 
-        {task.notice && <Notice tone="warning" className="mb-4">{task.notice}</Notice>}
+        {task.notice && <Notice tone="warning">{task.notice}</Notice>}
 
-        <div className="mb-4 flex items-center gap-3 rounded-2xl border border-line bg-surface p-3">
-          <IconTile icon={lvl === 3 ? Target : lvl === 2 ? Lightbulb : Sparkles} tone={lvl === 3 ? "lavender" : lvl === 2 ? "info" : "teal"} size="sm" />
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold">{levelInfo.name}</p>
-            <p className="text-xs text-muted">{levelInfo.body}</p>
-          </div>
-          <Badge tone="neutral">{tx({ en: `Attempt #${session.attempt}`, roman: `Koshish #${session.attempt}` })}</Badge>
-        </div>
-
-        <Card glow className="p-5 sm:p-8">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <p className="text-sm font-bold text-muted">
-              {tx({ en: `Step ${session.step + 1} of ${n}`, roman: `Step ${session.step + 1} / ${n}` })}
-            </p>
-            <p className="text-xs font-semibold text-subtle">{tx({ en: `Hints used: ${session.hints}`, roman: `Ishare: ${session.hints}` })}</p>
+        <Card glow className="p-5 sm:p-6">
+          <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+            <span className="font-semibold">{tx({ en: `Step ${session.step + 1} of ${n}`, roman: `Step ${session.step + 1} / ${n}`, ur: `قدم ${session.step + 1} از ${n}` })}</span>
+            <span className="text-subtle">{tx({ en: `Hints: ${session.hints}`, roman: `Ishare: ${session.hints}`, ur: `اشارے: ${session.hints}` })}</span>
           </div>
           <ProgressBar value={((session.step + (mustPredict ? 0 : 1)) / n) * 100} label="Task progress" />
 
           {mustPredict ? (
-            <div className="mt-8 animate-fade-up">
-              <p className="flex items-center gap-2 font-display text-xl font-bold sm:text-2xl">
-                <HelpCircle className="size-6 text-lavender" aria-hidden />
-                {tx({ en: "What do you think comes next?", roman: "Aap ke khayal mein agla qadam kya hai?" })}
+            <div className="mt-6">
+              <p className="flex items-center gap-2 text-lg font-semibold">
+                <HelpCircle className="size-5 text-lavender" aria-hidden />
+                {tx({ en: "What do you think comes next?", roman: "Aap ke khayal mein agla qadam kya hai?", ur: "آپ کے خیال میں اگلا قدم کیا ہے؟" })}
               </p>
-              <div className="mt-5 grid gap-3">
+              <div className="mt-4 grid gap-2.5">
                 {choices.map((c) => {
                   const wrong = wrongPicks.includes(c);
                   return (
@@ -353,8 +330,8 @@ export default function GuidePage() {
                       onClick={() => pickChoice(c)}
                       disabled={wrong}
                       className={cn(
-                        "flex min-h-16 items-center gap-3 rounded-2xl border-2 px-5 py-4 text-left text-base font-semibold transition-all cursor-pointer",
-                        wrong ? "border-danger/40 bg-danger-soft text-muted line-through" : "border-line bg-surface-2 hover:border-primary hover:bg-primary-soft",
+                        "flex min-h-14 items-center gap-3 rounded-xl border px-4 py-3 text-left font-medium transition-colors cursor-pointer",
+                        wrong ? "border-danger/30 bg-danger-soft text-muted line-through" : "border-line hover:border-primary hover:bg-primary-soft",
                       )}
                     >
                       {wrong ? <X className="size-5 shrink-0 text-danger" aria-hidden /> : <ArrowRight className="size-5 shrink-0 text-primary" aria-hidden />}
@@ -364,189 +341,150 @@ export default function GuidePage() {
                 })}
               </div>
               {wrongPicks.length > 0 && (
-                <p className="mt-3 text-sm text-muted" role="status">{tx({ en: "Not quite — that's a different step. Try again.", roman: "Bilkul nahi — yeh koi aur step hai. Dobara koshish karein." })}</p>
+                <p className="mt-3 text-sm text-muted" role="status">{tx({ en: "Not quite — that's a different step. Try again.", roman: "Yeh koi aur step hai. Dobara koshish karein.", ur: "یہ کوئی اور قدم ہے۔ دوبارہ کوشش کریں۔" })}</p>
               )}
             </div>
           ) : (
-            <div className="mt-8 animate-fade-up" key={`${session.step}-${simpler}`}>
-              {simpler && <Badge tone="info" className="mb-3">{tx({ en: "Simpler words", roman: "Aasaan alfaaz" })}</Badge>}
-              <p className="font-display text-2xl font-extrabold leading-snug sm:text-[2rem]">{stepText}</p>
-              <div className="mt-5 rounded-2xl bg-surface-2 p-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-subtle">{tx({ en: "Why it matters", roman: "Yeh kyun zaroori hai" })}</p>
-                <p className="mt-1 text-base text-muted">{step.why}</p>
-              </div>
+            <div className="mt-6" key={`${session.step}-${simpler}`}>
+              {simpler && <Badge tone="info" className="mb-2">{tx({ en: "Simpler words", roman: "Aasaan alfaaz", ur: "آسان الفاظ" })}</Badge>}
+              <p className="font-display text-xl font-bold leading-snug sm:text-2xl">{stepText}</p>
+              <p className="mt-3 text-muted">{step.why}</p>
               {showHint && (
-                <div className="mt-3 flex gap-3 rounded-2xl border border-warning/30 bg-warning-soft p-4 animate-fade-up">
-                  <Lightbulb className="mt-0.5 size-5 shrink-0 text-warning" aria-hidden />
-                  <p className="text-base text-fg">{step.hint}</p>
-                </div>
+                <p className="mt-3 flex gap-2 rounded-xl bg-warning-soft p-3 text-sm text-fg">
+                  <Lightbulb className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden />
+                  {step.hint}
+                </p>
               )}
             </div>
           )}
 
           {!mustPredict && (
-            <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-              <Button variant="secondary" icon={Repeat} onClick={() => (speakingId === "guide-step" ? stop() : speak(stepText, "guide-step"))}>
+            <div className="mt-5 flex flex-wrap gap-2">
+              <Button variant="secondary" size="sm" icon={Repeat} onClick={() => (speakingId === "guide-step" ? stop() : speak(stepText, "guide-step"))}>
                 {speakingId === "guide-step" ? t("common.stop") : t("common.repeat")}
               </Button>
-              <Button variant="secondary" icon={Lightbulb} onClick={takeHint} disabled={showHint}>{t("common.hint")}</Button>
-              <Button variant="secondary" icon={HelpCircle} onClick={dontUnderstand} disabled={simpler}>{t("common.dontUnderstand")}</Button>
-              <Button variant="secondary" icon={LifeBuoy} onClick={() => setRescueOpen((o) => !o)} className="text-danger">{t("common.stuck")}</Button>
+              <Button variant="secondary" size="sm" icon={Lightbulb} onClick={takeHint} disabled={showHint}>{t("common.hint")}</Button>
+              <Button variant="secondary" size="sm" icon={HelpCircle} onClick={dontUnderstand} disabled={simpler}>{t("common.dontUnderstand")}</Button>
+              <Button variant="ghost" size="sm" icon={LifeBuoy} onClick={() => setRescueOpen((o) => !o)} className="text-danger">{t("common.stuck")}</Button>
             </div>
           )}
 
           {rescueOpen && (
-            <div className="mt-4 rounded-2xl border border-danger/30 bg-danger-soft/60 p-4 animate-fade-up">
-              <p className="flex items-center gap-2 font-bold"><LifeBuoy className="size-5 text-danger" aria-hidden /> Rescue Mode</p>
-              <p className="mt-1 text-sm text-muted">{tx({ en: "Tell me what you see or what went wrong (optional). Don't type any codes or passwords.", roman: "Batayein aap ko kya nazar aa raha hai ya kya ghalat hua (zaroori nahi). Koi code ya password na likhein." })}</p>
-              <Textarea rows={2} value={problem} onChange={(e) => setProblem(e.target.value)} className="mt-3" placeholder={tx({ en: "e.g. The button isn't there / it says error", roman: "Maslan: button nazar nahi aa raha / error aa raha hai" })} />
-              <div className="mt-3 flex flex-wrap gap-2">
-                <Button icon={Wand2} loading={rescueLoading} onClick={askRescue}>{tx({ en: "Help me get unstuck", roman: "Mujhe nikalne mein madad karein" })}</Button>
-                <ButtonLink href="/vision" variant="ghost" icon={Sparkles}>{tx({ en: "Explain a screenshot instead", roman: "Screenshot samjhayein" })}</ButtonLink>
+            <div className="mt-4 space-y-3 rounded-xl bg-danger-soft p-4">
+              <p className="font-semibold">Rescue Mode</p>
+              <Textarea rows={2} value={problem} onChange={(e) => setProblem(e.target.value)} placeholder={tx({ en: "What went wrong? (optional — never type codes)", roman: "Kya ghalat hua? (zaroori nahi — code na likhein)", ur: "کیا غلط ہوا؟ (ضروری نہیں — کوئی کوڈ نہ لکھیں)" })} />
+              <div className="flex flex-wrap gap-2">
+                <Button size="sm" icon={Wand2} loading={rescueLoading} onClick={askRescue}>{tx({ en: "Help me get unstuck", roman: "Madad karein", ur: "میری مدد کریں" })}</Button>
+                <ButtonLink href="/vision" variant="ghost" size="sm" icon={Sparkles}>{tx({ en: "Explain a screenshot", roman: "Screenshot samjhayein", ur: "اسکرین شاٹ سمجھائیں" })}</ButtonLink>
               </div>
               {rescue && (
-                <div className="mt-4 rounded-2xl bg-surface p-4">
+                <div>
                   <div className="mb-2 flex items-center justify-between gap-2">
-                    <p className="font-semibold">{rescue.message}</p>
+                    <p className="text-sm font-semibold">{rescue.message}</p>
                     <ModeBadge mode={rescue.mode} />
                   </div>
-                  <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted">
-                    {rescue.recovery_steps.map((r) => <li key={r}>{r}</li>)}
-                  </ol>
+                  <StepList items={rescue.recovery_steps} tone="danger" />
                 </div>
               )}
             </div>
           )}
 
-          <div className="mt-8 flex items-center justify-between gap-3 border-t border-line pt-5">
-            <Button variant="ghost" size="lg" icon={ArrowLeft} disabled={session.step === 0} onClick={() => goTo(session.step - 1)}>{t("common.previous")}</Button>
+          <div className="mt-6 flex items-center justify-between gap-3 border-t border-line pt-5">
+            <Button variant="ghost" icon={ArrowLeft} disabled={session.step === 0} onClick={() => goTo(session.step - 1)}>{t("common.previous")}</Button>
             {!mustPredict &&
               (isLast ? (
-                <Button size="lg" icon={CheckCircle2} onClick={() => setFinishing(true)}>{tx({ en: "I did it — finish", roman: "Ho gaya — mukammal" })}</Button>
+                <Button size="lg" icon={CheckCircle2} onClick={() => setFinishing(true)}>{tx({ en: "I did it — finish", roman: "Ho gaya — mukammal", ur: "ہو گیا — مکمل" })}</Button>
               ) : (
-                <Button size="lg" icon={Check} onClick={() => goTo(session.step + 1)}>{tx({ en: "I did it — next", roman: "Ho gaya — agla" })}</Button>
+                <Button size="lg" icon={Check} onClick={() => goTo(session.step + 1)}>{tx({ en: "I did it — next", roman: "Ho gaya — agla", ur: "ہو گیا — اگلا" })}</Button>
               ))}
           </div>
 
           {finishing && (
-            <div className="mt-5 rounded-2xl border border-primary/30 bg-primary-soft p-5 animate-fade-up">
-              <p className="font-display text-lg font-bold">{tx({ en: "How confident do you feel doing this on your own now?", roman: "Ab yeh khud karne mein aap kitna pur-aitemaad hain?" })}</p>
+            <div className="mt-5 rounded-xl bg-primary-soft p-4">
+              <p className="font-semibold">{tx({ en: "How confident do you feel doing this alone now?", roman: "Ab yeh khud karne mein aap kitna pur-aitemaad hain?", ur: "اب یہ کام خود کرنے میں آپ کتنا پُراعتماد ہیں؟" })}</p>
               <div className="mt-3 grid grid-cols-5 gap-2" role="group" aria-label="Confidence from 1 to 5">
                 {[1, 2, 3, 4, 5].map((c) => (
-                  <button key={c} onClick={() => finish(c)} className="flex h-14 flex-col items-center justify-center rounded-2xl border border-line bg-surface font-display text-xl font-extrabold hover:border-primary hover:bg-surface-2 cursor-pointer">
+                  <button key={c} onClick={() => finish(c)} className="h-12 rounded-xl border border-line bg-surface text-lg font-bold hover:border-primary cursor-pointer">
                     {c}
                   </button>
                 ))}
               </div>
-              <div className="mt-2 flex justify-between text-xs text-subtle">
-                <span>{tx({ en: "Not yet", roman: "Abhi nahi" })}</span>
-                <span>{tx({ en: "Very confident", roman: "Bohat zyada" })}</span>
+              <div className="mt-1.5 flex justify-between text-xs text-subtle">
+                <span>{tx({ en: "Not yet", roman: "Abhi nahi", ur: "ابھی نہیں" })}</span>
+                <span>{tx({ en: "Very confident", roman: "Bohat zyada", ur: "بہت زیادہ" })}</span>
               </div>
             </div>
           )}
         </Card>
 
-        <Card className="mt-4 p-5">
-          <p className="flex items-center gap-2 text-sm font-bold"><ShieldCheck className="size-5 text-success" aria-hidden /> {tx({ en: "Stay safe", roman: "Mehfooz rahein" })}</p>
-          <ul className="mt-2 space-y-1.5 text-sm text-muted">
-            {task.safety_notes.map((s) => (
-              <li key={s} className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />{s}</li>
-            ))}
-            <li className="flex gap-2"><Check className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />{tx({ en: "You do every step yourself. HUMRAAH never needs your passwords, PINs or codes.", roman: "Har step aap khud karte hain. HUMRAAH ko kabhi password, PIN ya code nahi chahiye." })}</li>
+        <details className="rounded-xl border border-line px-4 py-3 text-sm">
+          <summary className="flex cursor-pointer items-center gap-2 font-semibold">
+            <ShieldCheck className="size-4 text-success" aria-hidden /> {tx({ en: "Stay safe", roman: "Mehfooz rahein", ur: "محفوظ رہیں" })}
+          </summary>
+          <ul className="mt-2 list-disc space-y-1 pl-5 text-muted">
+            {task.safety_notes.map((s) => <li key={s}>{s}</li>)}
+            <li>{tx({ en: "You do every step yourself. HUMRAAH never needs your passwords, PINs or codes.", roman: "Har step aap khud karte hain. HUMRAAH ko kabhi password, PIN ya code nahi chahiye.", ur: "ہر قدم آپ خود کرتے ہیں۔ ہمراہ کو کبھی پاس ورڈ، PIN یا کوڈ نہیں چاہیے۔" })}</li>
           </ul>
-        </Card>
+        </details>
       </div>
     );
   }
 
   // ── Library view ────────────────────────────────────────
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
         icon={Map}
-        eyebrow="HUMRAAH Guide"
-        title={tx({ en: "Learn a digital task, one step at a time", roman: "Digital kaam seekhein, ek ek qadam" })}
-        subtitle={tx({
-          en: "Pick a task or tell me your goal. You do every step yourself — I explain why each step matters and give less help as you improve.",
-          roman: "Koi kaam chunein ya apna maqsad batayein. Har qadam aap khud karte hain — main samjhata hoon aur aap ke seekhne ke saath madad kam karta hoon.",
-        })}
+        title={tx({ en: "Digital Guide", roman: "Digital Guide", ur: "ڈیجیٹل گائیڈ" })}
+        subtitle={tx({ en: "Learn any task one simple step at a time.", roman: "Koi bhi kaam ek ek aasaan qadam mein seekhein.", ur: "کوئی بھی کام ایک ایک آسان قدم میں سیکھیں۔" })}
       />
 
-      {error && <Notice tone="danger" className="mb-4">{error}</Notice>}
+      {error && <Notice tone="danger">{error}</Notice>}
 
-      <Card glow className="mb-8 p-5 sm:p-6">
-        <div className="flex flex-col gap-5 md:flex-row md:items-center">
-          <div className="flex-1">
-            <p className="font-display text-lg font-bold">{tx({ en: "What would you like to learn?", roman: "Aap kya seekhna chahte hain?" })}</p>
-            <p className="mt-1 text-sm text-muted">{tx({ en: "Type or speak your goal, e.g. “send a voice note on WhatsApp”.", roman: "Apna maqsad likhein ya bolein, maslan “WhatsApp par voice note bhejna”." })}</p>
-            <form
-              className="mt-4 flex flex-col gap-2 sm:flex-row"
-              onSubmit={(e) => {
-                e.preventDefault();
-                if (goal.trim()) start({ goal: goal.trim() });
-              }}
-            >
-              <Input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={tx({ en: "My goal is…", roman: "Mera maqsad hai…" })} aria-label="Your goal" maxLength={300} />
-              <Button type="submit" size="lg" icon={Sparkles} loading={loading} disabled={!goal.trim()} className="shrink-0">
-                {tx({ en: "Make my guide", roman: "Guide banayein" })}
-              </Button>
-            </form>
-          </div>
-          <div className="md:border-l md:border-line md:pl-6">
-            <VoiceMic
-              size="md"
-              onTranscript={(text) => {
-                setGoal(text);
-                start({ goal: text });
-              }}
-              labels={{ idle: tx({ en: "Or say your goal", roman: "Ya apna maqsad bolein" }), listening: tx({ en: "Listening…", roman: "Sun raha hoon…" }), unsupported: tx({ en: "Voice not supported — please type", roman: "Awaz support nahi — likhein" }) }}
-            />
-          </div>
-        </div>
+      <Card glow className="flex flex-col gap-4 p-5 md:flex-row md:items-center">
+        <form
+          className="flex flex-1 flex-col gap-2 sm:flex-row"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (goal.trim()) start({ goal: goal.trim() });
+          }}
+        >
+          <Input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder={tx({ en: "What do you want to learn? e.g. send a voice note", roman: "Kya seekhna hai? maslan voice note bhejna", ur: "کیا سیکھنا ہے؟ مثلاً وائس نوٹ بھیجنا" })} aria-label="Your goal" maxLength={300} />
+          <Button type="submit" size="lg" icon={Sparkles} loading={loading} disabled={!goal.trim()} className="shrink-0">
+            {tx({ en: "Make my guide", roman: "Guide banayein", ur: "رہنمائی بنائیں" })}
+          </Button>
+        </form>
+        <VoiceMic
+          size="md"
+          onTranscript={(text) => {
+            setGoal(text);
+            start({ goal: text });
+          }}
+          labels={{ idle: tx({ en: "Or say it", roman: "Ya bolein", ur: "یا بول کر بتائیں" }), listening: tx({ en: "Listening…", roman: "Sun raha hoon…", ur: "سن رہا ہوں…" }), unsupported: tx({ en: "Voice not supported", roman: "Awaz support nahi", ur: "آواز دستیاب نہیں" }) }}
+        />
       </Card>
 
-      <div className="mb-4 flex items-end justify-between gap-3">
-        <h2 className="text-xl font-bold">{tx({ en: "Popular guided tasks", roman: "Mashhoor guided kaam" })}</h2>
-        <Badge tone="success" icon={ShieldCheck}>{tx({ en: "Reviewed for safety", roman: "Hifazat ke liye jaancha gaya" })}</Badge>
-      </div>
-
-      {libError && <Notice tone="warning" className="mb-4">{libError}</Notice>}
-      {!library && !libError && <Spinner label={tx({ en: "Loading tasks…", roman: "Kaam load ho rahe hain…" })} />}
-      {loading && <div className="mb-4"><Spinner label={tx({ en: "Preparing your guide…", roman: "Aap ka guide tayyar ho raha hai…" })} /></div>}
-
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {library?.map((c, i) => {
-          const Icon = ICONS[c.icon] ?? Map;
-          return (
-            <button
+      <Section
+        title={tx({ en: "Popular tasks", roman: "Mashhoor kaam", ur: "مقبول کام" })}
+        description={tx({ en: "Help fades as you improve: full hints first, then on request, then you choose the next step.", roman: "Seekhne ke saath madad kam hoti hai: pehle poore ishare, phir maangne par, phir agla step aap chunte hain.", ur: "سیکھنے کے ساتھ مدد کم ہوتی ہے: پہلے پورے اشارے، پھر مانگنے پر، پھر اگلا قدم آپ خود چنتے ہیں۔" })}
+      >
+        {libError && <Notice tone="warning">{libError}</Notice>}
+        {!library && !libError && <Spinner label={tx({ en: "Loading tasks…", roman: "Kaam load ho rahe hain…", ur: "کام لوڈ ہو رہے ہیں…" })} />}
+        {loading && <Spinner label={tx({ en: "Preparing your guide…", roman: "Guide tayyar ho raha hai…", ur: "رہنمائی تیار ہو رہی ہے…" })} />}
+        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+          {library?.map((c, i) => (
+            <ActionCard
               key={c.id}
-              onClick={() => start({ task_id: c.id })}
-              disabled={loading}
-              className="group flex flex-col rounded-[var(--radius-lg)] border border-line bg-surface p-5 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-float disabled:opacity-60 cursor-pointer animate-fade-up"
-              style={{ animationDelay: `${i * 50}ms` }}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <IconTile icon={Icon} tone={TONES[i % TONES.length]} size="lg" />
-                <Badge tone="neutral">{c.category}</Badge>
-              </div>
-              <p className="mt-4 font-display text-lg font-bold leading-snug">{tx(c.title)}</p>
-              <p className="mt-1.5 flex-1 text-sm text-muted">{tx(c.blurb)}</p>
-              <div className="mt-4 flex items-center justify-between text-xs font-semibold text-subtle">
-                <span className="flex items-center gap-1.5"><Clock className="size-3.5" aria-hidden /> ~{c.minutes} min · {c.steps} {tx({ en: "steps", roman: "steps" })}</span>
-                <span className="flex items-center gap-1 text-primary opacity-0 transition-opacity group-hover:opacity-100">{tx({ en: "Start", roman: "Shuru" })} <ArrowRight className="size-3.5" aria-hidden /></span>
-              </div>
-            </button>
-          );
-        })}
-      </div>
-
-      <Notice tone="info" className="mt-8" title={tx({ en: "How HUMRAAH teaches", roman: "HUMRAAH kaise sikhata hai" })}>
-        {tx({
-          en: "First attempt: full guidance with hints. Second attempt: hints only when you ask. Third attempt onwards: you choose the next step yourself. Your progress is saved on this device only.",
-          roman: "Pehli koshish: isharon ke saath poori rehnumai. Doosri: ishara sirf maangne par. Teesri se: agla step aap khud chunte hain. Aap ki progress sirf isi device par mehfooz hoti hai.",
-        })}{" "}
-        <Link href="/progress" className="font-semibold text-primary underline-offset-2 hover:underline">{tx({ en: "View progress", roman: "Progress dekhein" })}</Link>
-      </Notice>
+              icon={ICONS[c.icon] ?? Map}
+              tone={TONES[i % TONES.length]}
+              title={tx(c.title)}
+              description={tx(c.blurb)}
+              meta={<span className="text-xs text-subtle">~{c.minutes} min · {c.steps} {tx({ en: "steps", roman: "steps", ur: "قدم" })}</span>}
+              onClick={() => !loading && start({ task_id: c.id })}
+            />
+          ))}
+        </div>
+      </Section>
     </div>
   );
 }

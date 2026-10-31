@@ -1,18 +1,38 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  AlertTriangle, Banknote, Camera, CheckCircle2, ChevronLeft, Circle, ExternalLink, FileWarning, KeyRound, LifeBuoy, Phone,
-  PhoneOff, Siren, UserX, type LucideIcon,
-} from "lucide-react";
+import { AlertTriangle, Banknote, CheckCircle2, ChevronLeft, Circle, ExternalLink, KeyRound, Phone, PhoneOff, Siren, UserX, type LucideIcon } from "lucide-react";
 import { EMERGENCY_PLAYBOOKS, OFFICIAL_CHANNELS, type EmergencyPlaybook } from "@/data/help";
 import { pick } from "@/data/scenarios";
 import { takeHandoff } from "@/lib/client";
 import { useT } from "@/lib/i18n";
-import { Badge, Button, Card, IconTile, Notice, PageHeader, ProgressBar, SpeakButton, cn } from "@/components/ui";
+import { ActionCard, Badge, Button, Card, Notice, PageHeader, ProgressBar, Section, SpeakButton, cn } from "@/components/ui";
 
 const ICONS: Record<EmergencyPlaybook["icon"], LucideIcon> = { key: KeyRound, banknote: Banknote, "user-x": UserX, "phone-off": PhoneOff, alert: AlertTriangle };
 const STORE = "humraah.emergency.checklist";
+
+const EVIDENCE_TIPS = [
+  {
+    en: "Screenshot the messages, the sender's number and any transactions.",
+    roman: "Messages, bhejne wale ka number aur transactions ke screenshot lein.",
+    ur: "پیغامات، بھیجنے والے کے نمبر اور لین دین کے اسکرین شاٹ لے لیں۔",
+  },
+  {
+    en: "Write down call times, amounts and complaint numbers.",
+    roman: "Calls ka waqt, raqam aur complaint numbers likh lein.",
+    ur: "کال کا وقت، رقم اور شکایت نمبر لکھ لیں۔",
+  },
+  {
+    en: "Don't forward suspicious links or delete messages before reporting.",
+    roman: "Report se pehle mashkook links forward ya messages delete na karein.",
+    ur: "رپورٹ کرنے سے پہلے مشکوک لنک آگے نہ بھیجیں اور پیغامات نہ مٹائیں۔",
+  },
+  {
+    en: "No one can guarantee getting money back for a fee — that's a scam too.",
+    roman: "Koi fees le kar paise wapas dilane ki guarantee nahi de sakta — yeh bhi dhoka hai.",
+    ur: "کوئی فیس لے کر رقم واپس دلانے کی ضمانت نہیں دے سکتا — یہ بھی دھوکہ ہے۔",
+  },
+];
 
 function loadChecks(): Record<string, number[]> {
   try {
@@ -51,122 +71,90 @@ export default function EmergencyPage() {
   const playbook = EMERGENCY_PLAYBOOKS.find((p) => p.id === selected);
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        icon={Siren}
-        tone="danger"
-        eyebrow="HUMRAAH Emergency"
-        title={tx({ en: "Emergency Help", roman: "Emergency Help", ur: "ایمرجنسی مدد" })}
-        subtitle={tx({ en: "Take a breath. We'll go through the most important steps first, one at a time.", roman: "Gehri saans lein. Hum sab se zaroori qadam pehle, ek ek kar ke uthayenge." })}
-      />
-
-      <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-danger/30 bg-danger-soft p-5 sm:p-6" role="alert">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <span className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-danger text-white shadow-[0_10px_30px_-10px_rgb(197_47_58/0.8)]">
-            <Phone className="size-7" aria-hidden />
-          </span>
-          <div className="flex-1">
-            <p className="font-display text-lg font-extrabold text-fg sm:text-xl">
-              {tx({ en: "If money or your account is at risk, call your bank now on the number on your card.", roman: "Agar paise ya account khatre mein hai to abhi apne card par likhe number par bank ko call karein.", ur: "اگر رقم یا اکاؤنٹ خطرے میں ہے تو ابھی اپنے کارڈ پر لکھے نمبر پر بینک کو کال کریں۔" })}
+    <div className="space-y-8">
+      <div>
+        <PageHeader
+          icon={Siren}
+          tone="danger"
+          title={tx({ en: "Emergency Help", roman: "Emergency Help", ur: "ایمرجنسی مدد" })}
+          subtitle={tx({ en: "Take a breath. Most important steps first.", roman: "Gehri saans lein. Sab se zaroori qadam pehle.", ur: "گہری سانس لیں۔ سب سے ضروری قدم پہلے۔" })}
+        />
+        <div className="flex gap-3 rounded-[var(--radius-lg)] bg-danger-soft p-4" role="alert">
+          <Phone className="mt-0.5 size-5 shrink-0 text-danger" aria-hidden />
+          <div>
+            <p className="font-semibold">
+              {tx({ en: "Money or account at risk? Call your bank now on the number on your card.", roman: "Paise ya account khatre mein? Abhi card par likhe number par bank ko call karein.", ur: "رقم یا اکاؤنٹ خطرے میں؟ ابھی کارڈ پر لکھے نمبر پر بینک کو کال کریں۔" })}
             </p>
-            <p className="mt-1 text-sm text-muted">
-              {tx({ en: "HUMRAAH cannot recover money or accounts, or contact anyone for you. It guides you to the right people quickly.", roman: "HUMRAAH paise ya account wapas nahi dila sakta, na aap ki taraf se kisi se rabta kar sakta hai. Yeh aap ko jaldi sahi logon tak pohanchata hai." })}
+            <p className="mt-0.5 text-sm text-muted">
+              {tx({ en: "HUMRAAH can't recover money or contact anyone for you.", roman: "HUMRAAH paise wapas nahi dila sakta, na aap ki taraf se kisi se rabta kar sakta hai.", ur: "ہمراہ رقم واپس نہیں دلا سکتا، نہ آپ کی طرف سے کسی سے رابطہ کر سکتا ہے۔" })}
             </p>
           </div>
         </div>
       </div>
 
       {!playbook ? (
-        <section aria-labelledby="what-happened">
-          <h2 id="what-happened" className="mb-3 font-display text-xl font-bold">{tx({ en: "What happened?", roman: "Kya hua?", ur: "کیا ہوا؟" })}</h2>
+        <Section title={tx({ en: "What happened?", roman: "Kya hua?", ur: "کیا ہوا؟" })}>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {EMERGENCY_PLAYBOOKS.map((p) => {
-              const Icon = ICONS[p.icon];
               const done = (checks[p.id] ?? []).length;
               return (
-                <button
+                <ActionCard
                   key={p.id}
                   onClick={() => setSelected(p.id)}
-                  className="group flex min-h-32 flex-col items-start gap-3 rounded-[var(--radius-lg)] border border-line bg-surface p-5 text-left shadow-card transition-all hover:-translate-y-0.5 hover:border-danger/50 cursor-pointer"
-                >
-                  <IconTile icon={Icon} tone="danger" />
-                  <span>
-                    <span className="block font-display text-base font-bold">{pick(p.title, lang)}</span>
-                    <span className="mt-1 block text-sm text-muted">{pick(p.when, lang)}</span>
-                  </span>
-                  {done > 0 && <Badge tone="success" icon={CheckCircle2}>{done}/{p.steps.length} {tx({ en: "done", roman: "mukammal" })}</Badge>}
-                </button>
+                  icon={ICONS[p.icon]}
+                  tone="danger"
+                  title={pick(p.title, lang)}
+                  description={pick(p.when, lang)}
+                  meta={done > 0 ? <Badge tone="success">{done}/{p.steps.length} {tx({ en: "done", roman: "mukammal", ur: "مکمل" })}</Badge> : undefined}
+                />
               );
             })}
           </div>
-        </section>
+        </Section>
       ) : (
         <Checklist playbook={playbook} done={checks[playbook.id] ?? []} onToggle={(i) => toggle(playbook.id, i)} onBack={() => setSelected(null)} />
       )}
 
-      <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="p-5 sm:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <IconTile icon={LifeBuoy} tone="teal" />
-            <div>
-              <h2 className="font-display text-lg font-bold">{tx({ en: "Official help channels", roman: "Official madad ke zaraye" })}</h2>
-              <p className="text-xs text-subtle">{tx({ en: "Checked Oct 2026. Always prefer numbers printed on your own card or bill.", roman: "Oct 2026 mein check kiye gaye. Hamesha apne card ya bill par likhe number ko tarjeeh dein." })}</p>
-            </div>
-          </div>
-          <ul className="flex flex-col gap-2.5">
+      <div className="grid gap-8 lg:grid-cols-2">
+        <Section
+          title={tx({ en: "Official help", roman: "Official madad", ur: "سرکاری مدد" })}
+          description={tx({ en: "Prefer numbers printed on your own card or bill.", roman: "Apne card ya bill par likhe number ko tarjeeh dein.", ur: "اپنے کارڈ یا بل پر لکھے نمبر کو ترجیح دیں۔" })}
+        >
+          <Card className="divide-y divide-line">
             {OFFICIAL_CHANNELS.map((c) => {
               const external = c.href?.startsWith("http");
               const inner = (
                 <>
-                  <span className="flex-1">
-                    <span className="block font-semibold">{pick(c.name, lang)}</span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block font-medium">{pick(c.name, lang)}</span>
                     <span className="block text-sm text-muted">{pick(c.detail, lang)}</span>
                   </span>
-                  {c.href && (external ? <ExternalLink className="size-5 shrink-0 text-primary" aria-hidden /> : <Phone className="size-5 shrink-0 text-primary" aria-hidden />)}
+                  {c.href && (external ? <ExternalLink className="size-4.5 shrink-0 text-primary" aria-hidden /> : <Phone className="size-4.5 shrink-0 text-primary" aria-hidden />)}
                 </>
               );
-              return (
-                <li key={c.name.en}>
-                  {c.href ? (
-                    <a
-                      href={c.href}
-                      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface-2 p-3.5 transition hover:border-primary/60"
-                    >
-                      {inner}
-                    </a>
-                  ) : (
-                    <div className="flex min-h-16 items-center gap-3 rounded-2xl border border-line bg-surface-2 p-3.5">{inner}</div>
-                  )}
-                </li>
+              return c.href ? (
+                <a key={c.name.en} href={c.href} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})} className="flex items-center gap-3 p-4 transition-colors hover:bg-surface-2">
+                  {inner}
+                </a>
+              ) : (
+                <div key={c.name.en} className="flex items-center gap-3 p-4">{inner}</div>
               );
             })}
-          </ul>
-        </Card>
+          </Card>
+        </Section>
 
-        <Card className="p-5 sm:p-6">
-          <div className="mb-4 flex items-center gap-3">
-            <IconTile icon={Camera} tone="info" />
-            <h2 className="font-display text-lg font-bold">{tx({ en: "Preserve evidence safely", roman: "Saboot mehfooz rakhein" })}</h2>
-          </div>
-          <ul className="flex flex-col gap-3 text-sm">
-            {[
-              { en: "Take screenshots of the messages, the sender's number and any transactions.", roman: "Messages, bhejne wale ka number aur transactions ke screenshots lein." },
-              { en: "Write down the time of calls, the amounts and any complaint numbers you are given.", roman: "Calls ka waqt, raqam aur milne wale complaint numbers likh lein." },
-              { en: "Don't forward suspicious links to others — describe them instead.", roman: "Mashkook links aage forward na karein — sirf bayan karein." },
-              { en: "Don't delete the messages until you have reported them.", roman: "Report karne se pehle messages delete na karein." },
-              { en: "Never share your OTP or PIN with anyone who calls to 'help' recover money.", roman: "Jo shakhs paise wapas dilane ki 'madad' ke liye call kare, use OTP ya PIN na batayein." },
-            ].map((tip, i) => (
-              <li key={i} className="flex gap-2.5">
-                <FileWarning className="mt-0.5 size-4.5 shrink-0 text-info" aria-hidden />
-                <span className="text-muted">{tx(tip)}</span>
-              </li>
-            ))}
-          </ul>
-          <Notice tone="warning" className="mt-5">
-            {tx({ en: "Recovery scams are common: no one can guarantee getting your money back for a fee.", roman: "Recovery ke naam par bhi dhoka hota hai: koi fees le kar paise wapas dilane ki guarantee nahi de sakta." })}
-          </Notice>
-        </Card>
+        <Section title={tx({ en: "Keep evidence safely", roman: "Saboot mehfooz rakhein", ur: "ثبوت محفوظ رکھیں" })}>
+          <Card className="p-5">
+            <ul className="space-y-3 text-sm">
+              {EVIDENCE_TIPS.map((tip, i) => (
+                <li key={i} className="flex gap-2.5">
+                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" aria-hidden />
+                  <span>{tx(tip)}</span>
+                </li>
+              ))}
+            </ul>
+          </Card>
+        </Section>
       </div>
     </div>
   );
@@ -174,59 +162,55 @@ export default function EmergencyPage() {
 
 function Checklist({ playbook, done, onToggle, onBack }: { playbook: EmergencyPlaybook; done: number[]; onToggle: (i: number) => void; onBack: () => void }) {
   const { lang, tx } = useT();
-  const Icon = ICONS[playbook.icon];
-  const progress = (done.length / playbook.steps.length) * 100;
   const speech = `${pick(playbook.title, lang)}. ${playbook.steps.map((s, i) => `${i + 1}. ${pick(s.text, lang)}`).join(" ")}`;
   return (
-    <Card glow className="p-5 sm:p-7 animate-fade-up">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-3">
-          <IconTile icon={Icon} tone="danger" size="lg" />
-          <div>
-            <h2 className="font-display text-xl font-extrabold">{pick(playbook.title, lang)}</h2>
-            <p className="text-sm text-muted">{pick(playbook.when, lang)}</p>
-          </div>
-        </div>
+    <Section
+      title={pick(playbook.title, lang)}
+      description={pick(playbook.when, lang)}
+      action={
         <div className="flex flex-wrap gap-2">
           <SpeakButton id={`sos-${playbook.id}`} text={speech} size="md" />
-          <Button variant="secondary" icon={ChevronLeft} onClick={onBack}>{tx({ en: "Other problems", roman: "Doosre masail" })}</Button>
+          <Button variant="secondary" icon={ChevronLeft} className="rtl:[&>svg]:rotate-180" onClick={onBack}>
+            {tx({ en: "Other problems", roman: "Doosre masail", ur: "دوسرے مسائل" })}
+          </Button>
         </div>
-      </div>
-      <div className="mt-5 flex items-center gap-3">
-        <ProgressBar value={progress} label="Checklist progress" />
-        <span className="shrink-0 text-sm font-bold text-muted">{done.length}/{playbook.steps.length}</span>
-      </div>
-      <ol className="mt-5 flex flex-col gap-3">
-        {playbook.steps.map((s, i) => {
-          const checked = done.includes(i);
-          return (
-            <li key={i}>
-              <button
-                onClick={() => onToggle(i)}
-                aria-pressed={checked}
-                className={cn(
-                  "flex w-full items-start gap-3.5 rounded-2xl border-2 p-4 text-left transition-all cursor-pointer",
-                  checked ? "border-success/40 bg-success-soft" : s.urgent ? "border-danger/40 bg-surface hover:border-danger" : "border-line bg-surface-2 hover:border-primary/60",
-                )}
-              >
-                {checked ? <CheckCircle2 className="mt-0.5 size-6 shrink-0 text-success" aria-hidden /> : <Circle className="mt-0.5 size-6 shrink-0 text-subtle" aria-hidden />}
-                <span className="flex-1">
-                  <span className="mb-1 flex flex-wrap items-center gap-2">
-                    <span className="text-xs font-bold text-subtle">{tx({ en: "Step", roman: "Qadam" })} {i + 1}</span>
-                    {s.urgent && !checked && <Badge tone="danger">{tx({ en: "Do now", roman: "Abhi karein", ur: "ابھی کریں" })}</Badge>}
+      }
+    >
+      <Card glow className="p-5">
+        <div className="mb-4 flex items-center gap-3">
+          <ProgressBar value={(done.length / playbook.steps.length) * 100} label={tx({ en: "Checklist progress", roman: "Checklist ki progress", ur: "چیک لسٹ کی پیش رفت" })} />
+          <span className="shrink-0 text-sm text-muted" dir="ltr">{done.length}/{playbook.steps.length}</span>
+        </div>
+        <ol className="space-y-2">
+          {playbook.steps.map((s, i) => {
+            const checked = done.includes(i);
+            return (
+              <li key={i}>
+                <button
+                  onClick={() => onToggle(i)}
+                  aria-pressed={checked}
+                  className={cn("flex w-full items-start gap-3 rounded-xl p-3 text-start transition-colors cursor-pointer", checked ? "bg-success-soft" : "hover:bg-surface-2")}
+                >
+                  {checked ? <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-success" aria-hidden /> : <Circle className="mt-0.5 size-5 shrink-0 text-subtle" aria-hidden />}
+                  <span className="flex-1">
+                    <span className={cn("font-medium", checked && "text-muted line-through decoration-1")}>{pick(s.text, lang)}</span>
+                    {s.urgent && !checked && <Badge tone="danger" className="ms-2 align-middle">{tx({ en: "Do now", roman: "Abhi karein", ur: "ابھی کریں" })}</Badge>}
                   </span>
-                  <span className={cn("block text-base font-semibold", checked && "text-muted line-through decoration-1")}>{pick(s.text, lang)}</span>
-                </span>
-              </button>
-            </li>
-          );
-        })}
-      </ol>
-      {done.length === playbook.steps.length && (
-        <Notice tone="success" className="mt-5" title={tx({ en: "You've completed every step.", roman: "Aap ne har qadam mukammal kar liya." })}>
-          {tx({ en: "Well done for acting quickly. Keep an eye on your accounts for the next few days and keep your complaint numbers safe.", roman: "Jaldi qadam uthane par shabash. Agle kuch din account par nazar rakhein aur complaint numbers sambhal kar rakhein." })}
-        </Notice>
-      )}
-    </Card>
+                </button>
+              </li>
+            );
+          })}
+        </ol>
+        {done.length === playbook.steps.length && (
+          <Notice tone="success" className="mt-4">
+            {tx({
+              en: "All steps done. Watch your accounts for a few days and keep your complaint numbers safe.",
+              roman: "Saare qadam mukammal. Kuch din account par nazar rakhein aur complaint numbers sambhal kar rakhein.",
+              ur: "تمام قدم مکمل۔ کچھ دن اپنے اکاؤنٹ پر نظر رکھیں اور شکایت نمبر سنبھال کر رکھیں۔",
+            })}
+          </Notice>
+        )}
+      </Card>
+    </Section>
   );
 }

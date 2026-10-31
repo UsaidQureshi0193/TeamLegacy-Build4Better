@@ -43,12 +43,12 @@
   --lavender-soft: #efebfc;
   --ring: #18b9a8;
   --shadow-sm: 0 1px 2px rgb(11 20 34 / 0.05), 0 1px 3px rgb(11 20 34 / 0.04);
-  --shadow-md: 0 4px 20px -6px rgb(11 20 34 / 0.1), 0 2px 6px -2px rgb(11 20 34 / 0.05);
-  --shadow-lg: 0 18px 50px -18px rgb(11 20 34 / 0.22);
+  --shadow-md: 0 1px 2px rgb(11 20 34 / 0.04), 0 2px 8px -4px rgb(11 20 34 / 0.06);
+  --shadow-lg: 0 12px 32px -12px rgb(11 20 34 / 0.18);
   --glow: 0 0 0 0 transparent;
-  --ambient-1: rgb(24 185 168 / 0.12);
-  --ambient-2: rgb(77 158 255 / 0.08);
-  --ambient-3: rgb(22 163 106 / 0.07);
+  --ambient-1: rgb(24 185 168 / 0.06);
+  --ambient-2: rgb(77 158 255 / 0.04);
+  --ambient-3: transparent;
   --glass: rgb(255 255 255 / 0.72);
   --hero-from: #0b1422;
   --hero-to: #0d4a49;
@@ -56,18 +56,18 @@
   --font-scale: 1;
   --radius-sm: 10px;
   --radius: 14px;
-  --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
   color-scheme: light;
 }
 
 .dark {
   --bg: #0b1422;
   --bg-elevated: #0f1b2d;
-  --surface: #111e31;
-  --surface-2: #14243a;
-  --surface-3: #1a2d47;
-  --border: #1f3350;
+  --surface: #0f1b2c;
+  --surface-2: #132236;
+  --surface-3: #1a2c45;
+  --border: #1c2e48;
   --border-strong: #2a4466;
   --text: #eef4f6;
   --text-muted: #a7b6c7;
@@ -88,12 +88,12 @@
   --lavender-soft: rgb(155 135 232 / 0.15);
   --ring: #2fd3c1;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
-  --shadow-md: 0 8px 30px -10px rgb(0 0 0 / 0.55);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.25);
   --shadow-lg: 0 24px 60px -20px rgb(0 0 0 / 0.7);
-  --glow: 0 0 0 1px rgb(24 185 168 / 0.25), 0 8px 32px -8px rgb(24 185 168 / 0.45);
-  --ambient-1: rgb(24 185 168 / 0.16);
-  --ambient-2: rgb(77 158 255 / 0.1);
-  --ambient-3: rgb(155 135 232 / 0.07);
+  --glow: 0 0 0 0 transparent;
+  --ambient-1: rgb(24 185 168 / 0.07);
+  --ambient-2: rgb(77 158 255 / 0.04);
+  --ambient-3: transparent;
   --glass: rgb(17 30 49 / 0.72);
   --hero-from: #0e2238;
   --hero-to: #0b4a47;
@@ -144,7 +144,7 @@
   --color-blue: var(--brand-blue);
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-jakarta), var(--font-inter), ui-sans-serif, system-ui, sans-serif;
-  --font-urdu: var(--font-urdu), "Noto Nastaliq Urdu", serif;
+  --font-urdu: var(--font-urdu), var(--font-inter), sans-serif;
   --shadow-card: var(--shadow-md);
   --shadow-soft: var(--shadow-sm);
   --shadow-float: var(--shadow-lg);
@@ -190,9 +190,21 @@ h1, h2, h3, h4, .font-display {
   letter-spacing: -0.015em;
 }
 
-[lang="ur"], .urdu {
-  font-family: var(--font-urdu), "Noto Nastaliq Urdu", serif;
-  line-height: 2.1;
+/* Urdu: a clean Naskh-style UI font (Noto Sans Arabic) for every element, Latin falls back to Inter.
+   Nastaliq looks beautiful in print but its tall lines made buttons and cards swell. */
+html[lang="ur"] body,
+html[lang="ur"] h1, html[lang="ur"] h2, html[lang="ur"] h3, html[lang="ur"] h4, html[lang="ur"] .font-display,
+html[lang="ur"] input, html[lang="ur"] textarea, html[lang="ur"] button,
+.urdu {
+  font-family: var(--font-urdu), var(--font-inter), sans-serif;
+  letter-spacing: 0;
+}
+html[lang="ur"] body {
+  line-height: 1.75;
+}
+/* Uppercase + wide tracking only makes sense for Latin labels. */
+html[lang="ur"] .uppercase {
+  text-transform: none;
   letter-spacing: 0;
 }
 
@@ -213,8 +225,7 @@ h1, h2, h3, h4, .font-display {
 
 .hero-gradient {
   background:
-    radial-gradient(600px 300px at 85% 0%, rgb(24 185 168 / 0.35), transparent 70%),
-    radial-gradient(500px 260px at 0% 100%, rgb(77 158 255 / 0.22), transparent 70%),
+    radial-gradient(520px 260px at 90% 0%, rgb(24 185 168 / 0.22), transparent 70%),
     linear-gradient(135deg, var(--hero-from), var(--hero-to));
 }
 
@@ -235,7 +246,7 @@ h1, h2, h3, h4, .font-display {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgb(24 185 168 / 0.55), rgb(77 158 255 / 0.15) 45%, rgb(22 163 106 / 0.4));
+  background: linear-gradient(135deg, rgb(24 185 168 / 0.35), rgb(24 185 168 / 0.08));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

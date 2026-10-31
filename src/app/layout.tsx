@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Noto_Nastaliq_Urdu, Plus_Jakarta_Sans } from "next/font/google";
+import { Inter, Noto_Sans_Arabic, Plus_Jakarta_Sans } from "next/font/google";
 import { AppShell } from "@/components/shell";
 import { PrefsProvider, THEME_BOOT_SCRIPT } from "@/lib/prefs";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const jakarta = Plus_Jakarta_Sans({ variable: "--font-jakarta", subsets: ["latin"], weight: ["500", "600", "700", "800"], display: "swap" });
-const urdu = Noto_Nastaliq_Urdu({ variable: "--font-urdu", subsets: ["arabic"], weight: ["400", "600", "700"], display: "swap" });
+const urdu = Noto_Sans_Arabic({ variable: "--font-urdu", subsets: ["arabic"], weight: ["400", "500", "600", "700"], display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: "HUMRAAH — Your Personal Guide to a Safer Digital Life", template: "%s · HUMRAAH" },

@@ -168,4 +168,6 @@ export interface StatusInfo {
   mode: AiMode;
   model: string | null;
   provider: string | null;
+  /** Server-side Urdu / Roman Urdu voice (Gemini TTS) is available. */
+  urduVoice?: boolean;
 }

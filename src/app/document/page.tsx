@@ -7,7 +7,7 @@ import {
   Square, User, Wallet, type LucideIcon,
 } from "lucide-react";
 import { ImageDrop } from "@/components/media";
-import { Badge, Button, Card, IconTile, ModeBadge, Notice, PageHeader, ProgressBar, SpeakButton, Spinner, cn } from "@/components/ui";
+import { Badge, Button, Card, ModeBadge, Notice, PageHeader, ProgressBar, Section, SpeakButton, Spinner, Stat, cn } from "@/components/ui";
 import { postJSON, runOcr, setHandoff } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { usePrefs } from "@/lib/prefs";
@@ -68,66 +68,63 @@ export default function DocumentPage() {
   const isBill = result ? /bill|challan|بل|چالان/i.test(result.doc_type) || result.fields.some((f) => f.kind === "amount") : false;
 
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
         icon={FileText}
         tone="lavender"
-        eyebrow="HUMRAAH Document"
         title={t("nav.document")}
-        subtitle={tx({
-          en: "Photograph a bill, fee challan, notice or form. I'll pick out the amount, dates and reference numbers and explain hard words.",
-          roman: "Bill, fee challan, notice ya form ki tasveer lein. Main raqam, tareekhen aur reference number nikaal kar mushkil alfaaz samjhaunga.",
-          ur: "بل، فیس چالان، نوٹس یا فارم کی تصویر لیں۔ میں رقم، تاریخیں اور ریفرنس نمبر نکال کر مشکل الفاظ سمجھاؤں گا۔",
-        })}
+        subtitle={tx({ en: "Photograph a bill or notice — I'll pick out what matters.", roman: "Bill ya notice ki tasveer lein — main zaroori baatein nikaal dunga.", ur: "بل یا نوٹس کی تصویر لیں — میں اہم باتیں نکال دوں گا۔" })}
         actions={image ? <Button variant="secondary" icon={RotateCcw} onClick={reset}>{tx({ en: "Read another", roman: "Doosra parhein", ur: "دوسرا پڑھیں" })}</Button> : undefined}
       />
 
-      <Notice tone="warning" icon={ShieldAlert} className="mb-6" title={tx({ en: "Protect your identity first", roman: "Pehle apni pehchaan mehfooz karein", ur: "پہلے اپنی شناخت محفوظ کریں" })}>
+      <Notice tone="warning" icon={ShieldAlert}>
         {tx({
-          en: "Cover your CNIC number, card numbers and account numbers before taking the photo. HUMRAAH also hides any it detects, and images are not stored.",
-          roman: "Tasveer lene se pehle CNIC, card aur account number dhaanp dein. HUMRAAH bhi jo number pehchaane chhupa deta hai, aur tasveerein save nahi hotin.",
-          ur: "تصویر لینے سے پہلے شناختی کارڈ، کارڈ اور اکاؤنٹ نمبر چھپا دیں۔ تصاویر محفوظ نہیں ہوتیں۔",
+          en: "Cover your CNIC, card and account numbers before taking the photo. Images are not stored.",
+          roman: "Tasveer se pehle CNIC, card aur account number dhaanp dein. Tasveerein save nahi hotin.",
+          ur: "تصویر سے پہلے شناختی کارڈ، کارڈ اور اکاؤنٹ نمبر چھپا دیں۔ تصاویر محفوظ نہیں ہوتیں۔",
         })}
       </Notice>
 
       {!image ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          <Card glow className="p-5 sm:p-7">
+        <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
+          <Card glow className="p-4 sm:p-5">
             <ImageDrop
               onImage={analyse}
               onSample={() => analyse(sampleBill())}
               sampleLabel={tx({ en: "Try a sample electricity bill", roman: "Sample bijli ka bill", ur: "نمونہ بجلی کا بل" })}
               label={tx({ en: "Upload a document photo", roman: "Document ki tasveer upload karein", ur: "دستاویز کی تصویر اپ لوڈ کریں" })}
-              hint={tx({ en: "Take it straight from above, in good light · PNG, JPG or WEBP", roman: "Seedha upar se, achi roshni mein · PNG, JPG ya WEBP", ur: "اوپر سے سیدھی، اچھی روشنی میں" })}
+              hint={tx({ en: "Straight from above, in good light", roman: "Seedha upar se, achi roshni mein", ur: "اوپر سے سیدھی، اچھی روشنی میں" })}
+              privacyNote=""
             />
           </Card>
-          <Card className="p-5">
-            <h2 className="font-display text-base font-bold">{tx({ en: "What I look for", roman: "Main kya dhoondta hoon", ur: "میں کیا ڈھونڈتا ہوں" })}</h2>
-            <ul className="mt-3 space-y-3">
-              {[
-                { icon: Wallet, tone: "teal" as const, en: "Amount to pay", roman: "Kitni raqam deni hai" },
-                { icon: CalendarClock, tone: "warning" as const, en: "Due date and late charges", roman: "Aakhri tareekh aur jurmana" },
-                { icon: Hash, tone: "info" as const, en: "Reference / consumer number", roman: "Reference / consumer number" },
-                { icon: BookOpen, tone: "lavender" as const, en: "Difficult words explained", roman: "Mushkil alfaaz ki wazahat" },
-                { icon: ListChecks, tone: "teal" as const, en: "A checklist of what to do", roman: "Kya karna hai ki checklist" },
-              ].map((x) => (
-                <li key={x.en} className="flex items-center gap-3 text-sm font-semibold">
-                  <IconTile icon={x.icon} tone={x.tone} size="sm" /> {tx(x)}
-                </li>
-              ))}
-            </ul>
+          <Card className="h-fit p-4 sm:p-5">
+            <Section title={tx({ en: "What I look for", roman: "Main kya dhoondta hoon", ur: "میں کیا ڈھونڈتا ہوں" })}>
+              <ul className="space-y-2.5 text-sm text-muted">
+                {[
+                  { icon: Wallet, en: "Amount to pay", roman: "Kitni raqam deni hai" },
+                  { icon: CalendarClock, en: "Due date and late charges", roman: "Aakhri tareekh aur jurmana" },
+                  { icon: Hash, en: "Reference / consumer number", roman: "Reference / consumer number" },
+                  { icon: BookOpen, en: "Difficult words explained", roman: "Mushkil alfaaz ki wazahat" },
+                  { icon: ListChecks, en: "A checklist of what to do", roman: "Kya karna hai ki checklist" },
+                ].map((x) => (
+                  <li key={x.en} className="flex items-center gap-2.5">
+                    <x.icon className="size-4 shrink-0 text-primary" aria-hidden /> {tx(x)}
+                  </li>
+                ))}
+              </ul>
+            </Section>
           </Card>
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,380px)_1fr]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,360px)_1fr]">
           <div className="space-y-4">
             <Card className="p-3">
               <div className="relative">
                 {/* eslint-disable-next-line @next/next/no-img-element -- local data URL preview */}
                 <img src={image} alt={tx({ en: "Your document", roman: "Aap ka document", ur: "آپ کی دستاویز" })} className="block max-h-[60vh] w-full rounded-xl object-contain" />
                 {busy && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/45 backdrop-blur-[2px]">
-                    <div className="rounded-2xl bg-elevated px-5 py-4 shadow-float">
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
+                    <div className="rounded-xl bg-elevated px-5 py-4">
                       <Spinner label={phase === "ocr" ? tx({ en: "Reading the document…", roman: "Document parh raha hoon…", ur: "دستاویز پڑھ رہا ہوں…" }) : tx({ en: "Understanding it…", roman: "Samajh raha hoon…", ur: "سمجھ رہا ہوں…" })} />
                       {phase === "ocr" && <ProgressBar value={progress * 100} className="mt-3 w-52" label="OCR progress" />}
                     </div>
@@ -138,14 +135,14 @@ export default function DocumentPage() {
             {error && (
               <Notice tone="danger">
                 {error}{" "}
-                <button className="font-bold text-primary underline cursor-pointer" onClick={() => analyse(image)}>{t("common.tryAgain")}</button>
+                <button className="font-semibold text-primary underline cursor-pointer" onClick={() => analyse(image)}>{t("common.tryAgain")}</button>
               </Notice>
             )}
           </div>
 
           {result && (
-            <div className="space-y-4 animate-fade-up">
-              <Card glow className="p-5 sm:p-6">
+            <div className="space-y-6">
+              <Card className="p-4 sm:p-5">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <Badge tone="lavender" icon={FileSearch}>{result.doc_type}</Badge>
                   <div className="flex items-center gap-1">
@@ -153,17 +150,18 @@ export default function DocumentPage() {
                     <SpeakButton id="doc-summary" text={result.summary} />
                   </div>
                 </div>
-                <p dir="auto" className={cn("mt-3 text-[1.05rem] leading-relaxed", urdu && "urdu")}>{result.summary}</p>
-                {result.notice && <p className="mt-2 text-xs font-medium text-warning">{result.notice}</p>}
+                <p dir="auto" className={cn("mt-3 leading-relaxed", urdu && "urdu")}>{result.summary}</p>
+                {result.notice && <p className="mt-2 text-xs text-warning">{result.notice}</p>}
                 {!!result.redactions && (
-                  <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-success">
-                    <ShieldCheck className="size-3.5" aria-hidden />
+                  <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
+                    <ShieldCheck className="size-3.5 text-success" aria-hidden />
                     {tx({ en: `${result.redactions} sensitive number(s) were hidden before analysis.`, roman: `${result.redactions} hassas number(s) chhupa diye gaye.`, ur: `${result.redactions} حساس نمبر چھپا دیے گئے۔` })}
                   </p>
                 )}
                 {isBill && (
                   <Button
                     className="mt-4"
+                    variant="soft"
                     icon={Map}
                     onClick={() => {
                       setHandoff("guide", "electricity-bill");
@@ -176,76 +174,62 @@ export default function DocumentPage() {
               </Card>
 
               {result.fields.length > 0 && (
-                <div>
-                  <div className="mb-2 flex items-center justify-between">
-                    <h2 className="font-display text-base font-bold">{tx({ en: "Important details", roman: "Aham tafseelat", ur: "اہم تفصیلات" })}</h2>
-                    <span className="text-xs font-semibold text-subtle">{tx({ en: "Confirm each on the paper", roman: "Har cheez kaghaz se milayein", ur: "ہر چیز کاغذ سے ملائیں" })}</span>
-                  </div>
+                <Section title={tx({ en: "Important details", roman: "Aham tafseelat", ur: "اہم تفصیلات" })} description={tx({ en: "Confirm each on the paper.", roman: "Har cheez kaghaz se milayein.", ur: "ہر چیز کاغذ سے ملائیں۔" })}>
                   <div className="grid gap-3 sm:grid-cols-2">
                     {result.fields.map((f, i) => {
                       const s = FIELD_STYLE[f.kind];
-                      return (
-                        <Card key={i} className="flex items-center gap-3 p-4">
-                          <IconTile icon={s.icon} tone={s.tone} />
-                          <div className="min-w-0">
-                            <p className="truncate text-xs font-semibold uppercase tracking-wider text-subtle">{f.label}</p>
-                            <p className="break-words font-display text-lg font-bold">{f.value}</p>
+                      return <Stat key={i} icon={s.icon} tone={s.tone} label={f.label} value={<span className="break-words text-lg">{f.value}</span>} />;
+                    })}
+                  </div>
+                </Section>
+              )}
+
+              {(result.checklist.length > 0 || result.terms.length > 0) && (
+                <Card className="space-y-6 p-4 sm:p-5">
+                  {result.checklist.length > 0 && (
+                    <Section
+                      title={tx({ en: "What to do", roman: "Kya karna hai", ur: "کیا کرنا ہے" })}
+                      action={<span className="text-xs text-subtle">{done.size}/{result.checklist.length}</span>}
+                    >
+                      <ProgressBar value={(done.size / result.checklist.length) * 100} label="Checklist progress" />
+                      <ul>
+                        {result.checklist.map((c, i) => {
+                          const checked = done.has(i);
+                          return (
+                            <li key={i}>
+                              <button
+                                role="checkbox"
+                                aria-checked={checked}
+                                onClick={() => setDone((d) => {
+                                  const n = new Set(d);
+                                  if (n.has(i)) n.delete(i);
+                                  else n.add(i);
+                                  return n;
+                                })}
+                                className="flex w-full items-start gap-3 rounded-lg px-2 py-2 text-left transition-colors hover:bg-surface-2 cursor-pointer"
+                              >
+                                {checked ? <CheckSquare className="mt-0.5 size-5 shrink-0 text-success" aria-hidden /> : <Square className="mt-0.5 size-5 shrink-0 text-subtle" aria-hidden />}
+                                <span dir="auto" className={cn("text-sm", checked && "text-muted line-through")}>{c}</span>
+                              </button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </Section>
+                  )}
+
+                  {result.terms.length > 0 && (
+                    <Section title={tx({ en: "Words explained", roman: "Alfaaz ki wazahat", ur: "الفاظ کی وضاحت" })} className={result.checklist.length > 0 ? "border-t border-line pt-5" : undefined}>
+                      <dl className="space-y-3">
+                        {result.terms.map((term, i) => (
+                          <div key={i}>
+                            <dt className="text-sm font-semibold">{term.term}</dt>
+                            <dd dir="auto" className={cn("text-sm text-muted", urdu && "urdu")}>{term.meaning}</dd>
                           </div>
-                        </Card>
-                      );
-                    })}
-                  </div>
-                </div>
-              )}
-
-              {result.checklist.length > 0 && (
-                <Card className="p-5">
-                  <div className="flex items-center justify-between gap-2">
-                    <h2 className="flex items-center gap-2 font-display text-base font-bold">
-                      <ListChecks className="size-5 text-primary" aria-hidden /> {tx({ en: "What to do", roman: "Kya karna hai", ur: "کیا کرنا ہے" })}
-                    </h2>
-                    <span className="text-xs font-semibold text-subtle">{done.size}/{result.checklist.length}</span>
-                  </div>
-                  <ProgressBar value={(done.size / result.checklist.length) * 100} className="mt-3" label="Checklist progress" />
-                  <ul className="mt-3 space-y-2">
-                    {result.checklist.map((c, i) => {
-                      const checked = done.has(i);
-                      return (
-                        <li key={i}>
-                          <button
-                            role="checkbox"
-                            aria-checked={checked}
-                            onClick={() => setDone((d) => {
-                              const n = new Set(d);
-                              if (n.has(i)) n.delete(i);
-                              else n.add(i);
-                              return n;
-                            })}
-                            className={cn("flex w-full items-start gap-3 rounded-xl border px-3 py-3 text-left transition cursor-pointer", checked ? "border-success/40 bg-success-soft" : "border-line bg-surface-2 hover:border-primary")}
-                          >
-                            {checked ? <CheckSquare className="mt-0.5 size-5 shrink-0 text-success" aria-hidden /> : <Square className="mt-0.5 size-5 shrink-0 text-subtle" aria-hidden />}
-                            <span dir="auto" className={cn("text-sm font-medium", checked && "text-muted line-through")}>{c}</span>
-                          </button>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </Card>
-              )}
-
-              {result.terms.length > 0 && (
-                <Card className="p-5">
-                  <h2 className="flex items-center gap-2 font-display text-base font-bold">
-                    <BookOpen className="size-5 text-lavender" aria-hidden /> {tx({ en: "Words explained", roman: "Alfaaz ki wazahat", ur: "الفاظ کی وضاحت" })}
-                  </h2>
-                  <dl className="mt-3 space-y-3">
-                    {result.terms.map((term, i) => (
-                      <div key={i} className="rounded-xl bg-surface-2 p-3">
-                        <dt className="font-bold">{term.term}</dt>
-                        <dd dir="auto" className={cn("mt-0.5 text-sm text-muted", urdu && "urdu")}>{term.meaning}</dd>
-                      </div>
-                    ))}
-                  </dl>
+                        ))}
+                      </dl>
+                    </Section>
+                  )}
                 </Card>
               )}
 

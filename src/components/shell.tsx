@@ -39,9 +39,10 @@ export const NAV: NavItem[] = [
 const GROUPS: NavItem["group"][] = ["nav.understand", "nav.protect", "nav.learn", "nav.you"];
 
 export function Logo({ compact }: { compact?: boolean }) {
+  const { tx } = useT();
   return (
     <Link href="/" className="flex items-center gap-3" aria-label="HUMRAAH home">
-      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)] shadow-[0_8px_24px_-8px_rgb(24_185_168/0.8)]">
+      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)]">
         <svg viewBox="0 0 32 32" className="size-6" aria-hidden>
           <path d="M9 7v18M23 7v18M9 16h14" stroke="#04211e" strokeWidth="3.4" strokeLinecap="round" />
           <circle cx="16" cy="16" r="2.6" fill="#F4B544" />
@@ -50,7 +51,7 @@ export function Logo({ compact }: { compact?: boolean }) {
       {!compact && (
         <span className="leading-none">
           <span className="block font-display text-lg font-extrabold tracking-[0.08em]">HUMRAAH</span>
-          <span className="mt-0.5 block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-subtle">Digital companion</span>
+          <span className="mt-0.5 block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-subtle">{tx({ en: "Digital companion", roman: "Digital saathi", ur: "ڈیجیٹل ساتھی" })}</span>
         </span>
       )}
     </Link>
@@ -65,10 +66,10 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { t } = useT();
   return (
-    <nav aria-label="Main" className="flex flex-col gap-5">
+    <nav aria-label="Main" className="flex flex-col gap-4">
       {GROUPS.map((g) => (
         <div key={g}>
-          <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-[0.14em] text-subtle">{t(g)}</p>
+          <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-subtle">{t(g)}</p>
           <ul className="flex flex-col gap-0.5">
             {NAV.filter((n) => n.group === g).map((n) => {
               const active = isActive(pathname, n.href);
@@ -80,11 +81,10 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-[0.95rem] font-semibold transition-all",
+                      "group flex items-center gap-3 rounded-lg px-3 py-2 text-[0.95rem] font-medium transition-colors",
                       active ? "bg-primary-soft text-fg" : "text-muted hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    {active && <span className="absolute inset-y-2 left-0 w-1 rounded-full bg-[linear-gradient(var(--brand-teal),var(--brand-emerald))]" aria-hidden />}
                     <n.icon className={cn("size-5 shrink-0", active ? "text-primary" : danger ? "text-danger" : "text-subtle group-hover:text-primary")} aria-hidden />
                     {t(n.key)}
                   </Link>
@@ -100,17 +100,17 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
 
 function SidebarFooter() {
   const status = useAiStatus();
+  const { tx } = useT();
   return (
-    <div className="rounded-2xl border border-line bg-surface-2 p-3.5">
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-bold text-muted">AI engine</span>
-        {status && <ModeBadge mode={status.mode} />}
-      </div>
-      <p className="mt-1.5 text-[11.5px] leading-snug text-subtle">
-        {status?.mode === "live" ? `Powered by ${status.provider}` : "Built-in safety rules. Add an AI key for full intelligence."}
-      </p>
-      <p className="mt-2 flex items-center gap-1.5 text-[11px] text-subtle">
-        <ShieldCheck className="size-3.5 text-success" aria-hidden /> Never asks for OTP, PIN or passwords
+    <div className="space-y-2 border-t border-line px-2 pt-4 text-xs text-subtle">
+      {status && (
+        <p className="flex items-center justify-between gap-2">
+          <span>{status.provider ?? tx({ en: "Built-in safety rules", roman: "Built-in hifazati usool", ur: "اندرونی حفاظتی اصول" })}</span>
+          <ModeBadge mode={status.mode} />
+        </p>
+      )}
+      <p className="flex items-center gap-1.5">
+        <ShieldCheck className="size-3.5 shrink-0 text-success" aria-hidden /> {tx({ en: "Never asks for OTP or PIN", roman: "Kabhi OTP ya PIN nahi maangta", ur: "کبھی OTP یا PIN نہیں مانگتا" })}
       </p>
     </div>
   );
@@ -137,7 +137,7 @@ function useOutside(ref: React.RefObject<HTMLElement | null>, onClose: () => voi
 }
 
 function SearchBox() {
-  const { t, lang } = useT();
+  const { t, tx, lang } = useT();
   const router = useRouter();
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
@@ -176,7 +176,7 @@ function SearchBox() {
     <div ref={ref} className="relative w-full max-w-md">
       <label className="relative block">
         <span className="sr-only">Search</span>
-        <Search className="pointer-events-none absolute left-3.5 top-1/2 size-4.5 -translate-y-1/2 text-subtle" aria-hidden />
+        <Search className="pointer-events-none absolute start-3.5 top-1/2 size-4.5 -translate-y-1/2 text-subtle" aria-hidden />
         <input
           ref={inputRef}
           value={q}
@@ -189,22 +189,22 @@ function SearchBox() {
             if (e.key === "Enter" && results.pages[0]) go(results.pages[0].href);
           }}
           placeholder={t("top.search")}
-          className="h-11 w-full rounded-2xl border border-line bg-surface-2 pl-10 pr-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
+          className="h-11 w-full rounded-2xl border border-line bg-surface-2 ps-10 pe-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
           role="combobox"
           aria-expanded={open}
           aria-controls="search-results"
         />
-        <kbd className="pointer-events-none absolute right-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-subtle sm:block">Ctrl K</kbd>
+        <kbd className="pointer-events-none absolute end-3 top-1/2 hidden -translate-y-1/2 rounded-md border border-line bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-subtle sm:block">Ctrl K</kbd>
       </label>
       {open && (
-        <div id="search-results" className="absolute left-0 right-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
+        <div id="search-results" className="absolute inset-x-0 top-[calc(100%+8px)] z-50 overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
           {results.pages.length > 0 && (
             <div className="p-2">
-              <p className="px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-subtle">Go to</p>
+              <p className="px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-subtle">{tx({ en: "Go to", roman: "Yahan jayein", ur: "یہاں جائیں" })}</p>
               {results.pages.map((p) => (
                 <button key={p.href} onClick={() => go(p.href)} className="flex w-full items-center gap-3 rounded-xl px-2.5 py-2 text-left text-sm font-semibold hover:bg-surface-2 cursor-pointer">
                   <p.icon className="size-4.5 text-primary" aria-hidden /> {t(p.key)}
-                  <ChevronRight className="ml-auto size-4 text-subtle" aria-hidden />
+                  <ChevronRight className="ms-auto size-4 text-subtle rtl:rotate-180" aria-hidden />
                 </button>
               ))}
             </div>
@@ -212,7 +212,7 @@ function SearchBox() {
           {results.terms.length > 0 && (
             <div className="border-t border-line p-2">
               <p className="flex items-center gap-1.5 px-2 pb-1 pt-1 text-[11px] font-bold uppercase tracking-wider text-subtle">
-                <BookOpenCheck className="size-3.5" aria-hidden /> Digital Dictionary
+                <BookOpenCheck className="size-3.5" aria-hidden /> {tx({ en: "Digital Dictionary", roman: "Digital Dictionary", ur: "ڈیجیٹل لغت" })}
               </p>
               {results.terms.map((d) => (
                 <div key={d.term} className="rounded-xl px-2.5 py-2">
@@ -222,7 +222,7 @@ function SearchBox() {
               ))}
             </div>
           )}
-          {!results.pages.length && !results.terms.length && <p className="p-4 text-sm text-muted">No matches. Try “scam”, “bill” or “OTP”.</p>}
+          {!results.pages.length && !results.terms.length && <p className="p-4 text-sm text-muted">{tx({ en: "No matches. Try “scam”, “bill” or “OTP”.", roman: "Kuch nahi mila. “scam”, “bill” ya “OTP” likh kar dekhein.", ur: "کچھ نہیں ملا۔ “بل” یا “OTP” لکھ کر دیکھیں۔" })}</p>}
         </div>
       )}
     </div>
@@ -231,7 +231,7 @@ function SearchBox() {
 
 function Notifications() {
   const { notices } = useProgress();
-  const { t } = useT();
+  const { t, lang } = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useOutside(ref, () => setOpen(false), open);
@@ -248,20 +248,20 @@ function Notifications() {
         className="relative flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted hover:text-fg cursor-pointer"
       >
         <Bell className="size-5" aria-hidden />
-        {unread > 0 && <span className="absolute right-2 top-2 flex size-4 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-navy">{unread}</span>}
+        {unread > 0 && <span className="absolute end-2 top-2 flex size-4 items-center justify-center rounded-full bg-amber text-[10px] font-bold text-navy">{unread}</span>}
       </button>
       {open && (
-        <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
+        <div className="absolute end-0 top-[calc(100%+8px)] z-50 w-[min(22rem,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-line bg-elevated shadow-float animate-fade-up">
           <p className="border-b border-line px-4 py-3 text-sm font-bold">{t("top.notifications")}</p>
           <ul className="max-h-80 overflow-y-auto scrollbar-thin">
-            {notices.length === 0 && <li className="p-4 text-sm text-muted">You&apos;re all caught up.</li>}
+            {notices.length === 0 && <li className="p-4 text-sm text-muted">{lang === "en" ? "You're all caught up." : lang === "ur" ? "کوئی نئی اطلاع نہیں۔" : "Koi nayi itla nahi."}</li>}
             {notices.map((n) => (
               <li key={n.id} className="border-b border-line last:border-0">
                 <Link href={n.href ?? "#"} onClick={() => setOpen(false)} className="flex gap-3 px-4 py-3 hover:bg-surface-2">
                   <span className={cn("mt-1.5 size-2 shrink-0 rounded-full", n.read ? "bg-surface-3" : "bg-primary")} aria-hidden />
                   <span>
-                    <span className="block text-sm font-semibold">{n.title}</span>
-                    <span className="block text-xs text-muted">{n.body}</span>
+                    <span className="block text-sm font-semibold">{noticeText(n, lang).title}</span>
+                    <span className="block text-xs text-muted">{noticeText(n, lang).body}</span>
                   </span>
                 </Link>
               </li>
@@ -273,9 +273,35 @@ function Notifications() {
   );
 }
 
+const NOTICE_TEXT: Record<string, { en: [string, string]; roman: [string, string]; ur: [string, string] }> = {
+  welcome: {
+    en: ["Welcome to HUMRAAH", "Try the Scam Escape Room — a safe place to practise spotting tricks."],
+    roman: ["HUMRAAH mein khush aamdeed", "Scam Escape Room try karein — dhoka pehchanne ki mehfooz mashq."],
+    ur: ["ہمراہ میں خوش آمدید", "اسکیم ایسکیپ روم آزمائیں — دھوکہ پہچاننے کی محفوظ مشق۔"],
+  },
+  privacy: {
+    en: ["2-minute Privacy Checkup", "See how protected your phone and accounts are."],
+    roman: ["2 minute ka Privacy Checkup", "Dekhein aap ka phone aur accounts kitne mehfooz hain."],
+    ur: ["دو منٹ کا پرائیویسی چیک اپ", "دیکھیں آپ کا فون اور اکاؤنٹس کتنے محفوظ ہیں۔"],
+  },
+  skill: {
+    en: ["New skill started", "Your Digital Independence Score was updated."],
+    roman: ["Nayi maharat shuru", "Aap ka Digital Independence Score update ho gaya."],
+    ur: ["نئی مہارت شروع", "آپ کا ڈیجیٹل خود مختاری اسکور اپڈیٹ ہو گیا۔"],
+  },
+};
+
+function noticeText(n: { id: string; title: string; body: string }, lang: Lang) {
+  const key = n.id.startsWith("skill-") ? "skill" : n.id;
+  const entry = NOTICE_TEXT[key];
+  if (!entry) return { title: n.title, body: n.body };
+  const [title, body] = entry[lang];
+  return { title, body };
+}
+
 function QuickSettings() {
   const { prefs, update, toggleTheme } = usePrefs();
-  const { t } = useT();
+  const { t, tx } = useT();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   useOutside(ref, () => setOpen(false), open);
@@ -293,8 +319,8 @@ function QuickSettings() {
           <Accessibility className="hidden size-5 md:block" aria-hidden />
         </button>
         {open && (
-          <div className="absolute right-0 top-[calc(100%+8px)] z-50 w-72 rounded-2xl border border-line bg-elevated p-3 shadow-float animate-fade-up">
-            <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-subtle">Language · Zabaan</p>
+          <div className="absolute end-0 top-[calc(100%+8px)] z-50 w-72 rounded-2xl border border-line bg-elevated p-3 shadow-float animate-fade-up">
+            <p className="px-1 pb-2 text-[11px] font-bold uppercase tracking-wider text-subtle">{tx({ en: "Language", roman: "Zabaan", ur: "زبان" })}</p>
             <div className="grid grid-cols-3 gap-1.5">
               {LANG_OPTIONS.map((l) => (
                 <button
@@ -307,10 +333,10 @@ function QuickSettings() {
                 </button>
               ))}
             </div>
-            <p className="px-1 pb-2 pt-4 text-[11px] font-bold uppercase tracking-wider text-subtle">Accessibility</p>
-            <Toggle label="Elder Mode — bigger text & buttons" checked={prefs.elder} onChange={(v) => update({ elder: v })} />
-            <Toggle label="Reduce motion" checked={prefs.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
-            <Toggle label="Read answers aloud automatically" checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
+            <p className="px-1 pb-2 pt-4 text-[11px] font-bold uppercase tracking-wider text-subtle">{tx({ en: "Accessibility", roman: "Aasaani", ur: "آسانی" })}</p>
+            <Toggle label={tx({ en: "Elder Mode — bigger text & buttons", roman: "Elder Mode — bara text aur buttons", ur: "بزرگ موڈ — بڑا متن اور بٹن" })} checked={prefs.elder} onChange={(v) => update({ elder: v })} />
+            <Toggle label={tx({ en: "Reduce motion", roman: "Kam harkat", ur: "کم حرکت" })} checked={prefs.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
+            <Toggle label={tx({ en: "Read answers aloud automatically", roman: "Jawab khud parh kar sunayein", ur: "جواب خود پڑھ کر سنائیں" })} checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
           </div>
         )}
       </div>
@@ -321,9 +347,9 @@ function QuickSettings() {
   );
 }
 
-export function Toggle({ label, checked, onChange, description }: { label: string; checked: boolean; onChange: (v: boolean) => void; description?: string }) {
+export function Toggle({ label, checked, onChange, description, className }: { label: string; checked: boolean; onChange: (v: boolean) => void; description?: string; className?: string }) {
   return (
-    <label className="flex cursor-pointer items-center justify-between gap-3 rounded-xl px-1 py-2">
+    <label className={cn("flex cursor-pointer items-center justify-between gap-3 rounded-xl px-1 py-2", className)}>
       <span>
         <span className="block text-sm font-semibold">{label}</span>
         {description && <span className="block text-xs text-muted">{description}</span>}
@@ -336,7 +362,7 @@ export function Toggle({ label, checked, onChange, description }: { label: strin
         onClick={() => onChange(!checked)}
         className={cn("relative h-7 w-12 shrink-0 rounded-full transition-colors cursor-pointer", checked ? "bg-primary" : "bg-surface-3 ring-1 ring-line")}
       >
-        <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", checked ? "left-6" : "left-1")} />
+        <span className={cn("absolute top-1 size-5 rounded-full bg-white shadow transition-all", checked ? "start-6" : "start-1")} />
       </button>
     </label>
   );
@@ -361,16 +387,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="ambient min-h-dvh">
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary">
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary">
         Skip to content
       </a>
 
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 left-0 z-40 hidden w-[17rem] flex-col border-r border-line bg-surface/80 px-4 py-5 backdrop-blur-xl lg:flex">
+      <aside className="fixed inset-y-0 start-0 z-40 hidden w-[17rem] flex-col border-e border-line bg-surface px-4 py-5 lg:flex">
         <div className="px-2">
           <Logo />
         </div>
-        <div className="mt-7 flex-1 overflow-y-auto scrollbar-thin pr-1">
+        <div className="mt-7 flex-1 overflow-y-auto scrollbar-thin pe-1">
           <SideNav />
         </div>
         <SidebarFooter />
@@ -380,7 +406,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       {drawer && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
           <button className="absolute inset-0 bg-navy/60 backdrop-blur-sm" aria-label="Close menu" onClick={() => setDrawer(false)} />
-          <div className="absolute inset-y-0 left-0 flex w-[min(20rem,85vw)] flex-col bg-elevated px-4 py-5 shadow-float animate-fade-up">
+          <div className="absolute inset-y-0 start-0 flex w-[min(20rem,85vw)] flex-col bg-elevated px-4 py-5 shadow-float animate-fade-up">
             <div className="flex items-center justify-between px-2">
               <Logo />
               <button onClick={() => setDrawer(false)} aria-label="Close menu" className="flex size-10 items-center justify-center rounded-xl text-muted hover:bg-surface-2 cursor-pointer">
@@ -395,7 +421,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </div>
       )}
 
-      <div className="lg:pl-[17rem]">
+      <div className="lg:ps-[17rem]">
         <header className="glass sticky top-0 z-30 border-b border-line">
           <div className="mx-auto flex h-[4.5rem] max-w-[1400px] items-center gap-3 px-4 sm:px-6 lg:px-8">
             <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-2xl border border-line bg-surface-2 text-muted lg:hidden cursor-pointer">
@@ -407,7 +433,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="hidden flex-1 sm:block">
               <SearchBox />
             </div>
-            <div className="ml-auto flex items-center gap-2">
+            <div className="ms-auto flex items-center gap-2">
               <Link href="/emergency" className="hidden h-11 items-center gap-2 rounded-2xl bg-danger-soft px-3.5 text-sm font-bold text-danger hover:brightness-105 md:flex">
                 <LifeBuoy className="size-5" aria-hidden /> SOS
               </Link>

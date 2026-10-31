@@ -2,11 +2,11 @@
 
 import { useMemo, useRef, useState } from "react";
 import {
-  AlertOctagon, AlertTriangle, ArrowRight, Eye, Heading, Info, Keyboard, LifeBuoy, Link2, MousePointerClick, RotateCcw,
+  AlertOctagon, AlertTriangle, Eye, Heading, Info, Keyboard, LifeBuoy, Link2, MousePointerClick, RotateCcw,
   ScanText, ShieldAlert, Tag, Target, type LucideIcon,
 } from "lucide-react";
 import { ImageDrop } from "@/components/media";
-import { Badge, Button, Card, EmptyState, Input, ModeBadge, Notice, PageHeader, ProgressBar, SpeakButton, Spinner, Textarea, cn } from "@/components/ui";
+import { Badge, Button, Card, EmptyState, Input, ModeBadge, Notice, PageHeader, ProgressBar, Section, SpeakButton, Spinner, StepList, Textarea, cn } from "@/components/ui";
 import { postJSON, runOcr, type OcrResult } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { usePrefs } from "@/lib/prefs";
@@ -141,23 +141,18 @@ export default function VisionPage() {
   const busy = phase === "ocr" || phase === "analysing";
 
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
         icon={Eye}
         tone="info"
-        eyebrow="HUMRAAH Vision · Point & Explain"
         title={t("nav.vision")}
-        subtitle={tx({
-          en: "Upload a screenshot of any confusing screen. I'll explain what it's asking — then tap any part to learn more.",
-          roman: "Kisi bhi uljhi hui screen ka screenshot upload karein. Main bataunga screen kya keh rahi hai — phir kisi bhi hissay par tap karein.",
-          ur: "کسی بھی الجھی ہوئی اسکرین کا اسکرین شاٹ اپ لوڈ کریں۔ میں بتاؤں گا کہ یہ کیا کہہ رہی ہے۔",
-        })}
+        subtitle={tx({ en: "Upload a screenshot — I'll explain it, then tap any part.", roman: "Screenshot dalein — main samjhaunga, phir kisi hissay par tap karein.", ur: "اسکرین شاٹ ڈالیں — میں سمجھاؤں گا۔" })}
         actions={image ? <Button variant="secondary" icon={RotateCcw} onClick={reset}>{tx({ en: "New screenshot", roman: "Naya screenshot", ur: "نیا اسکرین شاٹ" })}</Button> : undefined}
       />
 
       {!image ? (
-        <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          <Card glow className="p-5 sm:p-7">
+        <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
+          <Card glow className="p-4 sm:p-5">
             <ImageDrop
               onImage={onImage}
               onSample={() => onImage(samplePortal())}
@@ -168,7 +163,7 @@ export default function VisionPage() {
           <HowItWorks />
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_400px]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_380px]">
           <div className="space-y-4">
             <Card className="overflow-hidden p-3 sm:p-4">
               <div className="relative mx-auto w-fit max-w-full">
@@ -187,9 +182,9 @@ export default function VisionPage() {
                         aria-label={`Explain: ${el.text}`}
                         title={el.text}
                         className={cn(
-                          "absolute rounded-md border-2 transition-all cursor-pointer hover:scale-[1.02] focus-visible:outline-offset-1",
+                          "absolute rounded border-2 transition-colors cursor-pointer focus-visible:outline-offset-1",
                           s.box,
-                          active && "ring-4 ring-amber/70 border-amber",
+                          active && "ring-2 ring-amber border-amber",
                         )}
                         style={{
                           left: `${Math.max(0, (l.bbox.x0 / ocr.width) * 100 - pad)}%`,
@@ -201,8 +196,8 @@ export default function VisionPage() {
                     );
                   })}
                 {busy && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/45 backdrop-blur-[2px]">
-                    <div className="rounded-2xl bg-elevated px-5 py-4 shadow-float">
+                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
+                    <div className="rounded-xl bg-elevated px-5 py-4">
                       <Spinner label={phase === "ocr" ? tx({ en: "Reading the text…", roman: "Text parh raha hoon…", ur: "متن پڑھ رہا ہوں…" }) : tx({ en: "Understanding the screen…", roman: "Screen samajh raha hoon…", ur: "اسکرین سمجھ رہا ہوں…" })} />
                       {phase === "ocr" && <ProgressBar value={ocrProgress * 100} className="mt-3 w-52" label="OCR progress" />}
                     </div>
@@ -210,7 +205,7 @@ export default function VisionPage() {
                 )}
               </div>
               {result && boxes.length > 0 && (
-                <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm font-semibold text-muted">
+                <p className="mt-3 flex items-center justify-center gap-2 text-center text-sm text-muted">
                   <Target className="size-4 text-primary" aria-hidden />
                   {tx({ en: "Tap any highlighted box to ask what it means", roman: "Kisi bhi highlighted box par tap kar ke matlab poochein", ur: "کسی بھی نمایاں خانے پر ٹیپ کریں" })}
                 </p>
@@ -218,10 +213,10 @@ export default function VisionPage() {
             </Card>
 
             {phase === "idle" && (
-              <Card glow className="p-5">
-                <label className="block text-sm font-bold" htmlFor="vq">{tx({ en: "Anything specific you want to know? (optional)", roman: "Koi khaas sawal? (ikhtiyari)", ur: "کوئی خاص سوال؟ (اختیاری)" })}</label>
+              <Card glow className="p-4 sm:p-5">
+                <label className="block text-sm font-semibold" htmlFor="vq">{tx({ en: "Anything specific you want to know? (optional)", roman: "Koi khaas sawal? (ikhtiyari)", ur: "کوئی خاص سوال؟ (اختیاری)" })}</label>
                 <Input id="vq" value={question} onChange={(e) => setQuestion(e.target.value)} maxLength={300} placeholder={tx({ en: "e.g. Where do I type the reference number?", roman: "Jaise: reference number kahan likhun?", ur: "مثلاً: ریفرنس نمبر کہاں لکھوں؟" })} className="mt-2" />
-                <Button size="lg" icon={ScanText} className="mt-4 w-full sm:w-auto" onClick={() => analyse(image)}>
+                <Button size="lg" icon={ScanText} className="mt-3 w-full sm:w-auto" onClick={() => analyse(image)}>
                   {tx({ en: "Explain this screen", roman: "Yeh screen samjhayein", ur: "یہ اسکرین سمجھائیں" })}
                 </Button>
                 <p className="mt-3 text-xs text-subtle">{tx({ en: "Text is read on your device first. The image is not stored.", roman: "Text pehle aap ke device par parha jata hai. Tasveer save nahi hoti.", ur: "متن پہلے آپ کے آلے پر پڑھا جاتا ہے۔ تصویر محفوظ نہیں ہوتی۔" })}</p>
@@ -239,7 +234,7 @@ export default function VisionPage() {
             {!result && !busy && phase !== "idle" && !error && <EmptyState icon={Eye} title="No result yet" />}
             {result && (
               <>
-                <Card glow className="p-5 animate-fade-up">
+                <Card className="p-4 sm:p-5">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <Badge tone="info" icon={Eye}>{result.screen_type}</Badge>
                     <div className="flex items-center gap-1">
@@ -247,12 +242,10 @@ export default function VisionPage() {
                       <SpeakButton id="vision-summary" text={`${result.summary} ${result.next_step}`} />
                     </div>
                   </div>
-                  <p dir="auto" className={cn("mt-3 text-[1.05rem] leading-relaxed", prefs.lang === "ur" && "urdu")}>{result.summary}</p>
-                  <div className="mt-4 rounded-2xl border border-primary/30 bg-primary-soft p-4">
-                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                      <ArrowRight className="size-4" aria-hidden /> {tx({ en: "Safe next step", roman: "Agla mehfooz qadam", ur: "اگلا محفوظ قدم" })}
-                    </p>
-                    <p dir="auto" className={cn("mt-1 font-semibold", prefs.lang === "ur" && "urdu")}>{result.next_step}</p>
+                  <p dir="auto" className={cn("mt-3 leading-relaxed", prefs.lang === "ur" && "urdu")}>{result.summary}</p>
+                  <div className="mt-4 border-t border-line pt-4">
+                    <p className="text-sm font-medium text-primary">{tx({ en: "Safe next step", roman: "Agla mehfooz qadam", ur: "اگلا محفوظ قدم" })}</p>
+                    <p dir="auto" className={cn("mt-0.5 font-semibold", prefs.lang === "ur" && "urdu")}>{result.next_step}</p>
                   </div>
                   {result.notice && <p className="mt-3 text-xs font-medium text-warning">{result.notice}</p>}
                 </Card>
@@ -265,9 +258,9 @@ export default function VisionPage() {
 
                 <div ref={explainRef}>
                   {selected && (
-                    <Card className="border-amber/50 p-5 animate-fade-up">
-                      <p className="text-xs font-bold uppercase tracking-wider text-subtle">Point &amp; Explain</p>
-                      <p className="mt-1 font-display text-lg font-bold">“{selected.text}”</p>
+                    <Card className="border-amber/50 p-4 sm:p-5">
+                      <p className="text-xs text-subtle">Point &amp; Explain</p>
+                      <p className="mt-0.5 font-semibold">“{selected.text}”</p>
                       {explaining ? (
                         <div className="mt-3"><Spinner label={tx({ en: "Explaining…", roman: "Samjha raha hoon…", ur: "سمجھا رہا ہوں…" })} /></div>
                       ) : explain && (
@@ -279,7 +272,7 @@ export default function VisionPage() {
                           </div>
                           <p dir="auto" className={cn("mt-3 leading-relaxed", prefs.lang === "ur" && "urdu")}>{explain.explanation}</p>
                           {explain.tip && (
-                            <p dir="auto" className="mt-3 rounded-xl bg-surface-2 p-3 text-sm text-muted">
+                            <p dir="auto" className="mt-3 text-sm text-muted">
                               <strong className="text-fg">{tx({ en: "Tip: ", roman: "Mashwara: ", ur: "مشورہ: " })}</strong>{explain.tip}
                             </p>
                           )}
@@ -290,22 +283,22 @@ export default function VisionPage() {
                 </div>
 
                 {grouped.length > 0 && (
-                  <Card className="p-5">
-                    <h2 className="font-display text-base font-bold">{tx({ en: "What I can see", roman: "Mujhe kya nazar aa raha hai", ur: "مجھے کیا نظر آ رہا ہے" })}</h2>
-                    <div className="mt-3 max-h-[26rem] space-y-4 overflow-y-auto pr-1 scrollbar-thin">
+                  <Card className="p-4 sm:p-5">
+                    <Section title={tx({ en: "What I can see", roman: "Mujhe kya nazar aa raha hai", ur: "مجھے کیا نظر آ رہا ہے" })}>
+                    <div className="max-h-[26rem] space-y-4 overflow-y-auto pr-1 scrollbar-thin">
                       {grouped.map(({ kind, items }) => {
                         const s = KIND_STYLE[kind];
                         return (
                           <div key={kind}>
-                            <p className={cn("mb-1.5 flex items-center gap-2 text-xs font-bold uppercase tracking-wider", s.text)}>
+                            <p className={cn("mb-1 flex items-center gap-1.5 text-xs font-semibold", s.text)}>
                               <s.icon className="size-4" aria-hidden /> {s.label} · {items.length}
                             </p>
-                            <ul className="space-y-1.5">
+                            <ul>
                               {items.map((el, i) => (
                                 <li key={`${kind}-${i}`}>
                                   <button
                                     onClick={() => pointExplain(el)}
-                                    className={cn("w-full rounded-xl border px-3 py-2.5 text-left transition cursor-pointer hover:border-primary", selected === el ? "border-amber bg-warning-soft" : "border-line bg-surface-2")}
+                                    className={cn("w-full rounded-lg px-2.5 py-2 text-left transition-colors cursor-pointer", selected === el ? "bg-warning-soft" : "hover:bg-surface-2")}
                                   >
                                     <span className="block text-sm font-semibold">{el.text}</span>
                                     <span dir="auto" className="mt-0.5 block text-xs text-muted">{el.explanation}</span>
@@ -317,6 +310,7 @@ export default function VisionPage() {
                         );
                       })}
                     </div>
+                    </Section>
                   </Card>
                 )}
 
@@ -328,33 +322,26 @@ export default function VisionPage() {
                   </Notice>
                 )}
 
-                <Card className="p-5">
+                <Card className="p-4 sm:p-5">
                   {!rescueOpen ? (
                     <Button variant="soft" icon={LifeBuoy} className="w-full" onClick={() => setRescueOpen(true)}>
                       {t("common.stuck")} — Rescue Mode
                     </Button>
                   ) : (
-                    <div className="animate-fade-up">
-                      <p className="flex items-center gap-2 font-display font-bold"><LifeBuoy className="size-5 text-primary" aria-hidden /> Rescue Mode</p>
+                    <div>
+                      <p className="flex items-center gap-2 font-semibold"><LifeBuoy className="size-4.5 text-primary" aria-hidden /> Rescue Mode</p>
                       <label htmlFor="rescue" className="mt-2 block text-sm text-muted">{tx({ en: "What went wrong? (optional)", roman: "Kya ghalat hua? (ikhtiyari)", ur: "کیا غلط ہوا؟ (اختیاری)" })}</label>
                       <Textarea id="rescue" rows={3} value={problem} onChange={(e) => setProblem(e.target.value)} maxLength={800} className="mt-2" placeholder={tx({ en: "e.g. I pressed Continue and it says invalid", roman: "Jaise: Continue dabaya to invalid likha aa gaya", ur: "مثلاً: کنٹینیو دبایا تو غلط لکھا آیا" })} />
                       <Button className="mt-3" icon={LifeBuoy} loading={rescuing} onClick={askRescue}>
                         {tx({ en: "Help me recover", roman: "Wapas raste par layein", ur: "واپس راستے پر لائیں" })}
                       </Button>
                       {rescue && (
-                        <div className="mt-4 rounded-2xl bg-surface-2 p-4 animate-fade-up">
+                        <div className="mt-4 border-t border-line pt-4">
                           <div className="flex items-center justify-between gap-2">
                             <p dir="auto" className="font-semibold">{rescue.message}</p>
                             <ModeBadge mode={rescue.mode} />
                           </div>
-                          <ol className="mt-3 space-y-2">
-                            {rescue.recovery_steps.map((s, i) => (
-                              <li key={i} className="flex gap-3 text-sm">
-                                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-on-primary">{i + 1}</span>
-                                <span dir="auto">{s}</span>
-                              </li>
-                            ))}
-                          </ol>
+                          <StepList className="mt-3" items={rescue.recovery_steps.map((s, i) => <span key={i} dir="auto">{s}</span>)} />
                         </div>
                       )}
                     </div>
@@ -373,25 +360,19 @@ export default function VisionPage() {
 function HowItWorks() {
   const { tx } = useT();
   const steps = [
-    { icon: ScanText, en: "I read the visible text on your device (OCR).", roman: "Main aap ke device par nazar aane wala text parhta hoon (OCR)." },
-    { icon: Eye, en: "I explain what the screen is asking you to do.", roman: "Main batata hoon screen aap se kya karwana chahti hai." },
-    { icon: Target, en: "Tap any highlighted part for a focused explanation.", roman: "Kisi bhi highlighted hissay par tap karein aur wazahat lein." },
-    { icon: LifeBuoy, en: "Stuck? Rescue Mode gives recovery steps.", roman: "Atak gaye? Rescue Mode wapas laane ke steps deta hai." },
+    { en: "I read the visible text on your device.", roman: "Main aap ke device par text parhta hoon." },
+    { en: "I explain what the screen is asking.", roman: "Main batata hoon screen kya keh rahi hai." },
+    { en: "Tap any highlighted part to learn more.", roman: "Kisi highlighted hissay par tap karein." },
+    { en: "Stuck? Rescue Mode helps you recover.", roman: "Atak gaye? Rescue Mode madad karega." },
   ];
   return (
-    <Card className="p-5">
-      <h2 className="font-display text-base font-bold">{tx({ en: "How it works", roman: "Yeh kaise kaam karta hai", ur: "یہ کیسے کام کرتا ہے" })}</h2>
-      <ol className="mt-3 space-y-3">
-        {steps.map((s, i) => (
-          <li key={i} className="flex gap-3 text-sm text-muted">
-            <span className="flex size-8 shrink-0 items-center justify-center rounded-xl bg-info-soft text-info"><s.icon className="size-4" aria-hidden /></span>
-            <span className="pt-1.5">{tx(s)}</span>
-          </li>
-        ))}
-      </ol>
-      <p className="mt-4 rounded-xl bg-surface-2 p-3 text-xs text-subtle">
-        {tx({ en: "I only describe what is visible. I never invent buttons, and I'll tell you when I can't be sure.", roman: "Main sirf nazar aane wali cheez batata hoon. Button khud se nahi banata, aur shak ho to bata deta hoon.", ur: "میں صرف نظر آنے والی چیز بتاتا ہوں۔" })}
-      </p>
+    <Card className="h-fit p-4 sm:p-5">
+      <Section title={tx({ en: "How it works", roman: "Yeh kaise kaam karta hai", ur: "یہ کیسے کام کرتا ہے" })}>
+        <StepList items={steps.map((st) => <span key={st.en} className="text-muted">{tx(st)}</span>)} />
+        <p className="text-xs text-subtle">
+          {tx({ en: "I only describe what is visible and say when I'm unsure.", roman: "Main sirf nazar aane wali cheez batata hoon, aur shak ho to bata deta hoon.", ur: "میں صرف نظر آنے والی چیز بتاتا ہوں۔" })}
+        </p>
+      </Section>
     </Card>
   );
 }

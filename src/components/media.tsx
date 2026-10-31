@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ImagePlus, Mic, MicOff, ShieldCheck, Sparkles, Square } from "lucide-react";
 import { ACCEPTED_IMAGES, prepareImage } from "@/lib/client";
+import { useT } from "@/lib/i18n";
 import { useSpeechRecognition, useSpeechSupport } from "@/lib/speech";
 import { Button, cn } from "./ui";
 
@@ -10,10 +11,10 @@ import { Button, cn } from "./ui";
 export function ImageDrop({
   onImage,
   onSample,
-  sampleLabel = "Try a fictional sample",
-  label = "Upload a screenshot",
-  hint = "PNG, JPG or WEBP · up to 15 MB · you can also paste (Ctrl+V)",
-  privacyNote = "Hide CNIC, card and account numbers before uploading. Images are not stored.",
+  sampleLabel,
+  label,
+  hint,
+  privacyNote,
   compact,
 }: {
   onImage: (dataUrl: string) => void;
@@ -24,6 +25,11 @@ export function ImageDrop({
   privacyNote?: string;
   compact?: boolean;
 }) {
+  const { tx } = useT();
+  sampleLabel ??= tx({ en: "Try a fictional sample", roman: "Farzi namoona try karein", ur: "فرضی نمونہ آزمائیں" });
+  label ??= tx({ en: "Upload a screenshot", roman: "Screenshot upload karein", ur: "اسکرین شاٹ اپ لوڈ کریں" });
+  hint ??= tx({ en: "PNG, JPG or WEBP · or paste with Ctrl+V", roman: "PNG, JPG ya WEBP · ya Ctrl+V se paste", ur: "PNG، JPG یا WEBP · یا Ctrl+V سے پیسٹ کریں" });
+  privacyNote ??= tx({ en: "Images are not stored. Hide CNIC and card numbers first.", roman: "Tasveerein save nahi hotin. Pehle CNIC aur card number chhupa dein.", ur: "تصاویر محفوظ نہیں کی جاتیں۔ پہلے شناختی کارڈ اور کارڈ نمبر چھپا دیں۔" });
   const inputRef = useRef<HTMLInputElement>(null);
   const [drag, setDrag] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -64,19 +70,19 @@ export function ImageDrop({
           handle(e.dataTransfer.files?.[0]);
         }}
         className={cn(
-          "group relative flex flex-col items-center justify-center rounded-[var(--radius-lg)] border-2 border-dashed text-center transition-all",
-          compact ? "px-4 py-6" : "px-6 py-10",
-          drag ? "border-primary bg-primary-soft" : "border-line-strong bg-surface-2/60 hover:border-primary/60",
+          "flex flex-col items-center justify-center rounded-[var(--radius-lg)] border border-dashed text-center transition-colors",
+          compact ? "px-4 py-5" : "px-6 py-8",
+          drag ? "border-primary bg-primary-soft" : "border-line-strong hover:border-primary/60",
         )}
       >
-        <div className="mb-3 flex size-14 items-center justify-center rounded-2xl bg-primary-soft text-primary transition-transform group-hover:scale-105">
-          <ImagePlus className="size-7" aria-hidden />
+        <div className="mb-2.5 flex size-10 items-center justify-center rounded-xl bg-primary-soft text-primary">
+          <ImagePlus className="size-5" aria-hidden />
         </div>
-        <p className="font-display text-base font-bold">{label}</p>
+        <p className="font-semibold">{label}</p>
         <p className="mt-1 text-xs text-subtle">{hint}</p>
         <div className="mt-4 flex flex-wrap justify-center gap-2">
-          <Button size="md" icon={ImagePlus} onClick={() => inputRef.current?.click()}>
-            Choose image
+          <Button size="md" onClick={() => inputRef.current?.click()}>
+            {tx({ en: "Choose image", roman: "Tasveer chunein", ur: "تصویر منتخب کریں" })}
           </Button>
           {onSample && (
             <Button size="md" variant="secondary" icon={Sparkles} onClick={onSample}>
@@ -143,13 +149,13 @@ export function Waveform({ active, bars = 28, className, tone = "teal" }: { acti
     };
   }, [active, bars]);
 
-  const gradient = tone === "amber" ? "from-amber to-[#ffd98a]" : "from-teal to-emerald";
+  const gradient = tone === "amber" ? "bg-amber" : "bg-primary";
   return (
-    <div className={cn("flex h-12 items-center justify-center gap-[3px]", className)} aria-hidden>
+    <div className={cn("flex h-10 items-center justify-center gap-[3px]", className)} aria-hidden>
       {levels.map((l, i) => (
         <span
           key={i}
-          className={cn("w-[4px] origin-center rounded-full bg-gradient-to-t transition-[height] duration-75", gradient, active && levels.every((x) => x <= 0.2) && "animate-wave")}
+          className={cn("w-[3px] origin-center rounded-full opacity-80 transition-[height] duration-75", gradient, active && levels.every((x) => x <= 0.2) && "animate-wave")}
           style={{ height: `${Math.round((active ? l : 0.18) * 100)}%`, animationDelay: `${(i % 7) * 90}ms` }}
         />
       ))}
@@ -162,13 +168,18 @@ export function VoiceMic({ onTranscript, size = "lg", labels }: { onTranscript: 
   const { stt } = useSpeechSupport();
   const { state, interim, error, start, stop } = useSpeechRecognition(onTranscript);
   const listening = state === "listening";
-  const L = labels ?? { idle: "Tap and speak", listening: "Listening… tap to stop", unsupported: "Voice not supported here — please type" };
-  const dim = size === "lg" ? "size-20" : "size-14";
+  const { tx } = useT();
+  const L = labels ?? {
+    idle: tx({ en: "Tap and speak", roman: "Tap kar ke bolein", ur: "ٹیپ کر کے بولیں" }),
+    listening: tx({ en: "Listening… tap to stop", roman: "Sun raha hoon… rokne ke liye tap", ur: "سن رہا ہوں… روکنے کے لیے ٹیپ کریں" }),
+    unsupported: tx({ en: "Voice not supported here — please type", roman: "Yahan awaz nahi chalti — type karein", ur: "یہاں آواز کام نہیں کرتی — لکھ کر بتائیں" }),
+  };
+  const dim = size === "lg" ? "size-18" : "size-14";
 
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative">
-        {listening && <span className={cn("absolute inset-0 rounded-full bg-primary/40 animate-pulse-ring", dim)} aria-hidden />}
+        {listening && <span className={cn("absolute inset-0 rounded-full bg-danger/30 animate-pulse-ring", dim)} aria-hidden />}
         <button
           type="button"
           onClick={() => (listening ? stop() : start())}
@@ -179,8 +190,8 @@ export function VoiceMic({ onTranscript, size = "lg", labels }: { onTranscript: 
             "relative flex items-center justify-center rounded-full text-white transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-50",
             dim,
             listening
-              ? "bg-[linear-gradient(135deg,#ff6b75,#f4b544)] shadow-[0_0_40px_-6px_rgb(255_107_117/0.8)]"
-              : "bg-[linear-gradient(135deg,var(--brand-teal),var(--brand-emerald))] shadow-[0_12px_40px_-10px_rgb(24_185_168/0.9)] hover:scale-105",
+              ? "bg-danger"
+              : "bg-primary hover:bg-primary-strong",
           )}
         >
           {!stt ? <MicOff className="size-8" /> : listening ? <Square className="size-7 fill-current" /> : <Mic className={size === "lg" ? "size-9" : "size-6"} />}

@@ -98,7 +98,7 @@ npm run build && npm start
 | Variable | Required | Purpose |
 |---|---|---|
 | `GEMINI_API_KEY` | No | **Free** Live AI via Google Gemini — get a key at https://aistudio.google.com ("Get API key"). |
-| `GEMINI_MODEL` | No | Override the Gemini model (default `gemini-flash-latest`). |
+| `GEMINI_MODEL` | No | Main Gemini model (default `gemini-3.5-flash`). When the free tier is busy, HUMRAAH falls back to `gemini-flash-lite-latest` automatically. |
 | `ANTHROPIC_API_KEY` | No | Live AI via Anthropic Claude (paid). Takes priority over Gemini if both are set. |
 | `HUMRAAH_MODEL` | No | Override the Claude model (default `claude-opus-5-5`). |
 

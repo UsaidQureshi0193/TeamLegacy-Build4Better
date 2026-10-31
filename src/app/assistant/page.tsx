@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowRight, Bot, Eraser, Gauge, Lightbulb, Repeat, Send, ShieldCheck, Sparkles, Turtle, User, Volume2, VolumeX } from "lucide-react";
+import { ArrowRight, Bot, Eraser, Repeat, Send, ShieldCheck, Sparkles, Turtle, Volume2, VolumeX } from "lucide-react";
 import { VoiceMic } from "@/components/media";
 import { Badge, Button, Card, ModeBadge, Notice, PageHeader, Segmented, Spinner, cn } from "@/components/ui";
 import { postJSON, setHandoff, takeHandoff } from "@/lib/client";
@@ -103,13 +103,8 @@ export default function AssistantPage() {
     <div>
       <PageHeader
         icon={Bot}
-        eyebrow="HUMRAAH AI · Voice"
         title={t("nav.assistant")}
-        subtitle={tx({
-          en: "Speak or type in English, Roman Urdu or Urdu. I'll explain things simply, one step at a time.",
-          roman: "English, Roman Urdu ya Urdu mein bolein ya likhein. Main aasaan alfaaz mein, ek ek qadam samjhaunga.",
-          ur: "انگریزی، رومن اردو یا اردو میں بولیں یا لکھیں۔ میں آسان الفاظ میں سمجھاؤں گا۔",
-        })}
+        subtitle={tx({ en: "Speak or type — I'll explain simply.", roman: "Bolein ya likhein — main aasaan alfaaz mein samjhaunga.", ur: "بولیں یا لکھیں — میں آسان الفاظ میں سمجھاؤں گا۔" })}
         actions={
           <>
             <Segmented label="Language" value={prefs.lang} onChange={(v) => update({ lang: v })} options={LANGS} />
@@ -122,15 +117,12 @@ export default function AssistantPage() {
         }
       />
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-4 lg:grid-cols-[1fr_300px]">
         <Card glow className="flex min-h-[60vh] flex-col overflow-hidden">
-          <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-6 scrollbar-thin" aria-live="polite">
+          <div className="flex-1 space-y-5 overflow-y-auto p-4 sm:p-5 scrollbar-thin" aria-live="polite">
             {empty ? (
-              <div className="flex h-full flex-col items-center justify-center py-8 text-center animate-fade-up">
-                <div className="mb-2 inline-flex items-center gap-2 rounded-full bg-primary-soft px-3 py-1 text-xs font-bold text-primary">
-                  <Sparkles className="size-3.5" aria-hidden /> {tx({ en: "Patient Voice Mode", roman: "Patient Voice Mode", ur: "صبر والا وائس موڈ" })}
-                </div>
-                <h2 className={cn("mb-6 max-w-lg text-2xl font-extrabold sm:text-3xl", lang === "ur" && "urdu")}>
+              <div className="flex h-full flex-col items-center justify-center py-8 text-center">
+                <h2 className={cn("mb-5 max-w-lg text-xl font-bold", lang === "ur" && "urdu")}>
                   {tx({ en: "How can I help you today?", roman: "Aaj main aap ki kya madad karun?", ur: "آج میں آپ کی کیا مدد کروں؟" })}
                 </h2>
                 <VoiceMic
@@ -141,14 +133,14 @@ export default function AssistantPage() {
                     unsupported: tx({ en: "Voice isn't supported in this browser — please type below", roman: "Is browser mein awaz kaam nahi karti — neeche likhein", ur: "اس براؤزر میں آواز کام نہیں کرتی، نیچے لکھیں" }),
                   }}
                 />
-                <div className="mt-8 flex max-w-2xl flex-wrap justify-center gap-2">
+                <div className="mt-6 flex max-w-2xl flex-wrap justify-center gap-2">
                   {SUGGESTIONS.map((s) => {
                     const label = tx(s);
                     return (
                       <button
                         key={s.en}
                         onClick={() => void ask(label)}
-                        className={cn("rounded-full border border-line bg-surface-2 px-4 py-2.5 text-sm font-semibold text-muted transition hover:border-primary hover:text-fg cursor-pointer", lang === "ur" && "urdu")}
+                        className={cn("rounded-full border border-line px-3.5 py-2 text-sm text-muted transition-colors hover:border-primary/50 hover:text-fg cursor-pointer", lang === "ur" && "urdu")}
                       >
                         {label}
                       </button>
@@ -159,13 +151,10 @@ export default function AssistantPage() {
             ) : (
               messages.map((m) =>
                 m.role === "user" ? (
-                  <div key={m.id} className="flex justify-end gap-3 animate-fade-up">
-                    <div className={cn("max-w-[85%] rounded-3xl rounded-br-lg bg-[linear-gradient(135deg,var(--primary),var(--brand-emerald))] px-4 py-3 text-on-primary shadow-soft", lang === "ur" && "urdu")}>
-                      <p className="whitespace-pre-wrap text-[1.02rem] leading-relaxed">{m.content}</p>
+                  <div key={m.id} className="flex justify-end">
+                    <div className={cn("max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary", lang === "ur" && "urdu")}>
+                      <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
-                    <span className="mt-1 hidden size-9 shrink-0 items-center justify-center rounded-full bg-surface-3 text-muted sm:flex" aria-hidden>
-                      <User className="size-4.5" />
-                    </span>
                   </div>
                 ) : (
                   <AssistantBubble
@@ -183,9 +172,9 @@ export default function AssistantPage() {
               )
             )}
             {busy && (
-              <div className="flex items-center gap-3 animate-fade-up">
-                <span className="flex size-9 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden>
-                  <Bot className="size-4.5" />
+              <div className="flex items-center gap-3">
+                <span className="flex size-8 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden>
+                  <Bot className="size-4" />
                 </span>
                 <Spinner label={tx({ en: "HUMRAAH is thinking…", roman: "HUMRAAH soch raha hai…", ur: "ہمراہ سوچ رہا ہے…" })} />
               </div>
@@ -200,7 +189,7 @@ export default function AssistantPage() {
           )}
 
           <form
-            className="border-t border-line bg-surface-2/70 p-3 sm:p-4"
+            className="border-t border-line p-3 sm:p-4"
             onSubmit={(e) => {
               e.preventDefault();
               void ask(input);
@@ -224,7 +213,7 @@ export default function AssistantPage() {
                   maxLength={4000}
                   dir="auto"
                   placeholder={tx({ en: "Type here… e.g. “How do I fill an online form?”", roman: "Yahan likhein… jaise “Online form kaise bharun?”", ur: "یہاں لکھیں…" })}
-                  className="max-h-40 min-h-12 w-full resize-none rounded-2xl border border-line bg-surface px-4 py-3 text-base text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
+                  className="max-h-40 min-h-12 w-full resize-none rounded-xl border border-line bg-surface-2 px-4 py-3 text-base text-fg placeholder:text-subtle focus:border-primary focus:outline-none"
                 />
               </label>
               <Button type="submit" size="lg" icon={Send} disabled={!input.trim()} loading={busy} aria-label="Send" className="h-12 px-4">
@@ -233,73 +222,41 @@ export default function AssistantPage() {
             </div>
             <p className="mt-2 flex items-center gap-1.5 text-xs text-subtle">
               <ShieldCheck className="size-3.5 text-success" aria-hidden />
-              {tx({
-                en: "HUMRAAH never asks for your OTP, PIN or passwords. Don't type them here.",
-                roman: "HUMRAAH kabhi aap ka OTP, PIN ya password nahi maangta. Yahan na likhein.",
-                ur: "ہمراہ کبھی آپ کا او ٹی پی، پن یا پاس ورڈ نہیں مانگتا۔",
-              })}
+              {tx({ en: "Never type an OTP, PIN or password here.", roman: "Yahan kabhi OTP, PIN ya password na likhein.", ur: "یہاں کبھی او ٹی پی، پن یا پاس ورڈ نہ لکھیں۔" })}
             </p>
           </form>
         </Card>
 
-        <aside className="space-y-4">
-          <Card className="p-5">
-            <h2 className="flex items-center gap-2 font-display text-base font-bold">
-              <Lightbulb className="size-5 text-amber" aria-hidden /> {tx({ en: "Patient controls", roman: "Sabr wale controls", ur: "صبر والے کنٹرولز" })}
-            </h2>
-            <ul className="mt-3 space-y-2.5 text-sm text-muted">
-              <li className="flex gap-2.5"><Volume2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />{tx({ en: "Read aloud — hear any answer.", roman: "Parh kar sunayein — har jawab sunein.", ur: "پڑھ کر سنائیں — ہر جواب سنیں۔" })}</li>
-              <li className="flex gap-2.5"><Repeat className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />{tx({ en: "Repeat — as many times as you like.", roman: "Dobara — jitni baar chahein.", ur: "دوبارہ — جتنی بار چاہیں۔" })}</li>
-              <li className="flex gap-2.5"><Turtle className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />{tx({ en: "Slower — speaks more slowly.", roman: "Aahista — aahista bolta hai.", ur: "آہستہ — آہستہ بولتا ہے۔" })}</li>
-              <li className="flex gap-2.5"><Sparkles className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />{tx({ en: "Simpler words — explains again, more simply.", roman: "Aasaan alfaaz — dobara aasaani se samjhata hai.", ur: "آسان الفاظ — دوبارہ آسانی سے سمجھاتا ہے۔" })}</li>
-            </ul>
-            <div className="mt-4 border-t border-line pt-4">
-              <label className="flex items-center gap-3 text-sm font-semibold">
-                <Gauge className="size-4.5 text-subtle" aria-hidden />
-                <span className="flex-1">{tx({ en: "Speaking speed", roman: "Bolne ki raftaar", ur: "بولنے کی رفتار" })}</span>
-                <span className="tabular-nums text-subtle">{prefs.voiceRate.toFixed(2)}×</span>
-              </label>
-              <input
-                type="range"
-                min={0.6}
-                max={1.3}
-                step={0.05}
-                value={prefs.voiceRate}
-                onChange={(e) => update({ voiceRate: Number(e.target.value) })}
-                className="mt-2 w-full accent-[var(--primary)]"
-                aria-label="Speaking speed"
-              />
-              <label className="mt-3 flex cursor-pointer items-center gap-3 text-sm font-semibold">
-                <input type="checkbox" checked={prefs.autoSpeak} onChange={(e) => update({ autoSpeak: e.target.checked })} className="size-5 accent-[var(--primary)]" />
-                {tx({ en: "Read every answer aloud automatically", roman: "Har jawab khud-ba-khud parh kar sunayein", ur: "ہر جواب خود بخود سنائیں" })}
-              </label>
-            </div>
-          </Card>
-          <Notice tone="info" title={tx({ en: "Voice tips", roman: "Awaz ke mashwaray", ur: "آواز کے مشورے" })}>
+        <Card className="h-fit space-y-4 p-4 sm:p-5">
+          <p className="font-semibold">{tx({ en: "Voice settings", roman: "Awaz ki settings", ur: "آواز کی ترتیبات" })}</p>
+          <div>
+            <label className="flex items-center justify-between text-sm">
+              <span>{tx({ en: "Speaking speed", roman: "Bolne ki raftaar", ur: "بولنے کی رفتار" })}</span>
+              <span className="tabular-nums text-subtle">{prefs.voiceRate.toFixed(2)}×</span>
+            </label>
+            <input
+              type="range"
+              min={0.6}
+              max={1.3}
+              step={0.05}
+              value={prefs.voiceRate}
+              onChange={(e) => update({ voiceRate: Number(e.target.value) })}
+              className="mt-2 w-full accent-[var(--primary)]"
+              aria-label="Speaking speed"
+            />
+          </div>
+          <label className="flex cursor-pointer items-center gap-2.5 text-sm">
+            <input type="checkbox" checked={prefs.autoSpeak} onChange={(e) => update({ autoSpeak: e.target.checked })} className="size-4.5 accent-[var(--primary)]" />
+            {tx({ en: "Read every answer aloud", roman: "Har jawab sunayein", ur: "ہر جواب سنائیں" })}
+          </label>
+          <p className="border-t border-line pt-4 text-xs text-subtle">
             {tx({
-              en: "Voice works best in Chrome or Edge. Speech can mishear names and numbers — always check the text on screen.",
-              roman: "Awaz Chrome ya Edge mein behtar chalti hai. Naam aur numbers ghalat sunay ja sakte hain — screen par text zaroor check karein.",
-              ur: "آواز کروم یا ایج میں بہتر چلتی ہے۔ نام اور نمبر غلط سنے جا سکتے ہیں، اسکرین پر متن ضرور دیکھیں۔",
+              en: "Voice works best in Chrome or Edge. Check names and numbers on screen.",
+              roman: "Awaz Chrome ya Edge mein behtar hai. Naam aur numbers screen par check karein.",
+              ur: "آواز کروم یا ایج میں بہتر ہے۔ نام اور نمبر اسکرین پر دیکھیں۔",
             })}
-          </Notice>
-          <Card className="p-5">
-            <h2 className="font-display text-base font-bold">{tx({ en: "I can route you to", roman: "Main yahan le ja sakta hoon", ur: "میں یہاں لے جا سکتا ہوں" })}</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {[
-                ["shield", "Scam Shield"],
-                ["vision", "Vision AI"],
-                ["guide", "Digital Guide"],
-                ["academy", "Academy"],
-                ["document", "Document Reader"],
-                ["emergency", "Emergency Help"],
-              ].map(([m, label]) => (
-                <button key={m} onClick={() => router.push(`/${m}`)} className="cursor-pointer">
-                  <Badge tone={m === "emergency" ? "danger" : "teal"}>{label}</Badge>
-                </button>
-              ))}
-            </div>
-          </Card>
-        </aside>
+          </p>
+        </Card>
       </div>
     </div>
   );
@@ -317,11 +274,11 @@ function CompactMic({ onTranscript }: { onTranscript: (text: string) => void }) 
         aria-label={listening ? "Stop listening" : "Speak"}
         title={error ?? undefined}
         className={cn(
-          "relative flex size-12 items-center justify-center rounded-2xl text-white transition cursor-pointer",
-          listening ? "bg-[linear-gradient(135deg,#ff6b75,#f4b544)]" : "bg-[linear-gradient(135deg,var(--brand-teal),var(--brand-emerald))]",
+          "relative flex size-12 items-center justify-center rounded-xl text-white transition-colors cursor-pointer",
+          listening ? "bg-danger" : "bg-primary hover:bg-primary-strong",
         )}
       >
-        {listening && <span className="absolute inset-0 rounded-2xl bg-danger/40 animate-pulse-ring" aria-hidden />}
+        {listening && <span className="absolute inset-0 rounded-xl bg-danger/40 animate-pulse-ring" aria-hidden />}
         {listening ? <span className="size-4 rounded-sm bg-white" /> : <MicIcon />}
       </button>
     </div>
@@ -353,21 +310,20 @@ function AssistantBubble({
   const reply = m.reply;
   const urdu = reply?.language === "ur";
   return (
-    <div className="flex gap-3 animate-fade-up">
-      <span className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-full bg-[linear-gradient(135deg,#18B9A8,#16A36A)] text-[#04211e] shadow-soft" aria-hidden>
-        <Bot className="size-4.5" />
+    <div className="flex gap-3">
+      <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden>
+        <Bot className="size-4" />
       </span>
       <div className="min-w-0 max-w-[92%] flex-1 sm:max-w-[85%]">
-        <div className="rounded-3xl rounded-tl-lg border border-line bg-surface-2 px-4 py-3.5 shadow-soft">
+        <div className="rounded-2xl rounded-tl-md bg-surface-2 px-4 py-3">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             {reply && <ModeBadge mode={reply.mode} />}
             {m.simpler && <Badge tone="lavender" icon={Sparkles}>{t("common.simpler")}</Badge>}
-            {reply && reply.module !== "general" && <Badge tone="neutral">{reply.module}</Badge>}
           </div>
-          <p dir="auto" className={cn("whitespace-pre-wrap text-[1.05rem] leading-relaxed text-fg", urdu && "urdu text-right")}>{m.content}</p>
+          <p dir="auto" className={cn("whitespace-pre-wrap leading-relaxed text-fg", urdu && "urdu text-right")}>{m.content}</p>
           {reply?.notice && <p className="mt-2 text-xs font-medium text-warning">{reply.notice}</p>}
           {!!reply?.redactions && (
-            <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-success">
+            <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
               <ShieldCheck className="size-3.5" aria-hidden />
               {tx({ en: `${reply.redactions} sensitive number(s) were hidden before analysis.`, roman: `${reply.redactions} hassas number(s) jaanch se pehle chhupa diye gaye.`, ur: `${reply.redactions} حساس نمبر چھپا دیے گئے۔` })}
             </p>
@@ -375,16 +331,16 @@ function AssistantBubble({
         </div>
 
         {reply && reply.actions.length > 0 && (
-          <div className="mt-2.5 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap gap-2">
             {reply.actions.map((a, i) => (
-              <Button key={`${a.module}-${i}`} size="sm" variant={a.module === "emergency" ? "danger" : i === 0 ? "primary" : "secondary"} onClick={() => onAction(a)}>
+              <Button key={`${a.module}-${i}`} size="sm" variant={a.module === "emergency" ? "danger" : i === 0 ? "soft" : "secondary"} onClick={() => onAction(a)}>
                 {a.label} <ArrowRight className="size-4" aria-hidden />
               </Button>
             ))}
           </div>
         )}
 
-        <div className="mt-2 flex flex-wrap items-center gap-1" role="group" aria-label="Patient voice controls">
+        <div className="mt-1.5 flex flex-wrap items-center gap-0.5" role="group" aria-label="Patient voice controls">
           <Button size="sm" variant="ghost" icon={speaking ? VolumeX : Volume2} onClick={() => (speaking ? onStop() : onSpeak())}>
             {speaking ? t("common.stop") : t("common.listen")}
           </Button>

@@ -1,57 +1,32 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Accessibility, Bot, Check, Database, Heart, Info, Languages, Mic, Moon, Palette, Settings, ShieldCheck, Sun, Trash2,
-  User, Volume2,
-} from "lucide-react";
+import { Mic, Moon, Settings, ShieldCheck, Sun, Trash2, Volume2 } from "lucide-react";
 import { Toggle } from "@/components/shell";
-import { Badge, Button, Card, IconTile, Input, ModeBadge, Notice, PageHeader, Segmented, cn, useAiStatus } from "@/components/ui";
+import { Badge, Button, Card, Input, ModeBadge, PageHeader, Section, Segmented, StepList, useAiStatus } from "@/components/ui";
 import { useT } from "@/lib/i18n";
 import { usePrefs } from "@/lib/prefs";
 import { useSpeaker, useSpeechSupport } from "@/lib/speech";
 import type { Lang } from "@/lib/types";
 
-function Section({ icon, title, subtitle, children, tone = "teal" }: { icon: typeof Settings; title: string; subtitle?: string; children: React.ReactNode; tone?: "teal" | "info" | "lavender" | "success" | "warning" }) {
+/** One settings line: label (and optional hint) on the left, control on the right. */
+function Row({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
-    <Card className="p-5 sm:p-6">
-      <div className="mb-4 flex items-center gap-3">
-        <IconTile icon={icon} tone={tone} />
-        <div>
-          <h2 className="font-display text-lg font-bold">{title}</h2>
-          {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
-        </div>
+    <div className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <p className="font-medium">{label}</p>
+        {hint && <p className="text-sm text-muted">{hint}</p>}
       </div>
-      {children}
-    </Card>
+      <div className="shrink-0">{children}</div>
+    </div>
   );
 }
 
-function ThemeCard({ mode, active, onClick, label }: { mode: "light" | "dark"; active: boolean; onClick: () => void; label: string }) {
-  const dark = mode === "dark";
-  return (
-    <button
-      onClick={onClick}
-      aria-pressed={active}
-      className={cn("flex-1 rounded-2xl border-2 p-2 text-left transition-all cursor-pointer", active ? "border-primary" : "border-line hover:border-line-strong")}
-    >
-      <div className={cn("h-24 overflow-hidden rounded-xl p-2.5", dark ? "bg-[#0B1422]" : "bg-[#F3F7F6]")} aria-hidden>
-        <div className="flex gap-2">
-          <div className={cn("h-18 w-8 rounded-lg", dark ? "bg-[#111e31]" : "bg-white")} />
-          <div className="flex-1 space-y-2">
-            <div className={cn("h-3 w-2/3 rounded", dark ? "bg-[#1f3350]" : "bg-[#dde7e6]")} />
-            <div className={cn("h-8 rounded-lg", dark ? "bg-[#111e31] shadow-[0_0_0_1px_rgb(24_185_168/0.35)]" : "bg-white shadow")} />
-            <div className="h-3 w-1/2 rounded bg-[linear-gradient(90deg,#18B9A8,#16A36A)]" />
-          </div>
-        </div>
-      </div>
-      <p className="mt-2 flex items-center gap-2 px-1 text-sm font-semibold">
-        {dark ? <Moon className="size-4" aria-hidden /> : <Sun className="size-4" aria-hidden />} {label}
-        {active && <Check className="ml-auto size-4 text-primary" aria-hidden />}
-      </p>
-    </button>
-  );
-}
+const PRIVACY_POINTS = [
+  { en: "Preferences and progress are stored only on this device.", roman: "Preferences aur progress sirf is device par hoti hain." },
+  { en: "Screenshots and documents are not stored. Card and CNIC numbers are masked before AI.", roman: "Screenshots aur documents save nahi hote. AI se pehle card aur CNIC chhupa diye jate hain." },
+  { en: "Never asks for passwords, PINs or OTPs. Voice is not recorded.", roman: "Kabhi password, PIN ya OTP nahi maangta. Awaz record nahi hoti." },
+];
 
 export default function SettingsPage() {
   const { prefs, update } = usePrefs();
@@ -87,172 +62,133 @@ export default function SettingsPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto max-w-3xl space-y-8">
       <PageHeader
         icon={Settings}
         tone="info"
-        eyebrow="HUMRAAH"
-        title={tx({ en: "Settings & accessibility", roman: "Settings aur aasaani", ur: "ترتیبات اور رسائی" })}
-        subtitle={tx({ en: "Make HUMRAAH comfortable for your eyes, ears and language.", roman: "HUMRAAH ko apni aankhon, kaanon aur zabaan ke liye aaraamdeh banayein." })}
+        title={tx({ en: "Settings", roman: "Settings", ur: "ترتیبات" })}
+        subtitle={tx({ en: "Make HUMRAAH comfortable for you.", roman: "HUMRAAH ko apne liye aaraamdeh banayein." })}
       />
 
-      <div className="grid gap-6 xl:grid-cols-2">
-        <Section icon={User} title={tx({ en: "Profile", roman: "Profile" })} subtitle={tx({ en: "Only used to greet you. Stays on this device.", roman: "Sirf salam ke liye. Isi device par rehta hai." })}>
-          <label className="block">
-            <span className="mb-1.5 block text-sm font-semibold">{tx({ en: "What should we call you?", roman: "Hum aap ko kya kahein?" })}</span>
-            <Input value={prefs.name} maxLength={40} onChange={(e) => update({ name: e.target.value })} placeholder={tx({ en: "e.g. Abu, Ammi, Nana", roman: "maslan Abu, Ammi, Nana" })} autoComplete="nickname" />
-          </label>
-          <p className="mt-2 text-xs text-subtle">{tx({ en: "Please don't enter CNIC, phone or bank details here.", roman: "Yahan CNIC, phone ya bank details na likhein." })}</p>
-        </Section>
-
-        <Section icon={Palette} tone="lavender" title={tx({ en: "Appearance", roman: "Shakal o soorat" })}>
-          <div className="flex gap-3">
-            <ThemeCard mode="light" label={tx({ en: "Light", roman: "Roshan" })} active={prefs.theme === "light"} onClick={() => update({ theme: "light" })} />
-            <ThemeCard mode="dark" label={tx({ en: "Dark", roman: "Andhera" })} active={prefs.theme === "dark"} onClick={() => update({ theme: "dark" })} />
-          </div>
-        </Section>
-
-        <Section icon={Languages} title={tx({ en: "Language · Zabaan · زبان", roman: "Zabaan · Language · زبان" })} subtitle={tx({ en: "Applies to menus, AI answers and voice.", roman: "Menus, AI jawab aur awaz par lagu hota hai." })}>
-          <Segmented<Lang>
-            label="Language"
-            value={prefs.lang}
-            onChange={(v) => update({ lang: v })}
-            options={[
-              { value: "en", label: "English" },
-              { value: "roman", label: "Roman Urdu" },
-              { value: "ur", label: "اردو" },
-            ]}
-          />
-          <p className="mt-3 text-xs text-subtle">
-            {tx({ en: "Some practice content is in English and Roman Urdu only; live AI answers in all three.", roman: "Kuch practice content sirf English aur Roman Urdu mein hai; live AI teeno mein jawab deta hai." })}
-          </p>
-        </Section>
-
-        <Section icon={Accessibility} tone="success" title={tx({ en: "Accessibility", roman: "Aasaani" })}>
-          <div className="divide-y divide-line">
-            <Toggle
-              label={tx({ en: "Elder Mode", roman: "Elder Mode" })}
-              description={tx({ en: "Bigger text, larger buttons and stronger contrast.", roman: "Bara text, bare buttons aur wazeh rang." })}
-              checked={prefs.elder}
-              onChange={(v) => update({ elder: v })}
+      <Section title={tx({ en: "General", roman: "Aam" })}>
+        <Card className="divide-y divide-line">
+          <Row label={tx({ en: "Your name", roman: "Aap ka naam" })} hint={tx({ en: "Only used to greet you.", roman: "Sirf salam ke liye." })}>
+            <Input value={prefs.name} maxLength={40} onChange={(e) => update({ name: e.target.value })} placeholder="e.g. Abu" autoComplete="nickname" className="h-10 sm:w-56" />
+          </Row>
+          <Row label={tx({ en: "Language", roman: "Zabaan", ur: "زبان" })}>
+            <Segmented<Lang>
+              label="Language"
+              value={prefs.lang}
+              onChange={(v) => update({ lang: v })}
+              options={[
+                { value: "en", label: "English" },
+                { value: "roman", label: "Roman Urdu" },
+                { value: "ur", label: "اردو" },
+              ]}
             />
-            <Toggle
-              label={tx({ en: "Reduce motion", roman: "Harkat kam karein" })}
-              description={tx({ en: "Turns off animations.", roman: "Animations band." })}
-              checked={prefs.reduceMotion}
-              onChange={(v) => update({ reduceMotion: v })}
+          </Row>
+          <Row label={tx({ en: "Theme", roman: "Theme" })}>
+            <Segmented<"light" | "dark">
+              label="Theme"
+              value={prefs.theme}
+              onChange={(v) => update({ theme: v })}
+              options={[
+                { value: "light", label: tx({ en: "Light", roman: "Roshan" }), icon: Sun },
+                { value: "dark", label: tx({ en: "Dark", roman: "Andhera" }), icon: Moon },
+              ]}
             />
-          </div>
-          <div className="mt-3 rounded-2xl border border-line bg-surface-2 p-4" aria-hidden>
-            <p className="text-xs font-bold uppercase tracking-wider text-subtle">{tx({ en: "Preview", roman: "Jhalak" })}</p>
-            <p className="mt-1 font-display text-lg font-bold">{tx({ en: "Check a Message", roman: "Message check karein" })}</p>
-            <p className="text-sm text-muted">{tx({ en: "Text and buttons grow when Elder Mode is on.", roman: "Elder Mode on karne par text aur buttons bare ho jate hain." })}</p>
-          </div>
-        </Section>
+          </Row>
+        </Card>
+      </Section>
 
-        <Section icon={Volume2} title={tx({ en: "Voice", roman: "Awaz" })} subtitle={tx({ en: "Voice-first, never voice-only — typing always works.", roman: "Awaz pehle, magar sirf awaz nahi — likhna hamesha chalta hai." })}>
-          <label className="block">
-            <span className="mb-2 flex items-center justify-between text-sm font-semibold">
-              {tx({ en: "Speaking speed", roman: "Bolne ki raftaar" })}
-              <span className="text-muted">{prefs.voiceRate.toFixed(2)}×</span>
-            </span>
-            <input
-              type="range"
-              min={0.6}
-              max={1.3}
-              step={0.05}
-              value={prefs.voiceRate}
-              onChange={(e) => update({ voiceRate: Number(e.target.value) })}
-              className="w-full accent-[var(--primary)] h-8 cursor-pointer"
-              aria-label="Speaking speed"
-            />
-            <span className="flex justify-between text-xs text-subtle">
-              <span>{tx({ en: "Slower", roman: "Aahista" })}</span>
-              <span>{tx({ en: "Faster", roman: "Tez" })}</span>
-            </span>
-          </label>
-          <div className="mt-3">
-            <Button variant="secondary" icon={Volume2} onClick={testVoice} disabled={!tts}>
-              {speaking ? tx({ en: "Stop", roman: "Rokein" }) : tx({ en: "Test voice", roman: "Awaz test karein" })}
-            </Button>
+      <Section title={tx({ en: "Accessibility & voice", roman: "Aasaani aur awaz" })}>
+        <Card className="divide-y divide-line">
+          <div className="px-4 py-2">
+            <Toggle label={tx({ en: "Elder Mode", roman: "Elder Mode" })} description={tx({ en: "Bigger text and buttons.", roman: "Bara text aur buttons." })} checked={prefs.elder} onChange={(v) => update({ elder: v })} />
           </div>
-          <div className="mt-3 divide-y divide-line">
-            <Toggle
-              label={tx({ en: "Read answers aloud automatically", roman: "Jawab khud parh kar sunayein" })}
-              checked={prefs.autoSpeak}
-              onChange={(v) => update({ autoSpeak: v })}
-            />
+          <div className="px-4 py-2">
+            <Toggle label={tx({ en: "Reduce motion", roman: "Harkat kam karein" })} description={tx({ en: "Turns off animations.", roman: "Animations band." })} checked={prefs.reduceMotion} onChange={(v) => update({ reduceMotion: v })} />
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Badge tone={stt ? "success" : "warning"} icon={Mic}>{stt ? tx({ en: "Voice input supported", roman: "Awaz se input mumkin" }) : tx({ en: "Voice input not supported — use Chrome/Edge", roman: "Awaz input nahi — Chrome/Edge istemal karein" })}</Badge>
-            <Badge tone={tts ? "success" : "warning"} icon={Volume2}>{tts ? tx({ en: "Read-aloud supported", roman: "Parh kar sunana mumkin" }) : tx({ en: "Read-aloud not supported", roman: "Parh kar sunana mumkin nahi" })}</Badge>
+          <div className="px-4 py-2">
+            <Toggle label={tx({ en: "Read answers aloud", roman: "Jawab parh kar sunayein" })} checked={prefs.autoSpeak} onChange={(v) => update({ autoSpeak: v })} />
           </div>
-          <p className="mt-2 text-xs text-subtle">{tx({ en: "Urdu speech depends on the voices installed on your device. Always check important numbers on screen.", roman: "Urdu awaz aap ke device ki voices par munhasir hai. Zaroori numbers hamesha screen par check karein." })}</p>
-        </Section>
+          <Row label={tx({ en: "Speaking speed", roman: "Bolne ki raftaar" })} hint={`${prefs.voiceRate.toFixed(2)}×`}>
+            <div className="flex items-center gap-3">
+              <input
+                type="range"
+                min={0.6}
+                max={1.3}
+                step={0.05}
+                value={prefs.voiceRate}
+                onChange={(e) => update({ voiceRate: Number(e.target.value) })}
+                className="h-8 w-40 cursor-pointer accent-[var(--primary)]"
+                aria-label="Speaking speed"
+              />
+              <Button variant="secondary" size="sm" icon={Volume2} onClick={testVoice} disabled={!tts}>
+                {speaking ? tx({ en: "Stop", roman: "Rokein" }) : tx({ en: "Test", roman: "Test" })}
+              </Button>
+            </div>
+          </Row>
+          <div className="flex flex-wrap gap-2 p-4">
+            <Badge tone={stt ? "success" : "warning"} icon={Mic}>{stt ? tx({ en: "Voice input works", roman: "Awaz input chalta hai" }) : tx({ en: "No voice input — use Chrome/Edge", roman: "Awaz input nahi — Chrome/Edge" })}</Badge>
+            <Badge tone={tts ? "success" : "warning"} icon={Volume2}>{tts ? tx({ en: "Read-aloud works", roman: "Parh kar sunana chalta hai" }) : tx({ en: "No read-aloud", roman: "Parh kar sunana nahi" })}</Badge>
+          </div>
+        </Card>
+      </Section>
 
-        <Section icon={Bot} tone="info" title={tx({ en: "AI engine", roman: "AI engine" })}>
+      <Section title={tx({ en: "AI engine", roman: "AI engine" })}>
+        <Card className="p-5">
           <div className="flex flex-wrap items-center gap-2">
             {status ? <ModeBadge mode={status.mode} /> : <Badge>…</Badge>}
-            {status?.model && <Badge tone="neutral">{status.model}</Badge>}
-            {status?.provider && <Badge tone="neutral">{status.provider}</Badge>}
+            {status?.provider && <span className="text-sm text-muted">{status.provider} · {status.model}</span>}
           </div>
           {status?.mode === "live" ? (
-            <p className="mt-3 text-sm text-muted">
-              {tx({ en: "Live AI is on. Answers are generated by the model, checked by HUMRAAH's safety rules, and labelled “Live AI”.", roman: "Live AI on hai. Jawab model banata hai, HUMRAAH ke safety rules check karte hain, aur “Live AI” likha hota hai." })}
-            </p>
+            <p className="mt-3 text-sm text-muted">{tx({ en: "Live AI is on. Answers are checked by HUMRAAH's safety rules.", roman: "Live AI on hai. Jawab HUMRAAH ke safety rules check karte hain." })}</p>
           ) : (
-            <div className="mt-3 text-sm text-muted">
-              <p>{tx({ en: "Demo Mode: HUMRAAH is using its built-in, rule-based safety engine and on-device OCR. Results are real but less flexible, and are labelled “Demo Mode”.", roman: "Demo Mode: HUMRAAH apna built-in rules wala safety engine aur device par OCR istemal kar raha hai. Natije asal hain magar kam lachakdaar, aur “Demo Mode” likha hota hai." })}</p>
-              <p className="mt-2 font-semibold text-fg">{tx({ en: "To enable live AI (for the person running the server):", roman: "Live AI on karne ke liye (server chalane wale ke liye):" })}</p>
-              <ol className="mt-1 list-decimal space-y-1 pl-5">
-                <li>{tx({ en: "Create a file named .env.local in the project folder.", roman: "Project folder mein .env.local file banayein." })}</li>
-                <li>{tx({ en: "Add GEMINI_API_KEY=… (free key from aistudio.google.com) or ANTHROPIC_API_KEY=… with your key.", roman: "Us mein GEMINI_API_KEY=… (aistudio.google.com se free key) ya ANTHROPIC_API_KEY=… apni key ke saath likhein." })}</li>
-                <li>{tx({ en: "Restart the server (npm run dev).", roman: "Server dobara chalayein (npm run dev)." })}</li>
-              </ol>
-              <p className="mt-2 text-xs text-subtle">{tx({ en: "Keys stay on the server and are never shown or sent to the browser.", roman: "Keys server par rehti hain, browser ko kabhi nahi bheji jaatin." })}</p>
-            </div>
+            <>
+              <p className="mt-3 text-sm text-muted">{tx({ en: "Demo Mode uses HUMRAAH's built-in safety rules. To turn on live AI:", roman: "Demo Mode HUMRAAH ke built-in rules istemal karta hai. Live AI on karne ke liye:" })}</p>
+              <StepList
+                className="mt-3"
+                items={[
+                  tx({ en: "Create a file named .env.local in the project folder.", roman: "Project folder mein .env.local file banayein." }),
+                  tx({ en: "Add GEMINI_API_KEY=… (free key from aistudio.google.com) or ANTHROPIC_API_KEY=… with your key.", roman: "Us mein GEMINI_API_KEY=… (aistudio.google.com se free key) ya ANTHROPIC_API_KEY=… apni key ke saath likhein." }),
+                  tx({ en: "Restart the server (npm run dev).", roman: "Server dobara chalayein (npm run dev)." }),
+                ]}
+              />
+              <p className="mt-3 text-xs text-subtle">{tx({ en: "Keys stay on the server, never in the browser.", roman: "Keys server par rehti hain, browser mein kabhi nahi." })}</p>
+            </>
           )}
-        </Section>
+        </Card>
+      </Section>
 
-        <Section icon={Database} tone="warning" title={tx({ en: "Privacy & your data", roman: "Privacy aur aap ka data" })}>
-          <ul className="flex flex-col gap-2.5 text-sm">
-            {[
-              { en: "Preferences and learning progress are stored only on this device.", roman: "Preferences aur progress sirf is device par mehfooz hoti hain." },
-              { en: "Screenshots and documents are processed for the analysis and not stored.", roman: "Screenshots aur documents sirf jaanch ke liye istemal hote hain, save nahi hote." },
-              { en: "Text is read on your device first; card numbers and CNICs are masked before any AI analysis.", roman: "Text pehle aap ke device par parha jata hai; AI se pehle card aur CNIC number chhupa diye jate hain." },
-              { en: "Nothing is sent anywhere except to the AI provider when live AI is on.", roman: "Live AI on ho to sirf AI provider ko bheja jata hai, aur kahin nahi." },
-              { en: "HUMRAAH never asks for or stores passwords, PINs or OTPs. Voice is not recorded.", roman: "HUMRAAH kabhi password, PIN ya OTP nahi maangta na save karta hai. Awaz record nahi hoti." },
-            ].map((x, i) => (
+      <Section title={tx({ en: "Privacy & your data", roman: "Privacy aur aap ka data" })}>
+        <Card className="p-5">
+          <ul className="space-y-2.5 text-sm">
+            {PRIVACY_POINTS.map((x, i) => (
               <li key={i} className="flex gap-2.5">
-                <ShieldCheck className="mt-0.5 size-4.5 shrink-0 text-success" aria-hidden />
-                <span className="text-muted">{tx(x)}</span>
+                <ShieldCheck className="mt-0.5 size-4 shrink-0 text-success" aria-hidden />
+                <span>{tx(x)}</span>
               </li>
             ))}
           </ul>
-          <div className="mt-4">
-            <Button variant="danger" icon={Trash2} onClick={clearAll} disabled={cleared}>{tx({ en: "Clear all my data", roman: "Mera saara data mitayein" })}</Button>
-          </div>
-        </Section>
-      </div>
+          <Button variant="danger" size="sm" icon={Trash2} className="mt-4" onClick={clearAll} disabled={cleared}>{tx({ en: "Clear all my data", roman: "Mera saara data mitayein" })}</Button>
+        </Card>
+      </Section>
 
-      <Card glow className="p-5 sm:p-7">
-        <div className="flex flex-col gap-5 md:flex-row md:items-start">
-          <IconTile icon={Heart} tone="teal" size="lg" />
-          <div className="flex-1">
-            <h2 className="font-display text-xl font-bold">{tx({ en: "About HUMRAAH", roman: "HUMRAAH ke baare mein" })}</h2>
-            <p className="mt-1 font-display text-lg italic text-gradient">Samjhay bhi. Sikhaye bhi. Hifazat bhi kare.</p>
-            <p className="mt-3 text-sm text-muted">
-              {tx({
-                en: "HUMRAAH is a guidance and learning platform, not a bank, payment processor, government authority, antivirus or guaranteed fraud-verification service. It explains, guides, checks and teaches — you stay in control of every sensitive action. AI can make mistakes; verify important things with the official provider.",
-                roman: "HUMRAAH rehnumai aur seekhne ka platform hai — bank, payment processor, sarkari idara, antivirus ya pakki fraud tasdeeq ki service nahi. Yeh samjhata, rasta dikhata, check karta aur sikhata hai — har hassaas qadam aap ke haath mein rehta hai. AI ghalti kar sakta hai; zaroori baatein official idare se tasdeeq karein.",
-              })}
-            </p>
-            <Notice tone="info" icon={Info} className="mt-4" title={tx({ en: "Credits", roman: "Credits" })}>
-              Anthropic Claude (AI analysis, when configured) · Tesseract.js (on-device OCR) · Web Speech API (voice) · Lucide (icons) · Recharts (charts) · Next.js &amp; Tailwind CSS. {tx({ en: "All banks, people and numbers in samples and practice are fictional.", roman: "Samples aur practice mein tamam bank, log aur numbers farzi hain." })}
-            </Notice>
-          </div>
-        </div>
-      </Card>
+      <Section title={tx({ en: "About", roman: "Baare mein" })}>
+        <Card className="space-y-2 p-5 text-sm">
+          <p className="font-medium italic">Samjhay bhi. Sikhaye bhi. Hifazat bhi kare.</p>
+          <p className="text-muted">
+            {tx({
+              en: "HUMRAAH is a guidance and learning companion — not a bank, authority or fraud-verification service. AI can make mistakes; verify important things with the official provider.",
+              roman: "HUMRAAH rehnumai aur seekhne ka saathi hai — bank, idara ya fraud tasdeeq ki service nahi. AI ghalti kar sakta hai; zaroori baatein official idare se tasdeeq karein.",
+            })}
+          </p>
+          <p className="text-xs text-subtle">
+            Anthropic Claude · Google Gemini · Tesseract.js · Web Speech API · Lucide · Recharts · Next.js · Tailwind CSS. {tx({ en: "All practice data is fictional.", roman: "Tamam practice data farzi hai." })}
+          </p>
+        </Card>
+      </Section>
     </div>
   );
 }

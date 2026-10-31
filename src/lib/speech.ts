@@ -8,7 +8,7 @@ import { usePrefs } from "./prefs";
 import type { Lang } from "./types";
 
 const RECOGNITION_LANG: Record<Lang, string> = { en: "en-US", roman: "ur-PK", ur: "ur-PK" };
-const VOICE_LANGS: Record<Lang, string[]> = { en: ["en-US", "en-GB", "en-IN", "en"], roman: ["en-IN", "en-PK", "en-GB", "en"], ur: ["ur-PK", "ur", "hi-IN"] };
+const VOICE_LANGS: Record<Lang, string[]> = { en: ["en-US", "en-GB", "en-IN", "en"], roman: ["en-IN", "en-PK", "en-GB", "en"], ur: ["ur-PK", "ur-IN", "ur"] };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function getRecognitionCtor(): any {
@@ -121,43 +121,129 @@ function speakable(text: string) {
   return text.replace(/[*_#>•`]/g, " ").replace(/[\u{1F300}-\u{1FAFF}]/gu, "").replace(/\s+/g, " ").trim();
 }
 
+// ── Server voice (Gemini TTS) for Urdu and Roman Urdu ──
+// Shared across every component so starting one voice always stops the previous one.
+let currentAudio: HTMLAudioElement | null = null;
+let currentFetch: AbortController | null = null;
+const audioUrls = new Map<string, string>();
+let serverVoice: Promise<boolean> | null = null;
+
+function hasServerVoice(): Promise<boolean> {
+  serverVoice ??= fetch("/api/status")
+    .then((r) => r.json())
+    .then((s) => Boolean(s.urduVoice))
+    .catch(() => false);
+  return serverVoice;
+}
+
+function stopEverything() {
+  if (typeof window === "undefined") return;
+  window.speechSynthesis?.cancel();
+  currentAudio?.pause();
+  currentAudio = null;
+  currentFetch?.abort();
+  currentFetch = null;
+}
+
+async function serverAudioUrl(text: string, lang: "roman" | "ur"): Promise<string | null> {
+  const key = `${lang}:${text}`;
+  const cached = audioUrls.get(key);
+  if (cached) return cached;
+  currentFetch = new AbortController();
+  const res = await fetch("/api/tts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ text, language: lang }),
+    signal: currentFetch.signal,
+  });
+  if (!res.ok) return null;
+  const url = URL.createObjectURL(await res.blob());
+  audioUrls.set(key, url);
+  return url;
+}
+
 export function useSpeaker() {
   const { prefs } = usePrefs();
   const [speakingId, setSpeakingId] = useState<string | null>(null);
   const [lastText, setLastText] = useState<{ id: string; text: string } | null>(null);
+  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window === "undefined" || !("speechSynthesis" in window)) return;
     window.speechSynthesis.getVoices();
-    return () => window.speechSynthesis.cancel();
+    return () => stopEverything();
   }, []);
 
-  const speak = useCallback(
-    (text: string, id = "default", rateMultiplier = 1) => {
+  /** Browser voice. Returns false when no suitable voice exists (common for Urdu). */
+  const speakWithBrowser = useCallback(
+    (text: string, id: string, rate: number) => {
       if (typeof window === "undefined" || !("speechSynthesis" in window)) return false;
-      const synth = window.speechSynthesis;
-      synth.cancel();
-      const u = new SpeechSynthesisUtterance(speakable(text));
       const voice = pickVoice(prefs.lang);
+      if (!voice && prefs.lang === "ur") return false;
+      const u = new SpeechSynthesisUtterance(text);
       if (voice) {
         u.voice = voice;
         u.lang = voice.lang;
       } else {
-        u.lang = prefs.lang === "en" ? "en-US" : "ur-PK";
+        u.lang = "en-US";
       }
-      u.rate = Math.max(0.5, Math.min(1.4, prefs.voiceRate * rateMultiplier));
+      u.rate = rate;
       u.onstart = () => setSpeakingId(id);
       u.onend = () => setSpeakingId((s) => (s === id ? null : s));
       u.onerror = () => setSpeakingId(null);
-      setLastText({ id, text });
-      synth.speak(u);
+      window.speechSynthesis.speak(u);
       return true;
     },
-    [prefs.lang, prefs.voiceRate],
+    [prefs.lang],
+  );
+
+  const speak = useCallback(
+    (raw: string, id = "default", rateMultiplier = 1) => {
+      const text = speakable(raw);
+      if (!text || typeof window === "undefined") return false;
+      stopEverything();
+      setVoiceError(null);
+      setLastText({ id, text: raw });
+      const rate = Math.max(0.5, Math.min(1.4, prefs.voiceRate * rateMultiplier));
+      const lang = prefs.lang;
+
+      if (lang === "en") return speakWithBrowser(text, id, rate);
+
+      // Urdu / Roman Urdu: natural Pakistani voice from the server, browser voice as fallback.
+      setSpeakingId(id);
+      (async () => {
+        try {
+          if (await hasServerVoice()) {
+            const url = await serverAudioUrl(text, lang);
+            if (url) {
+              const audio = new Audio(url);
+              audio.playbackRate = rate;
+              audio.onended = () => setSpeakingId((s) => (s === id ? null : s));
+              audio.onerror = () => setSpeakingId(null);
+              currentAudio = audio;
+              await audio.play();
+              return;
+            }
+          }
+        } catch (e) {
+          if (e instanceof DOMException && e.name === "AbortError") return;
+        }
+        if (!speakWithBrowser(text, id, rate)) {
+          setSpeakingId(null);
+          setVoiceError(
+            lang === "ur"
+              ? "اس براؤزر میں اردو آواز موجود نہیں۔ اردو آواز کے لیے Gemini key لگائیں یا Microsoft Edge استعمال کریں۔"
+              : "Is waqt awaz dastyab nahi. Thori dair baad koshish karein.",
+          );
+        }
+      })();
+      return true;
+    },
+    [prefs.lang, prefs.voiceRate, speakWithBrowser],
   );
 
   const stop = useCallback(() => {
-    if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
+    stopEverything();
     setSpeakingId(null);
   }, []);
 
@@ -165,5 +251,5 @@ export function useSpeaker() {
     if (lastText) speak(lastText.text, lastText.id, slow ? 0.7 : 1);
   }, [lastText, speak]);
 
-  return { speak, stop, repeat, speakingId, speaking: speakingId !== null };
+  return { speak, stop, repeat, speakingId, speaking: speakingId !== null, voiceError };
 }

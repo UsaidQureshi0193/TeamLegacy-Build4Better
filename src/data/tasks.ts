@@ -5,20 +5,23 @@
 
 import type { GuideStep, Lang } from "@/lib/types";
 
+type StepText = [instruction: string, why: string, hint: string, simpler: string];
+
 interface StepSrc {
-  en: [instruction: string, why: string, hint: string, simpler: string];
-  roman: [instruction: string, why: string, hint: string, simpler: string];
+  en: StepText;
+  roman: StepText;
+  ur?: StepText;
 }
 
 export interface LibraryTask {
   id: string;
   icon: "zap" | "video" | "mail" | "file" | "landmark" | "calendar";
   category: string;
-  title: { en: string; roman: string };
-  blurb: { en: string; roman: string };
+  title: { en: string; roman: string; ur?: string };
+  blurb: { en: string; roman: string; ur?: string };
   keywords: string[];
   minutes: number;
-  safety: { en: string[]; roman: string[] };
+  safety: { en: string[]; roman: string[]; ur?: string[] };
   steps: StepSrc[];
 }
 
@@ -256,18 +259,23 @@ export const TASK_LIBRARY: LibraryTask[] = [
 ];
 
 export function localiseTask(task: LibraryTask, lang: Lang) {
-  const l: "en" | "roman" = lang === "en" ? "en" : "roman";
+  // Urdu script falls back to Roman Urdu for any text not yet translated.
+  const pickText = <T,>(v: { en: T; roman: T; ur?: T }): T => (lang === "en" ? v.en : lang === "ur" ? (v.ur ?? v.roman) : v.roman);
   const steps: GuideStep[] = task.steps.map((s, i) => {
-    const [instruction, why, hint, simpler] = s[l];
+    const [instruction, why, hint, simpler] = pickText(s);
     return { id: `${task.id}-${i + 1}`, instruction, why, hint, simpler };
   });
   return {
     task_id: task.id,
-    title: task.title[l],
+    title: pickText(task.title),
     category: task.category,
     steps,
-    safety_notes: task.safety[l],
-    completion_criteria: l === "en" ? "You confirm that you completed every step yourself." : "Aap tasdeeq karein ke har step aap ne khud mukammal kiya.",
+    safety_notes: pickText(task.safety),
+    completion_criteria: pickText({
+      en: "You confirm that you completed every step yourself.",
+      roman: "Aap tasdeeq karein ke har step aap ne khud mukammal kiya.",
+      ur: "آپ تصدیق کریں کہ ہر قدم آپ نے خود مکمل کیا۔",
+    }),
   };
 }
 

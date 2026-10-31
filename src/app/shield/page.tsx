@@ -3,11 +3,11 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  AlertOctagon, CheckCircle2, CircleHelp, Dna, ExternalLink, GraduationCap, Image as ImageIcon, Link2, LifeBuoy, MessageSquareText,
-  QrCode, RotateCcw, ScanText, ShieldAlert, ShieldCheck, Sparkles, Wand2,
+  AlertOctagon, CircleHelp, Dna, ExternalLink, GraduationCap, Image as ImageIcon, Link2, LifeBuoy, MessageSquareText,
+  QrCode, RotateCcw, ShieldAlert, ShieldCheck, Sparkles, Wand2,
 } from "lucide-react";
 import { ImageDrop, VoiceMic } from "@/components/media";
-import { Badge, Button, Card, IconTile, ModeBadge, Notice, PageHeader, ProgressBar, Segmented, SpeakButton, Spinner, Textarea, cn } from "@/components/ui";
+import { Badge, Button, Card, IconTile, ModeBadge, Notice, PageHeader, ProgressBar, Section, Segmented, SpeakButton, Spinner, StepList, Textarea, cn } from "@/components/ui";
 import { postJSON, runOcr, setHandoff, takeHandoff } from "@/lib/client";
 import { useT } from "@/lib/i18n";
 import { usePrefs } from "@/lib/prefs";
@@ -170,21 +170,17 @@ export default function ShieldPage() {
   const speakText = result ? [result.summary, ...result.indicators.map((i) => `${i.indicator}. ${i.explanation}`), ...result.safe_actions].join(" ") : "";
 
   return (
-    <div>
+    <div className="space-y-8">
       <PageHeader
         icon={ShieldAlert}
         tone="danger"
-        eyebrow="HUMRAAH Shield"
         title={tx({ en: "Scam Shield", roman: "Scam Shield", ur: "اسکیم شیلڈ" })}
-        subtitle={tx({
-          en: "Got a strange SMS, WhatsApp, email or QR code? HUMRAAH shows you exactly which parts look risky — and what to do next.",
-          roman: "Ajeeb SMS, WhatsApp, email ya QR code aaya? HUMRAAH dikhata hai kaunsa hissa khatarnaak hai — aur ab kya karein.",
-        })}
+        subtitle={tx({ en: "Check a message, screenshot or QR code for scam signs.", roman: "Message, screenshot ya QR code mein dhoke ki nishaniyan check karein." })}
         actions={result && <Button variant="secondary" icon={RotateCcw} onClick={reset}>{tx({ en: "Check another", roman: "Doosra check karein" })}</Button>}
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
-        <Card glow className="p-5 sm:p-6">
+      <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+        <Card glow className="p-4 sm:p-5">
           <Segmented<Tab>
             label="Input type"
             value={tab}
@@ -193,17 +189,17 @@ export default function ShieldPage() {
               setError(null);
             }}
             options={[
-              { value: "text", label: tx({ en: "Paste message", roman: "Message paste" }), icon: MessageSquareText },
+              { value: "text", label: tx({ en: "Message", roman: "Message" }), icon: MessageSquareText },
               { value: "image", label: tx({ en: "Screenshot", roman: "Screenshot" }), icon: ImageIcon },
               { value: "qr", label: tx({ en: "QR code", roman: "QR code" }), icon: QrCode },
             ]}
-            className="mb-5"
+            className="mb-4"
           />
 
           {tab === "text" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               <Textarea
-                rows={6}
+                rows={5}
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder={tx({ en: "Paste or type the message you received…", roman: "Jo message aaya hai woh yahan paste ya type karein…" })}
@@ -214,12 +210,12 @@ export default function ShieldPage() {
                 <Button size="lg" icon={Dna} loading={loading} disabled={!text.trim()} onClick={() => analyse(text, null)}>
                   {tx({ en: "Check for scam signs", roman: "Dhoke ki nishaniyan check karein" })}
                 </Button>
-                <Button variant="secondary" icon={Sparkles} onClick={() => setText(SAMPLE_SMS_TEXT)}>
+                <Button variant="ghost" icon={Sparkles} onClick={() => setText(SAMPLE_SMS_TEXT)}>
                   {tx({ en: "Use fictional sample", roman: "Farzi namoona" })}
                 </Button>
               </div>
-              <details className="rounded-2xl border border-line bg-surface-2 p-4">
-                <summary className="cursor-pointer text-sm font-semibold text-muted">{tx({ en: "Or say it out loud — read the message to me", roman: "Ya bol kar sunayein — message parh kar batayein" })}</summary>
+              <details className="text-sm">
+                <summary className="cursor-pointer text-muted hover:text-fg">{tx({ en: "Or read the message out loud", roman: "Ya message bol kar sunayein" })}</summary>
                 <div className="pt-4">
                   <VoiceMic size="md" onTranscript={(t) => setText((prev) => (prev ? `${prev} ${t}` : t))} />
                 </div>
@@ -228,27 +224,26 @@ export default function ShieldPage() {
           )}
 
           {tab === "image" && (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {!image ? (
                 <ImageDrop onImage={onImage} onSample={() => onImage(sampleScamSms())} sampleLabel={tx({ en: "Try fictional SMS", roman: "Farzi SMS try karein" })} />
               ) : (
-                <div className="grid gap-4 md:grid-cols-[220px_1fr]">
+                <div className="grid gap-4 md:grid-cols-[200px_1fr]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image} alt="Uploaded screenshot" className="max-h-80 w-full rounded-2xl border border-line object-contain bg-surface-2" />
+                  <img src={image} alt="Uploaded screenshot" className="max-h-72 w-full rounded-xl border border-line bg-surface-2 object-contain" />
                   <div className="space-y-3">
                     {ocrState.busy ? (
                       <div className="space-y-2 pt-2">
-                        <Spinner label={tx({ en: "Reading the text in your screenshot…", roman: "Screenshot ka text parha ja raha hai…" })} />
+                        <Spinner label={tx({ en: "Reading the text on your device…", roman: "Text aap ke device par parha ja raha hai…" })} />
                         <ProgressBar value={ocrState.progress * 100} label="OCR progress" />
-                        <p className="text-xs text-subtle">{tx({ en: "Text is read on your device.", roman: "Text aap ke device par parha ja raha hai." })}</p>
                       </div>
                     ) : (
                       <>
                         <div className="flex items-center justify-between gap-2">
-                          <p className="flex items-center gap-2 text-sm font-bold"><ScanText className="size-4 text-primary" /> {tx({ en: "Text found — please check & correct", roman: "Mila hua text — check aur durust karein" })}</p>
+                          <p className="text-sm font-semibold">{tx({ en: "Text found — check & correct it", roman: "Mila hua text — check aur durust karein" })}</p>
                           {ocrState.confidence !== undefined && <Badge tone={ocrState.confidence > 70 ? "success" : "warning"}>{ocrState.confidence}% clear</Badge>}
                         </div>
-                        <Textarea rows={6} value={text} onChange={(e) => setText(e.target.value)} aria-label="Extracted text" />
+                        <Textarea rows={5} value={text} onChange={(e) => setText(e.target.value)} aria-label="Extracted text" />
                         <div className="flex flex-wrap gap-2">
                           <Button size="lg" icon={Dna} loading={loading} disabled={!text.trim()} onClick={() => analyse(text, image)}>
                             {tx({ en: "Check for scam signs", roman: "Dhoke ki nishaniyan check karein" })}
@@ -264,229 +259,184 @@ export default function ShieldPage() {
           )}
 
           {tab === "qr" && (
-            <div className="space-y-4">
-              <Notice tone="info" title={tx({ en: "QR Guard", roman: "QR Guard" })}>
-                {tx({
-                  en: "HUMRAAH decodes the QR code on your device and shows where it leads — it never opens the link or starts a payment.",
-                  roman: "HUMRAAH QR code ko aap ke device par parh kar dikhata hai ke yeh kahan le jata hai — link khud nahi kholta na payment shuru karta hai.",
-                })}
-              </Notice>
+            <div className="space-y-3">
+              <p className="text-sm text-muted">
+                {tx({ en: "HUMRAAH shows where a QR code leads. It never opens the link or starts a payment.", roman: "HUMRAAH batata hai QR code kahan le jata hai. Link khud nahi kholta na payment shuru karta hai." })}
+              </p>
               <ImageDrop onImage={onQr} label={tx({ en: "Upload a photo of the QR code", roman: "QR code ki tasveer upload karein" })} privacyNote="" compact />
               {qr && (
-                <div className="rounded-2xl border border-line bg-surface-2 p-4">
-                  <p className="text-xs font-bold uppercase tracking-wider text-subtle">{tx({ en: "This QR code contains", roman: "Is QR code mein yeh hai" })}</p>
+                <div className="rounded-xl bg-surface-2 p-4">
+                  <p className="text-xs font-medium text-subtle">{tx({ en: "This QR code contains", roman: "Is QR code mein yeh hai" })}</p>
                   <p className="mt-1 break-all font-mono text-sm">{qr.content}</p>
-                  <p className="mt-2 text-xs text-muted">{tx({ en: "Not opened. Compare it with the shop or company name before paying.", roman: "Khola nahi gaya. Payment se pehle dukaan ya company ke naam se milayein." })}</p>
                 </div>
               )}
             </div>
           )}
 
           {error && <Notice tone="danger" className="mt-4">{error}</Notice>}
-          {loading && <div className="mt-5"><Spinner label={tx({ en: "Looking for warning signs…", roman: "Khatre ki nishaniyan dhoondi ja rahi hain…" })} /></div>}
+          {loading && <div className="mt-4"><Spinner label={tx({ en: "Looking for warning signs…", roman: "Khatre ki nishaniyan dhoondi ja rahi hain…" })} /></div>}
         </Card>
 
-        <aside className="space-y-4">
-          <Card className="p-5">
-            <p className="font-display font-bold">{tx({ en: "The 3 golden rules", roman: "3 sunehri usool" })}</p>
-            <ol className="mt-3 space-y-3 text-sm">
-              {[
-                { en: "Never share an OTP, PIN or password — with anyone.", roman: "OTP, PIN ya password kabhi kisi ko na batayein." },
-                { en: "Don't tap links in unexpected messages. Open the official app yourself.", roman: "Ghair mutawaqqa message ke link na kholein. Official app khud kholein." },
-                { en: "Verify by calling the number on your card or bill — not the one in the message.", roman: "Card ya bill wale number par call kar ke tasdeeq karein — message wale par nahi." },
-              ].map((r, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-primary-soft text-xs font-bold text-primary">{i + 1}</span>
-                  <span className="text-muted">{tx(r)}</span>
-                </li>
-              ))}
-            </ol>
-          </Card>
-          <Card className="p-5">
-            <div className="flex items-start gap-3">
-              <IconTile icon={LifeBuoy} tone="danger" />
-              <div>
-                <p className="font-bold">{tx({ en: "Already shared a code or sent money?", roman: "Code bata diya ya paise bhej diye?" })}</p>
-                <p className="mt-1 text-sm text-muted">{tx({ en: "Act now — every minute matters.", roman: "Abhi qadam uthayein — har minute qeemti hai." })}</p>
-                <Button
-                  variant="danger"
-                  size="sm"
-                  className="mt-3"
-                  onClick={() => {
-                    setHandoff("emergency", "shared-otp");
-                    router.push("/emergency");
-                  }}
-                >
-                  {tx({ en: "Open Emergency Help", roman: "Emergency Help kholein" })}
-                </Button>
-              </div>
-            </div>
-          </Card>
-        </aside>
+        <Card className="space-y-4 p-4 sm:p-5">
+          <div>
+            <p className="mb-3 font-semibold">{tx({ en: "3 golden rules", roman: "3 sunehri usool" })}</p>
+            <StepList
+              items={[
+                { en: "Never share an OTP, PIN or password.", roman: "OTP, PIN ya password kabhi na batayein." },
+                { en: "Don't tap links in unexpected messages.", roman: "Ghair mutawaqqa message ke link na kholein." },
+                { en: "Call the number on your card — not the one in the message.", roman: "Card wale number par call karein — message wale par nahi." },
+              ].map((r) => <span key={r.en} className="text-muted">{tx(r)}</span>)}
+            />
+          </div>
+          <div className="border-t border-line pt-4">
+            <p className="text-sm font-semibold">{tx({ en: "Already shared a code or sent money?", roman: "Code bata diya ya paise bhej diye?" })}</p>
+            <Button
+              variant="danger"
+              size="sm"
+              icon={LifeBuoy}
+              className="mt-2"
+              onClick={() => {
+                setHandoff("emergency", "shared-otp");
+                router.push("/emergency");
+              }}
+            >
+              {tx({ en: "Open Emergency Help", roman: "Emergency Help kholein" })}
+            </Button>
+          </div>
+        </Card>
       </div>
 
       {result && risk && dna && (
-        <section ref={resultRef} className="mt-8 scroll-mt-28 space-y-6 animate-fade-up" aria-live="polite">
+        <section ref={resultRef} className="scroll-mt-28 space-y-8" aria-live="polite">
           {/* Risk verdict */}
-          <Card glow className="overflow-hidden">
-            <div className={cn("flex flex-col gap-5 p-5 sm:flex-row sm:items-center sm:p-6", risk.tone === "danger" ? "bg-danger-soft" : risk.tone === "warning" ? "bg-warning-soft" : risk.tone === "success" ? "bg-success-soft" : "bg-info-soft")}>
-              <IconTile icon={risk.icon} tone={risk.tone} size="lg" className="bg-surface" />
-              <div className="flex-1">
+          <div className={cn("rounded-[var(--radius-lg)] p-4 sm:p-5", { danger: "bg-danger-soft", warning: "bg-warning-soft", success: "bg-success-soft", info: "bg-info-soft" }[risk.tone])}>
+            <div className="flex items-start gap-3.5">
+              <IconTile icon={risk.icon} tone={risk.tone} className="bg-surface" />
+              <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h2 className={cn("text-2xl font-extrabold", { danger: "text-danger", warning: "text-warning", success: "text-success", info: "text-info" }[risk.tone])}>{tx(risk)}</h2>
+                  <h2 className={cn("text-xl font-bold", { danger: "text-danger", warning: "text-warning", success: "text-success", info: "text-info" }[risk.tone])}>{tx(risk)}</h2>
                   <ModeBadge mode={result.mode} />
-                  {result.redactions ? <Badge tone="lavender" icon={ShieldCheck}>{result.redactions} sensitive number(s) hidden</Badge> : null}
                 </div>
-                <p className={cn("mt-1.5 text-base text-fg", lang === "ur" && "urdu")}>{result.summary}</p>
-                <div className="mt-3 max-w-md">
-                  <ProgressBar value={risk.meter} tone={risk.tone === "danger" ? "danger" : risk.tone === "warning" ? "amber" : "teal"} label="Risk level" />
-                  <div className="mt-1 flex justify-between text-[11px] font-semibold text-subtle"><span>Low</span><span>Medium</span><span>High</span></div>
-                </div>
+                <p className={cn("mt-1 text-fg", lang === "ur" && "urdu")}>{result.summary}</p>
+                <ProgressBar value={risk.meter} tone={risk.tone === "danger" ? "danger" : risk.tone === "warning" ? "amber" : "teal"} label="Risk level" className="mt-3 max-w-sm" />
+                {result.redactions ? (
+                  <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
+                    <ShieldCheck className="size-3.5 text-success" aria-hidden /> {result.redactions} sensitive number(s) hidden before checking
+                  </p>
+                ) : null}
               </div>
-              <SpeakButton text={speakText} id="shield-result" size="md" className="self-start" />
+              <SpeakButton text={speakText} id="shield-result" />
             </div>
-            {result.notice && <Notice tone="warning" className="m-5 mt-0 sm:m-6 sm:mt-0">{result.notice}</Notice>}
-          </Card>
+            {result.notice && <Notice tone="warning" className="mt-3 bg-surface">{result.notice}</Notice>}
+          </div>
 
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
+          <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
             {/* Scam DNA */}
-            <Card className="p-5 sm:p-6">
-              <div className="mb-4 flex items-center gap-3">
-                <IconTile icon={Dna} tone="lavender" />
-                <div>
-                  <h3 className="text-lg font-bold">Scam DNA</h3>
-                  <p className="text-sm text-muted">{tx({ en: "The exact words that raised a warning. Tap a highlight.", roman: "Woh alfaaz jin par warning aayi. Highlight par tap karein." })}</p>
-                </div>
-              </div>
-              <div className="rounded-2xl border border-line bg-surface-2 p-4 text-[1.02rem] leading-[2.1]">
-                {dna.segments.map((s, i) =>
-                  s.idx === undefined ? (
-                    <span key={i}>{s.text}</span>
-                  ) : (
-                    <button
-                      key={i}
-                      onClick={() => setFocus(s.idx!)}
-                      className={cn("mx-0.5 rounded-md px-1 py-0.5 font-semibold ring-1 transition cursor-pointer", SEV_STYLE[s.sev!].mark, focus === s.idx && "ring-2")}
-                    >
-                      {s.text}
-                      <sup className="ml-0.5 text-[10px] font-bold">{s.idx! + 1}</sup>
-                    </button>
-                  ),
-                )}
-              </div>
-              {result.indicators.length === 0 ? (
-                <Notice tone="success" className="mt-4" title={tx({ en: "No common warning signs found", roman: "Aam khatre ki nishaniyan nahi milin" })}>
-                  {tx({ en: "That isn't a guarantee. If money or personal details are involved, verify with the organisation directly.", roman: "Yeh zamanat nahi. Paise ya zaati maloomat ka maamla ho to idare se khud tasdeeq karein." })}
-                </Notice>
-              ) : (
-                <ul className="mt-5 space-y-3">
-                  {result.indicators.map((ind, i) => (
-                    <li key={i}>
+            <Card className="p-4 sm:p-5">
+              <Section title="Scam DNA" description={tx({ en: "Words that raised a warning. Tap one to see why.", roman: "Woh alfaaz jin par warning aayi. Tap kar ke wajah dekhein." })}>
+                <div className="rounded-xl bg-surface-2 p-4 leading-[2.1]">
+                  {dna.segments.map((s, i) =>
+                    s.idx === undefined ? (
+                      <span key={i}>{s.text}</span>
+                    ) : (
                       <button
-                        onClick={() => setFocus(i)}
-                        className={cn("w-full rounded-2xl border p-4 text-left transition cursor-pointer", focus === i ? "border-primary bg-primary-soft" : "border-line bg-surface hover:border-line-strong")}
+                        key={i}
+                        onClick={() => setFocus(s.idx!)}
+                        className={cn("mx-0.5 rounded px-1 py-0.5 font-medium ring-1 transition cursor-pointer", SEV_STYLE[s.sev!].mark, focus === s.idx && "ring-2")}
                       >
-                        <div className="flex items-start gap-3">
-                          <span className={cn("mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white", SEV_STYLE[ind.severity].dot)}>{i + 1}</span>
-                          <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <p className="font-bold">{ind.indicator}</p>
+                        {s.text}
+                        <sup className="ml-0.5 text-[10px] font-bold">{s.idx! + 1}</sup>
+                      </button>
+                    ),
+                  )}
+                </div>
+                {result.indicators.length === 0 ? (
+                  <Notice tone="success" title={tx({ en: "No common warning signs found", roman: "Aam khatre ki nishaniyan nahi milin" })}>
+                    {tx({ en: "That isn't a guarantee — verify anything involving money.", roman: "Yeh zamanat nahi — paison ka maamla ho to tasdeeq karein." })}
+                  </Notice>
+                ) : (
+                  <ul className="divide-y divide-line">
+                    {result.indicators.map((ind, i) => (
+                      <li key={i}>
+                        <button
+                          onClick={() => setFocus(i)}
+                          className={cn("flex w-full items-start gap-3 rounded-lg px-2 py-3 text-left transition-colors cursor-pointer", focus === i ? "bg-primary-soft" : "hover:bg-surface-2")}
+                        >
+                          <span className={cn("mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold text-white", SEV_STYLE[ind.severity].dot)}>{i + 1}</span>
+                          <span className="min-w-0 flex-1">
+                            <span className="flex flex-wrap items-center gap-2">
+                              <span className="font-semibold">{ind.indicator}</span>
                               <Badge tone={SEV_STYLE[ind.severity].badge}>{ind.severity}</Badge>
                               {!dna.found.has(i) && <Badge tone="neutral">{tx({ en: "from screenshot", roman: "screenshot se" })}</Badge>}
-                            </div>
-                            <p className="mt-1 break-words text-sm italic text-subtle">“{ind.evidence}”</p>
-                            <p className={cn("mt-1.5 text-sm text-muted", lang === "ur" && "urdu")}>{ind.explanation}</p>
-                          </div>
-                        </div>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </Card>
-
-            <div className="space-y-6">
-              <Card className="p-5 sm:p-6">
-                <div className="mb-3 flex items-center gap-3">
-                  <IconTile icon={CheckCircle2} tone="success" />
-                  <h3 className="text-lg font-bold">{tx({ en: "What to do now", roman: "Ab kya karein" })}</h3>
-                </div>
-                <ol className="space-y-2.5">
-                  {result.safe_actions.map((a, i) => (
-                    <li key={i} className="flex gap-3 rounded-xl bg-surface-2 p-3 text-sm">
-                      <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-success-soft text-xs font-bold text-success">{i + 1}</span>
-                      <span className={cn(lang === "ur" && "urdu")}>{a}</span>
-                    </li>
-                  ))}
-                </ol>
-              </Card>
-
-              {result.links.length > 0 && (
-                <Card className="p-5 sm:p-6">
-                  <div className="mb-3 flex items-center gap-3">
-                    <IconTile icon={Link2} tone="warning" />
-                    <h3 className="text-lg font-bold">{tx({ en: "Links in this message", roman: "Is message ke links" })}</h3>
-                  </div>
-                  <ul className="space-y-3">
-                    {result.links.map((l) => (
-                      <li key={l.url} className="rounded-xl border border-line p-3">
-                        <p className="break-all font-mono text-sm font-semibold text-danger">{l.domain}</p>
-                        <p className="mt-0.5 break-all text-xs text-subtle">{l.url}</p>
-                        <p className="mt-1.5 text-sm text-muted">{l.note}</p>
+                            </span>
+                            <span className="mt-0.5 block break-words text-sm italic text-subtle">“{ind.evidence}”</span>
+                            <span className={cn("mt-1 block text-sm text-muted", lang === "ur" && "urdu")}>{ind.explanation}</span>
+                          </span>
+                        </button>
                       </li>
                     ))}
                   </ul>
-                </Card>
+                )}
+              </Section>
+            </Card>
+
+            <Card className="space-y-6 p-4 sm:p-5">
+              <Section title={tx({ en: "What to do now", roman: "Ab kya karein" })}>
+                <StepList tone="success" items={result.safe_actions.map((a, i) => <span key={i} className={cn(lang === "ur" && "urdu")}>{a}</span>)} />
+              </Section>
+
+              {result.links.length > 0 && (
+                <Section title={tx({ en: "Links in this message", roman: "Is message ke links" })} className="border-t border-line pt-5">
+                  <ul className="space-y-3">
+                    {result.links.map((l) => (
+                      <li key={l.url} className="flex gap-2.5 text-sm">
+                        <Link2 className="mt-0.5 size-4 shrink-0 text-warning" aria-hidden />
+                        <span className="min-w-0">
+                          <span className="block break-all font-mono font-semibold text-danger">{l.domain}</span>
+                          <span className="mt-0.5 block text-muted">{l.note}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </Section>
               )}
 
-              <Card className="p-5 sm:p-6">
-                <div className="mb-3 flex items-center gap-3">
-                  <IconTile icon={CircleHelp} tone="info" />
-                  <h3 className="text-lg font-bold">{tx({ en: "What HUMRAAH can't know", roman: "HUMRAAH kya nahi jaan sakta" })}</h3>
-                </div>
-                <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted">
+              <Section title={tx({ en: "What HUMRAAH can't know", roman: "HUMRAAH kya nahi jaan sakta" })} className="border-t border-line pt-5">
+                <ul className="list-disc space-y-1 pl-5 text-sm text-muted">
                   {result.unknowns.map((u, i) => <li key={i}>{u}</li>)}
                 </ul>
-                <p className="mt-4 rounded-xl bg-surface-2 p-3 text-xs text-subtle">{result.confidence_note}</p>
-              </Card>
-            </div>
+                <p className="text-xs text-subtle">{result.confidence_note}</p>
+              </Section>
+            </Card>
           </div>
 
           {/* Flagship journey: learn from it */}
-          <Card glow className="hero-gradient overflow-hidden p-6 text-white sm:p-8">
-            <div className="flex flex-col gap-5 md:flex-row md:items-center">
-              <div className="flex-1">
-                <Badge className="bg-white/15 text-white" icon={GraduationCap}>{tx({ en: "Learn from this", roman: "Is se seekhein" })}</Badge>
-                <h3 className="mt-3 text-2xl font-extrabold text-white">{tx({ en: "Practise spotting this trick — safely", roman: "Yeh chaal pehchanne ki mehfooz mashq karein" })}</h3>
-                <p className="mt-2 max-w-xl text-white/75">
-                  {tx({
-                    en: "Enter the Scam Escape Room with a similar, fictional message. Find the clues yourself and choose the safe response — your result updates your Digital Independence Score.",
-                    roman: "Milte julte farzi message ke saath Scam Escape Room mein jayein. Khud nishaniyan dhoondein aur mehfooz jawab chunein — nateeja aap ka Digital Independence Score update karega.",
-                  })}
-                </p>
-              </div>
-              <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
-                <button
-                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-2xl bg-white px-6 font-semibold text-[#0B1422] transition hover:bg-white/90 active:scale-[0.98] cursor-pointer"
-                  onClick={() => {
-                    setHandoff("academy", result.practice_scenario ?? "bank-otp");
-                    router.push("/academy");
-                  }}
-                >
-                  <Wand2 className="size-5" aria-hidden />
-                  {tx({ en: "Enter Scam Escape Room", roman: "Scam Escape Room mein jayein" })}
-                </button>
-                <button
-                  className="inline-flex h-13 items-center justify-center gap-2.5 rounded-2xl border border-white/25 px-6 font-semibold text-white transition hover:bg-white/10 cursor-pointer"
-                  onClick={() => {
-                    setHandoff("assistant", tx({ en: `I received a message that HUMRAAH rated "${tx(risk)}". What should I do?`, roman: `Mujhe aisa message aaya jise HUMRAAH ne "${tx(risk)}" kaha. Main kya karun?` }));
-                    router.push("/assistant");
-                  }}
-                >
-                  <ExternalLink className="size-5" aria-hidden />
-                  {tx({ en: "Ask HUMRAAH about it", roman: "HUMRAAH se poochein" })}
-                </button>
-              </div>
+          <Card className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:p-5">
+            <IconTile icon={GraduationCap} tone="lavender" />
+            <div className="flex-1">
+              <p className="font-semibold">{tx({ en: "Practise spotting this trick — safely", roman: "Yeh chaal pehchanne ki mehfooz mashq karein" })}</p>
+              <p className="text-sm text-muted">{tx({ en: "A similar fictional message in the Scam Escape Room. Your result updates your score.", roman: "Scam Escape Room mein milta julta farzi message. Nateeja aap ka score update karega." })}</p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <Button
+                icon={Wand2}
+                onClick={() => {
+                  setHandoff("academy", result.practice_scenario ?? "bank-otp");
+                  router.push("/academy");
+                }}
+              >
+                {tx({ en: "Enter Scam Escape Room", roman: "Scam Escape Room mein jayein" })}
+              </Button>
+              <Button
+                variant="ghost"
+                icon={ExternalLink}
+                onClick={() => {
+                  setHandoff("assistant", tx({ en: `I received a message that HUMRAAH rated "${tx(risk)}". What should I do?`, roman: `Mujhe aisa message aaya jise HUMRAAH ne "${tx(risk)}" kaha. Main kya karun?` }));
+                  router.push("/assistant");
+                }}
+              >
+                {tx({ en: "Ask HUMRAAH about it", roman: "HUMRAAH se poochein" })}
+              </Button>
             </div>
           </Card>
         </section>
