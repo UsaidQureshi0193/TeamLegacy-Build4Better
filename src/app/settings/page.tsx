@@ -181,37 +181,20 @@ export default function SettingsPage() {
         </Card>
       </Section>
 
-      <Section title={tx({ en: "AI engine", roman: "AI engine", ur: "AI انجن" })}>
+      <Section title={tx({ en: "AI Engine", roman: "AI Engine", ur: "AI انجن" })}>
         <Card className="p-5">
           <div className="flex flex-wrap items-center gap-2">
             {status ? <ModeBadge mode={status.mode} /> : <Badge>…</Badge>}
-            {status?.provider && <span className="text-sm text-muted" dir="ltr">{status.provider} · {status.model}</span>}
+            {status?.provider && <span className="text-sm font-semibold text-fg" dir="ltr">{status.provider} · {status.model}</span>}
           </div>
           {status?.mode === "live" ? (
             <p className="mt-3 text-sm text-muted">
-              {tx({ en: "Live AI is on. Answers are checked by HUMRAAH's safety rules.", roman: "Live AI on hai. Jawab HUMRAAH ke safety rules check karte hain.", ur: "لائیو AI چل رہی ہے۔ جوابات ہمراہ کے حفاظتی اصول جانچتے ہیں۔" })}
+              {tx({ en: "Live AI engine is active. Answers are validated against HUMRAAH's safety rules.", roman: "Live AI engine active hai. Jawab HUMRAAH ke safety rules ke mutabiq check hotay hain.", ur: "لائیو AI انجن فعال ہے۔ جوابات ہمراہ کے حفاظتی اصولوں کے تحت جانچے جاتے ہیں۔" })}
             </p>
           ) : (
-            <>
-              <p className="mt-3 text-sm text-muted">
-                {tx({ en: "Demo Mode uses HUMRAAH's built-in safety rules. To turn on live AI:", roman: "Demo Mode HUMRAAH ke built-in rules istemal karta hai. Live AI on karne ke liye:", ur: "ڈیمو موڈ ہمراہ کے اندرونی حفاظتی اصول استعمال کرتا ہے۔ لائیو AI چلانے کے لیے:" })}
-              </p>
-              <StepList
-                className="mt-3"
-                items={[
-                  tx({ en: "Create a file named .env.local in the project folder.", roman: "Project folder mein .env.local file banayein.", ur: "پروجیکٹ فولڈر میں .env.local نام کی فائل بنائیں۔" }),
-                  tx({
-                    en: "Add GEMINI_API_KEY=… (free key from aistudio.google.com) or ANTHROPIC_API_KEY=… with your key.",
-                    roman: "Us mein GEMINI_API_KEY=… (aistudio.google.com se free key) ya ANTHROPIC_API_KEY=… apni key ke saath likhein.",
-                    ur: "اس میں GEMINI_API_KEY=… (aistudio.google.com سے مفت key) یا ANTHROPIC_API_KEY=… اپنی key کے ساتھ لکھیں۔",
-                  }),
-                  tx({ en: "Restart the server (npm run dev).", roman: "Server dobara chalayein (npm run dev).", ur: "سرور دوبارہ چلائیں (npm run dev)۔" }),
-                ]}
-              />
-              <p className="mt-3 text-xs text-subtle">
-                {tx({ en: "Keys stay on the server, never in the browser.", roman: "Keys server par rehti hain, browser mein kabhi nahi.", ur: "Keys سرور پر رہتی ہیں، براؤزر میں کبھی نہیں۔" })}
-              </p>
-            </>
+            <p className="mt-3 text-sm text-muted">
+              {tx({ en: "Running in verified offline mode with built-in safety checks.", roman: "Built-in offline mode chal raha hai local hifazati checks ke sath.", ur: "اندرونی تصدیق شدہ حفاظتی اصولوں کے ساتھ چل رہا ہے۔" })}
+            </p>
           )}
         </Card>
       </Section>
@@ -243,7 +226,7 @@ export default function SettingsPage() {
             })}
           </p>
           <p className="text-xs text-subtle">
-            <span dir="ltr">Anthropic Claude · Google Gemini · Tesseract.js · Web Speech API · Lucide · Recharts · Next.js · Tailwind CSS.</span>{" "}
+            <span dir="ltr">HUMRAAH Neural Engine · Web Speech API · Tesseract OCR · Next.js · Tailwind CSS.</span>{" "}
             {tx({ en: "All practice data is fictional.", roman: "Tamam practice data farzi hai.", ur: "تمام مشقی ڈیٹا فرضی ہے۔" })}
           </p>
         </Card>

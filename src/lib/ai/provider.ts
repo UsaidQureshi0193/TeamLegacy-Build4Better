@@ -22,8 +22,8 @@ export function aiConfigured(): boolean {
 
 export function activeInfo(): { provider: string; model: string } | null {
   const p = activeProvider();
-  if (p === "claude") return { provider: "Anthropic Claude", model: CLAUDE_MODEL };
-  if (p === "gemini") return { provider: "Google Gemini", model: GEMINI_MODEL };
+  if (p === "claude") return { provider: "HUMRAAH Intelligence", model: "Core AI" };
+  if (p === "gemini") return { provider: "HUMRAAH AI Engine", model: "Neural Flash" };
   return null;
 }
 

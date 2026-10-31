@@ -79,22 +79,22 @@ export async function geminiStructuredCall<T extends z.ZodType>(opts: Structured
     if (error instanceof ApiError) {
       console.error("[humraah] Gemini API error", error.status, error.message);
       if (isBusy(error)) {
-        throw new AiUnavailableError("The free AI is very busy right now, so HUMRAAH used its built-in safety engine. Please try again in a minute.");
+        throw new AiUnavailableError("The AI engine is busy right now, so HUMRAAH used its built-in safety engine. Please try again in a minute.");
       }
       if (error.status === 400 || error.status === 401 || error.status === 403) {
-        throw new AiUnavailableError("The Gemini key or model setting is invalid, so HUMRAAH used its built-in safety engine.");
+        throw new AiUnavailableError("The AI engine configuration is invalid, so HUMRAAH used its built-in safety engine.");
       }
       if (error.status === 429) {
-        throw new AiUnavailableError("The free AI limit was reached for now, so HUMRAAH used its built-in safety engine. Try again in a minute.");
+        throw new AiUnavailableError("The AI engine limit was reached for now, so HUMRAAH used its built-in safety engine. Try again in a minute.");
       }
       if (error.status === 404) {
-        throw new AiUnavailableError("The Gemini model name was not found, so HUMRAAH used its built-in safety engine.");
+        throw new AiUnavailableError("The AI engine model was not found, so HUMRAAH used its built-in safety engine.");
       }
       throw new AiUnavailableError("The AI service had a problem, so HUMRAAH used its built-in safety engine.");
     }
-    console.error("[humraah] Gemini call failed", error);
+    console.error("[humraah] AI call failed", error);
     if (isBusy(error)) {
-      throw new AiUnavailableError("The free AI is very busy right now, so HUMRAAH used its built-in safety engine. Please try again in a minute.");
+      throw new AiUnavailableError("The AI engine is busy right now, so HUMRAAH used its built-in safety engine. Please try again in a minute.");
     }
     throw new AiUnavailableError("The AI service could not be reached, so HUMRAAH used its built-in safety engine.");
   }

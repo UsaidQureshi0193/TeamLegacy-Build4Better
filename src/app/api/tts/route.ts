@@ -14,7 +14,7 @@ export async function POST(request: Request) {
     const text = clampText(body.text, 1200);
     if (!lang) throw new InputError("Server voice is only used for Urdu and Roman Urdu.");
     if (!text) throw new InputError("Nothing to read aloud.");
-    if (!geminiConfigured()) return Response.json({ error: "Urdu voice needs a Gemini key." }, { status: 503 });
+    if (!geminiConfigured()) return Response.json({ error: "Voice engine is currently unavailable." }, { status: 503 });
 
     const key = createHash("sha256").update(`${lang}:${text}`).digest("hex");
     let audio = cache.get(key);

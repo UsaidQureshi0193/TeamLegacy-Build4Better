@@ -132,7 +132,7 @@ export default function HomePage() {
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-lime/80" />
-              {tx({ en: "Direct Gemini Audio", roman: "Direct Gemini Audio", ur: "براہِ راست جیمنائی آڈیو" })}
+              {tx({ en: "Direct Voice Engine", roman: "Direct Voice Engine", ur: "براہِ راست صوتی انجن" })}
             </span>
             <span className="flex items-center gap-1.5">
               <span className="size-1.5 rounded-full bg-lime/80" />

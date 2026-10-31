@@ -231,7 +231,7 @@ export function useSpeaker() {
           setSpeakingId(null);
           setVoiceError(
             lang === "ur"
-              ? "اس براؤزر میں اردو آواز موجود نہیں۔ اردو آواز کے لیے Gemini key لگائیں یا Microsoft Edge استعمال کریں۔"
+              ? "اس وقت آواز دستیاب نہیں۔ تھوڑی دیر بعد دوبارہ کوشش کریں۔"
               : "Is waqt awaz dastyab nahi. Thori dair baad koshish karein.",
           );
         }
