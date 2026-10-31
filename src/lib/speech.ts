@@ -118,7 +118,13 @@ function pickVoice(lang: Lang): SpeechSynthesisVoice | null {
 
 /** Strip emoji / bullets / markdown so speech sounds natural. */
 function speakable(text: string) {
-  return text.replace(/[*_#>•`]/g, " ").replace(/[\u{1F300}-\u{1FAFF}]/gu, "").replace(/\s+/g, " ").trim();
+  return text
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/https?:\/\/\S+/gi, "")
+    .replace(/[*_#>`~•-]/g, " ")
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // ── Server voice (Gemini TTS) for Urdu and Roman Urdu ──
@@ -126,15 +132,6 @@ function speakable(text: string) {
 let currentAudio: HTMLAudioElement | null = null;
 let currentFetch: AbortController | null = null;
 const audioUrls = new Map<string, string>();
-let serverVoice: Promise<boolean> | null = null;
-
-function hasServerVoice(): Promise<boolean> {
-  serverVoice ??= fetch("/api/status")
-    .then((r) => r.json())
-    .then((s) => Boolean(s.urduVoice))
-    .catch(() => false);
-  return serverVoice;
-}
 
 function stopEverything() {
   if (typeof window === "undefined") return;
@@ -150,16 +147,20 @@ async function serverAudioUrl(text: string, lang: "roman" | "ur"): Promise<strin
   const cached = audioUrls.get(key);
   if (cached) return cached;
   currentFetch = new AbortController();
-  const res = await fetch("/api/tts", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ text, language: lang }),
-    signal: currentFetch.signal,
-  });
-  if (!res.ok) return null;
-  const url = URL.createObjectURL(await res.blob());
-  audioUrls.set(key, url);
-  return url;
+  try {
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text, language: lang }),
+      signal: currentFetch.signal,
+    });
+    if (!res.ok) return null;
+    const url = URL.createObjectURL(await res.blob());
+    audioUrls.set(key, url);
+    return url;
+  } catch {
+    return null;
+  }
 }
 
 export function useSpeaker() {
@@ -209,21 +210,19 @@ export function useSpeaker() {
 
       if (lang === "en") return speakWithBrowser(text, id, rate);
 
-      // Urdu / Roman Urdu: natural Pakistani voice from the server, browser voice as fallback.
+      // Urdu / Roman Urdu: direct natural voice from server, browser voice as fallback.
       setSpeakingId(id);
       (async () => {
         try {
-          if (await hasServerVoice()) {
-            const url = await serverAudioUrl(text, lang);
-            if (url) {
-              const audio = new Audio(url);
-              audio.playbackRate = rate;
-              audio.onended = () => setSpeakingId((s) => (s === id ? null : s));
-              audio.onerror = () => setSpeakingId(null);
-              currentAudio = audio;
-              await audio.play();
-              return;
-            }
+          const url = await serverAudioUrl(text, lang);
+          if (url) {
+            const audio = new Audio(url);
+            audio.playbackRate = rate;
+            audio.onended = () => setSpeakingId((s) => (s === id ? null : s));
+            audio.onerror = () => setSpeakingId(null);
+            currentAudio = audio;
+            await audio.play();
+            return;
           }
         } catch (e) {
           if (e instanceof DOMException && e.name === "AbortError") return;

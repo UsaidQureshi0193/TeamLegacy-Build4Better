@@ -66,8 +66,9 @@ export async function POST(request: Request) {
       const reply: ChatReply = { ...ai, reply: softenVerdicts(ai.reply), language: lang, mode: "live", redactions: count };
       return Response.json(reply);
     } catch (error) {
-      if (!(error instanceof AiUnavailableError)) throw error;
-      return Response.json({ ...demoChat(text, lang, style), mode: "demo", notice: error.message, redactions: count } satisfies ChatReply);
+      console.warn("[humraah] Assistant AI call failed, falling back to demo engine:", error);
+      const notice = error instanceof AiUnavailableError ? error.message : "Live AI limit reached, using built-in safety engine.";
+      return Response.json({ ...demoChat(text, lang, style), mode: "demo", notice, redactions: count } satisfies ChatReply);
     }
   } catch (error) {
     return errorResponse(error);

@@ -309,25 +309,37 @@ export default function ShieldPage() {
       {result && risk && dna && (
         <section ref={resultRef} className="scroll-mt-28 space-y-8" aria-live="polite">
           {/* Risk verdict */}
-          <div className={cn("rounded-[var(--radius-lg)] p-4 sm:p-5", { danger: "bg-danger-soft", warning: "bg-warning-soft", success: "bg-success-soft", info: "bg-info-soft" }[risk.tone])}>
-            <div className="flex items-start gap-3.5">
-              <IconTile icon={risk.icon} tone={risk.tone} className="bg-surface" />
+          <div
+            className={cn(
+              "rounded-3xl border p-5 sm:p-6 shadow-md backdrop-blur-md transition-all",
+              {
+                danger: "bg-gradient-to-r from-danger-soft via-danger-soft/85 to-surface border-danger/30 shadow-danger/5",
+                warning: "bg-gradient-to-r from-warning-soft via-warning-soft/85 to-surface border-warning/30 shadow-warning/5",
+                success: "bg-gradient-to-r from-success-soft via-success-soft/85 to-surface border-success/30 shadow-success/5",
+                info: "bg-gradient-to-r from-info-soft via-info-soft/85 to-surface border-info/30 shadow-info/5",
+              }[risk.tone],
+            )}
+          >
+            <div className="flex items-start gap-4">
+              <IconTile icon={risk.icon} tone={risk.tone} size="lg" className="bg-surface shadow-soft" />
               <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h2 className={cn("text-xl font-bold", { danger: "text-danger", warning: "text-warning", success: "text-success", info: "text-info" }[risk.tone])}>{tx(risk)}</h2>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h2 className={cn("font-display text-xl sm:text-2xl font-extrabold tracking-tight", { danger: "text-danger", warning: "text-warning", success: "text-success", info: "text-info" }[risk.tone])}>
+                    {tx(risk)}
+                  </h2>
                   <ModeBadge mode={result.mode} />
                 </div>
-                <p className={cn("mt-1 text-fg", lang === "ur" && "urdu")}>{result.summary}</p>
-                <ProgressBar value={risk.meter} tone={risk.tone === "danger" ? "danger" : risk.tone === "warning" ? "amber" : "teal"} label="Risk level" className="mt-3 max-w-sm" />
+                <p className={cn("mt-1.5 text-base text-fg leading-relaxed", lang === "ur" && "urdu")}>{result.summary}</p>
+                <ProgressBar value={risk.meter} tone={risk.tone === "danger" ? "danger" : risk.tone === "warning" ? "amber" : "teal"} label="Risk level" className="mt-3.5 max-w-sm h-2.5 shadow-inner" />
                 {result.redactions ? (
-                  <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
+                  <p className="mt-2.5 flex items-center gap-1.5 text-xs text-muted">
                     <ShieldCheck className="size-3.5 text-success" aria-hidden /> {result.redactions} sensitive number(s) hidden before checking
                   </p>
                 ) : null}
               </div>
-              <SpeakButton text={speakText} id="shield-result" />
+              <SpeakButton text={speakText} id="shield-result" size="md" />
             </div>
-            {result.notice && <Notice tone="warning" className="mt-3 bg-surface">{result.notice}</Notice>}
+            {result.notice && <Notice tone="warning" className="mt-4 bg-surface/90 border-warning/30">{result.notice}</Notice>}
           </div>
 
           <div className="grid gap-4 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">

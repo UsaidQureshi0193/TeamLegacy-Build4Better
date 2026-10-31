@@ -151,8 +151,11 @@
   --shadow-glow: var(--glow);
   --animate-wave: wave 1s ease-in-out infinite;
   --animate-float: float 6s ease-in-out infinite;
+  --animate-float-slow: float-slow 9s ease-in-out infinite;
   --animate-fade-up: fade-up 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both;
   --animate-pulse-ring: pulse-ring 1.8s cubic-bezier(0.2, 0.7, 0.2, 1) infinite;
+  --animate-pulse-subtle: pulse-subtle 3s ease-in-out infinite;
+  --animate-shimmer: shimmer 2.5s infinite linear;
 
   @keyframes wave {
     0%, 100% { transform: scaleY(0.35); }
@@ -162,13 +165,25 @@
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-6px); }
   }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+  }
   @keyframes fade-up {
-    from { opacity: 0; transform: translateY(8px); }
+    from { opacity: 0; transform: translateY(10px); }
     to { opacity: 1; transform: translateY(0); }
   }
   @keyframes pulse-ring {
     0% { transform: scale(0.9); opacity: 0.65; }
     100% { transform: scale(1.65); opacity: 0; }
+  }
+  @keyframes pulse-subtle {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.88; transform: scale(1.02); }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 }
 
@@ -211,22 +226,35 @@ html[lang="ur"] .uppercase {
 /* Layered ambient lighting behind the app */
 .ambient {
   background:
-    radial-gradient(900px 500px at 8% -10%, var(--ambient-1), transparent 60%),
-    radial-gradient(700px 420px at 100% 0%, var(--ambient-2), transparent 60%),
-    radial-gradient(800px 500px at 60% 110%, var(--ambient-3), transparent 60%),
+    radial-gradient(1000px 600px at 8% -5%, var(--ambient-1), transparent 65%),
+    radial-gradient(850px 500px at 95% 5%, var(--ambient-2), transparent 60%),
+    radial-gradient(900px 600px at 50% 100%, var(--ambient-3), transparent 70%),
     var(--bg);
+  background-attachment: fixed;
 }
 
 .glass {
   background: var(--glass);
-  backdrop-filter: saturate(160%) blur(14px);
-  -webkit-backdrop-filter: saturate(160%) blur(14px);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+}
+
+.glass-panel {
+  background: var(--glass);
+  backdrop-filter: saturate(180%) blur(16px);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm), inset 0 1px 0 0 rgba(255, 255, 255, 0.08);
 }
 
 .hero-gradient {
+  position: relative;
+  overflow: hidden;
   background:
-    radial-gradient(520px 260px at 90% 0%, rgb(24 185 168 / 0.22), transparent 70%),
+    radial-gradient(600px 300px at 88% 12%, rgba(24, 185, 168, 0.35), transparent 75%),
+    radial-gradient(450px 260px at 12% 88%, rgba(77, 158, 255, 0.2), transparent 70%),
     linear-gradient(135deg, var(--hero-from), var(--hero-to));
+  box-shadow: 0 20px 45px -15px rgba(0, 0, 0, 0.35), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
 }
 
 .text-gradient {
@@ -234,6 +262,45 @@ html[lang="ur"] .uppercase {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+.text-gradient-gold {
+  background: linear-gradient(135deg, #f4b544 0%, #ff8f3d 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Smooth lift and glow for interactive cards */
+.card-hover {
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px -10px rgba(11, 20, 34, 0.12);
+}
+.dark .card-hover:hover {
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(24, 185, 168, 0.22);
+}
+
+/* Tone glow effects on hover */
+.glow-teal:hover {
+  box-shadow: 0 14px 32px -10px rgba(24, 185, 168, 0.25), 0 0 0 1px rgba(24, 185, 168, 0.3);
+}
+.glow-danger:hover {
+  box-shadow: 0 14px 32px -10px rgba(220, 38, 38, 0.25), 0 0 0 1px rgba(220, 38, 38, 0.3);
+}
+.glow-warning:hover {
+  box-shadow: 0 14px 32px -10px rgba(245, 158, 11, 0.25), 0 0 0 1px rgba(245, 158, 11, 0.3);
+}
+.glow-info:hover {
+  box-shadow: 0 14px 32px -10px rgba(59, 130, 246, 0.25), 0 0 0 1px rgba(59, 130, 246, 0.3);
+}
+.glow-success:hover {
+  box-shadow: 0 14px 32px -10px rgba(16, 185, 129, 0.25), 0 0 0 1px rgba(16, 185, 129, 0.3);
+}
+.glow-lavender:hover {
+  box-shadow: 0 14px 32px -10px rgba(155, 135, 232, 0.25), 0 0 0 1px rgba(155, 135, 232, 0.3);
 }
 
 /* Gradient hairline border for premium cards */
@@ -246,7 +313,7 @@ html[lang="ur"] .uppercase {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg, rgb(24 185 168 / 0.35), rgb(24 185 168 / 0.08));
+  background: linear-gradient(135deg, rgb(24 185 168 / 0.4), rgb(24 185 168 / 0.08));
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;

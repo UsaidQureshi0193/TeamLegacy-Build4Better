@@ -21,20 +21,20 @@ type Variant = "primary" | "secondary" | "ghost" | "danger" | "soft";
 type Size = "sm" | "md" | "lg" | "xl";
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-primary text-on-primary hover:bg-primary-strong",
-  secondary: "bg-surface text-fg border border-line hover:bg-surface-2",
-  ghost: "text-muted hover:text-fg hover:bg-surface-2",
-  danger: "bg-danger text-white hover:brightness-110",
-  soft: "bg-primary-soft text-primary hover:brightness-105",
+  primary: "bg-gradient-to-r from-primary to-[#0e8a7d] text-on-primary shadow-sm hover:shadow-md hover:shadow-primary/20 hover:brightness-105 active:scale-[0.98]",
+  secondary: "bg-surface text-fg border border-line/90 hover:border-line-strong hover:bg-surface-2 active:scale-[0.98]",
+  ghost: "text-muted hover:text-fg hover:bg-surface-2 active:scale-[0.98]",
+  danger: "bg-gradient-to-r from-[#d9303c] to-[#b7242f] text-white shadow-sm hover:shadow-md hover:shadow-danger/25 hover:brightness-105 active:scale-[0.98]",
+  soft: "bg-primary-soft text-primary hover:bg-primary-soft/80 active:scale-[0.98]",
 };
 const SIZES: Record<Size, string> = {
-  sm: "h-9 px-3 text-sm gap-1.5 rounded-lg",
-  md: "h-11 px-4 text-[0.95rem] gap-2 rounded-xl",
-  lg: "h-12 px-5 text-base gap-2 rounded-xl",
+  sm: "h-9 px-3.5 text-sm gap-1.5 rounded-xl",
+  md: "h-11 px-4.5 text-[0.95rem] gap-2 rounded-xl",
+  lg: "h-12 px-5.5 text-base gap-2.5 rounded-2xl",
   xl: "min-h-14 px-6 text-lg gap-3 rounded-2xl",
 };
 const BUTTON_BASE =
-  "inline-flex items-center justify-center font-semibold transition-colors duration-150 select-none active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -66,10 +66,10 @@ export function ButtonLink({ href, variant = "primary", size = "md", icon: Icon,
 
 // ── Surfaces ─────────────────────────────────────────────
 
-/** Plain surface. `glow` only tints the border to mark the one main card on a page. */
+/** Plain surface. `glow` gives a refined primary accent tint to mark the primary card. */
 export function Card({ className, children, glow, as: Tag = "div", ...rest }: React.HTMLAttributes<HTMLDivElement> & { glow?: boolean; as?: "div" | "section" | "article" }) {
   return (
-    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface shadow-card", glow ? "border-primary/30" : "border-line", className)} {...rest}>
+    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface shadow-card transition-all duration-200", glow ? "border-primary/50 shadow-md shadow-primary/5 ring-1 ring-primary/20" : "border-line/80", className)} {...rest}>
       {children}
     </Tag>
   );
@@ -82,7 +82,7 @@ export function Section({ title, description, action, children, className }: { t
       {(title || action) && (
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            {title && <h2 className="text-lg font-bold">{title}</h2>}
+            {title && <h2 className="font-display text-lg sm:text-xl font-bold tracking-tight text-fg">{title}</h2>}
             {description && <p className="mt-0.5 text-sm text-muted">{description}</p>}
           </div>
           {action}
@@ -93,20 +93,34 @@ export function Section({ title, description, action, children, className }: { t
   );
 }
 
+const GLOW_TONE: Record<Tone, string> = {
+  teal: "glow-teal",
+  danger: "glow-danger",
+  warning: "glow-warning",
+  info: "glow-info",
+  success: "glow-success",
+  lavender: "glow-lavender",
+  neutral: "",
+};
+
 /** Clickable tile: icon, title, one-line description. Used for menus of choices. */
 export function ActionCard({ href, onClick, icon, tone = "teal", title, description, meta, className, disabled }: { href?: string; onClick?: () => void; icon: LucideIcon; tone?: Tone; title: string; description?: string; meta?: React.ReactNode; className?: string; disabled?: boolean }) {
   const body = (
     <>
-      <IconTile icon={icon} tone={tone} />
+      <IconTile icon={icon} tone={tone} size="md" className="transition-transform duration-200 group-hover:scale-105" />
       <span className="min-w-0 flex-1">
-        <span className="block font-semibold leading-snug">{title}</span>
-        {description && <span className="mt-0.5 block text-sm text-muted">{description}</span>}
+        <span className="block font-display font-semibold leading-snug text-fg group-hover:text-primary transition-colors">{title}</span>
+        {description && <span className="mt-1 block text-sm text-muted leading-relaxed">{description}</span>}
         {meta && <span className="mt-2 block">{meta}</span>}
       </span>
-      <ChevronRight className="mt-1 size-4 shrink-0 text-subtle transition group-hover:translate-x-0.5 group-hover:text-primary rtl:rotate-180" aria-hidden />
+      <ChevronRight className="mt-1 size-4.5 shrink-0 text-subtle transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary rtl:rotate-180" aria-hidden />
     </>
   );
-  const cls = cn("group flex w-full items-start gap-3.5 rounded-[var(--radius-lg)] border border-line bg-surface p-4 text-left shadow-card transition-colors hover:border-primary/40 hover:bg-surface-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60", className);
+  const cls = cn(
+    "group flex w-full items-start gap-4 rounded-[var(--radius-lg)] border border-line/80 bg-surface p-4 sm:p-5 text-left shadow-card card-hover hover:border-primary/50 hover:bg-surface-2/90 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
+    GLOW_TONE[tone],
+    className,
+  );
   return href ? (
     <Link href={href} className={cls}>{body}</Link>
   ) : (
@@ -158,7 +172,7 @@ const TONES: Record<Tone, string> = {
 
 export function Badge({ tone = "neutral", icon: Icon, children, className }: { tone?: Tone; icon?: LucideIcon; children: React.ReactNode; className?: string }) {
   return (
-    <span className={cn("inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold", TONES[tone], className)}>
+    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ring-1 ring-inset ring-current/15", TONES[tone], className)}>
       {Icon && <Icon className="size-3.5" aria-hidden />}
       {children}
     </span>
@@ -166,9 +180,9 @@ export function Badge({ tone = "neutral", icon: Icon, children, className }: { t
 }
 
 export function IconTile({ icon: Icon, tone = "teal", size = "md", className }: { icon: LucideIcon; tone?: Tone; size?: "sm" | "md" | "lg"; className?: string }) {
-  const s = size === "lg" ? "size-12 rounded-xl [&>svg]:size-6" : size === "sm" ? "size-8 rounded-lg [&>svg]:size-4" : "size-10 rounded-xl [&>svg]:size-5";
+  const s = size === "lg" ? "size-12 rounded-2xl [&>svg]:size-6" : size === "sm" ? "size-8 rounded-xl [&>svg]:size-4" : "size-10 rounded-2xl [&>svg]:size-5";
   return (
-    <span className={cn("inline-flex shrink-0 items-center justify-center", TONES[tone], s, className)}>
+    <span className={cn("inline-flex shrink-0 items-center justify-center shadow-soft", TONES[tone], s, className)}>
       <Icon aria-hidden />
     </span>
   );
@@ -178,13 +192,13 @@ export function PageHeader({ icon, title, subtitle, tone = "teal", actions }: { 
   return (
     <header className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3.5">
-        <IconTile icon={icon} tone={tone} />
+        <IconTile icon={icon} tone={tone} size="lg" />
         <div>
-          <h1 className="text-2xl font-bold">{title}</h1>
-          {subtitle && <p className="mt-0.5 max-w-2xl text-sm text-muted sm:text-base">{subtitle}</p>}
+          <h1 className="font-display text-2xl sm:text-3xl font-extrabold tracking-tight text-fg">{title}</h1>
+          {subtitle && <p className="mt-1 max-w-2xl text-sm sm:text-base text-muted leading-relaxed">{subtitle}</p>}
         </div>
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
     </header>
   );
 }
@@ -219,14 +233,19 @@ export function ModeBadge({ mode, className }: { mode: AiMode; className?: strin
 
 export function Notice({ tone = "info", title, children, className, icon }: { tone?: "info" | "warning" | "danger" | "success"; title?: string; children: React.ReactNode; className?: string; icon?: LucideIcon }) {
   const Icon = icon ?? (tone === "success" ? CheckCircle2 : tone === "info" ? Info : AlertTriangle);
-  const styles = { info: "bg-info-soft", warning: "bg-warning-soft", danger: "bg-danger-soft", success: "bg-success-soft" }[tone];
+  const styles = {
+    info: "bg-info-soft/70 border-info/30",
+    warning: "bg-warning-soft/70 border-warning/30",
+    danger: "bg-danger-soft/70 border-danger/30",
+    success: "bg-success-soft/70 border-success/30",
+  }[tone];
   const color = { info: "text-info", warning: "text-warning", danger: "text-danger", success: "text-success" }[tone];
   return (
-    <div role={tone === "danger" ? "alert" : "status"} className={cn("flex gap-3 rounded-xl p-3.5 text-sm", styles, className)}>
-      <Icon className={cn("mt-0.5 size-4.5 shrink-0", color)} aria-hidden />
-      <div>
+    <div role={tone === "danger" ? "alert" : "status"} className={cn("flex gap-3.5 rounded-2xl border p-4 text-sm shadow-sm backdrop-blur-sm", styles, className)}>
+      <Icon className={cn("mt-0.5 size-5 shrink-0", color)} aria-hidden />
+      <div className="space-y-0.5">
         {title && <p className="font-semibold text-fg">{title}</p>}
-        <div className="text-muted [&_strong]:text-fg">{children}</div>
+        <div className="text-muted leading-relaxed [&_strong]:text-fg">{children}</div>
       </div>
     </div>
   );

@@ -117,7 +117,12 @@ export async function geminiStructuredCall<T extends z.ZodType>(opts: Structured
 
 // ── Text-to-speech (Urdu / Roman Urdu voice) ─────────────
 // Browsers rarely ship an Urdu voice, so Urdu and Roman Urdu are spoken by Gemini TTS.
-const TTS_MODELS = [process.env.GEMINI_TTS_MODEL || "gemini-3.8-flash-tts", "gemini-3.8-flash-lite-tts", "gemini-3.1-flash-tts-preview"];
+const TTS_MODELS = [
+  process.env.GEMINI_TTS_MODEL || "gemini-3.8-flash-lite-tts",
+  "gemini-3.8-flash-tts",
+  "gemini-3.1-flash-tts-preview",
+];
+const TTS_TIMEOUT_MS = 12_000;
 
 /** Wraps raw 16-bit mono PCM in a WAV header so browsers can play it. */
 function pcmToWav(pcm: Buffer, sampleRate: number): Buffer {
@@ -139,20 +144,19 @@ function pcmToWav(pcm: Buffer, sampleRate: number): Buffer {
 }
 
 export async function geminiSpeak(text: string, lang: "roman" | "ur"): Promise<Buffer> {
-  const direction =
-    lang === "ur"
-      ? "Read this aloud in natural Pakistani Urdu, warm, clear and a little slow:"
-      : "This is Urdu written in English letters (Roman Urdu). Read it aloud in natural Pakistani Urdu pronunciation, warm, clear and a little slow:";
+  const clean = text.trim();
+  if (!clean) throw new AiUnavailableError("No text provided for speech.");
+
   let last: unknown;
   for (const model of TTS_MODELS) {
     try {
       const response = await getClient().models.generateContent({
         model,
-        contents: [{ role: "user", parts: [{ text: `${direction}\n${text}` }] }],
+        contents: [{ role: "user", parts: [{ text: clean }] }],
         config: {
           responseModalities: ["AUDIO"],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: "Kore" } } },
-          abortSignal: AbortSignal.timeout(PER_MODEL_TIMEOUT_MS),
+          abortSignal: AbortSignal.timeout(TTS_TIMEOUT_MS),
         },
       });
       const audio = response.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data)?.inlineData;

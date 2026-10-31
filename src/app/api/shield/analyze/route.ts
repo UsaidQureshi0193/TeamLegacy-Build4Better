@@ -73,8 +73,9 @@ export async function POST(request: Request) {
       };
       return Response.json(result);
     } catch (error) {
-      if (!(error instanceof AiUnavailableError)) throw error;
-      return Response.json({ ...rules, mode: "demo", notice: error.message, redactions: count } satisfies ScamAnalysis);
+      console.warn("[humraah] Shield AI call failed, falling back to rules engine:", error);
+      const notice = error instanceof AiUnavailableError ? error.message : "Live AI limit reached, using built-in safety engine.";
+      return Response.json({ ...rules, mode: "demo", notice, redactions: count } satisfies ScamAnalysis);
     }
   } catch (error) {
     return errorResponse(error);

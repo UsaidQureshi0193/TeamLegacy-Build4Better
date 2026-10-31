@@ -47,9 +47,14 @@ function PhoneFrame({ room, children }: { room: EscapeRoom; children: React.Reac
   const wa = room.channel === "whatsapp";
   return (
     <div className="mx-auto w-full max-w-[22rem]">
-      <div className="rounded-[2.6rem] bg-[#0a0f18] p-2.5 shadow-float ring-1 ring-white/10">
-        <div className="overflow-hidden rounded-[2.1rem] bg-white text-[#111]">
-          <div className={cn("flex items-center justify-between px-6 pb-1 pt-3 text-[11px] font-semibold", wa ? "bg-[#075E54] text-white" : "bg-[#f7f7f7]")}>
+      <div className="relative rounded-[2.8rem] bg-gradient-to-b from-[#1c2438] via-[#0b101a] to-[#04060a] p-3 shadow-[0_20px_50px_rgba(0,0,0,0.5),0_0_35px_rgba(30,174,152,0.15)] ring-1 ring-white/15">
+        {/* Sleek speaker notch */}
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 w-20 h-4 bg-black/90 rounded-full z-20 flex items-center justify-center gap-2 ring-1 ring-white/10 shadow-inner">
+          <div className="size-2 rounded-full bg-[#182030] ring-1 ring-white/5" />
+          <div className="w-7 h-1.5 rounded-full bg-[#182030]" />
+        </div>
+        <div className="overflow-hidden rounded-[2.2rem] bg-white text-[#111] shadow-inner">
+          <div className={cn("flex items-center justify-between px-6 pb-1 pt-3.5 text-[11px] font-semibold", wa ? "bg-[#075E54] text-white" : "bg-[#f7f7f7]")}>
             <span>{room.time}</span>
             <span className="flex items-center gap-1" aria-hidden>
               <Signal className="size-3" /> <Wifi className="size-3" /> <Battery className="size-3.5" />

@@ -45,8 +45,9 @@ export async function POST(request: Request) {
       });
       return Response.json({ ...ai, mode: "live", redactions: count } satisfies DocumentResult);
     } catch (error) {
-      if (!(error instanceof AiUnavailableError)) throw error;
-      return Response.json({ ...demoDocument(text, lang), mode: "demo", notice: error.message, redactions: count } satisfies DocumentResult);
+      console.warn("[humraah] Document AI call failed, falling back to demo engine:", error);
+      const notice = error instanceof AiUnavailableError ? error.message : "Live AI limit reached, using built-in safety engine.";
+      return Response.json({ ...demoDocument(text, lang), mode: "demo", notice, redactions: count } satisfies DocumentResult);
     }
   } catch (error) {
     return errorResponse(error);

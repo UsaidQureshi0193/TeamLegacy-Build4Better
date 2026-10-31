@@ -79,13 +79,15 @@ export default function EmergencyPage() {
           title={tx({ en: "Emergency Help", roman: "Emergency Help", ur: "ایمرجنسی مدد" })}
           subtitle={tx({ en: "Take a breath. Most important steps first.", roman: "Gehri saans lein. Sab se zaroori qadam pehle.", ur: "گہری سانس لیں۔ سب سے ضروری قدم پہلے۔" })}
         />
-        <div className="flex gap-3 rounded-[var(--radius-lg)] bg-danger-soft p-4" role="alert">
-          <Phone className="mt-0.5 size-5 shrink-0 text-danger" aria-hidden />
-          <div>
-            <p className="font-semibold">
+        <div className="flex gap-4 rounded-3xl border border-rose-500/30 bg-gradient-to-r from-danger-soft via-danger-soft/80 to-surface p-5 sm:p-6 shadow-md shadow-danger/5 backdrop-blur-md" role="alert">
+          <span className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-danger text-white shadow-md shadow-danger/30">
+            <Phone className="size-6 animate-pulse" aria-hidden />
+          </span>
+          <div className="space-y-1">
+            <p className="font-display text-base sm:text-lg font-bold text-fg">
               {tx({ en: "Money or account at risk? Call your bank now on the number on your card.", roman: "Paise ya account khatre mein? Abhi card par likhe number par bank ko call karein.", ur: "رقم یا اکاؤنٹ خطرے میں؟ ابھی کارڈ پر لکھے نمبر پر بینک کو کال کریں۔" })}
             </p>
-            <p className="mt-0.5 text-sm text-muted">
+            <p className="text-sm text-muted leading-relaxed">
               {tx({ en: "HUMRAAH can't recover money or contact anyone for you.", roman: "HUMRAAH paise wapas nahi dila sakta, na aap ki taraf se kisi se rabta kar sakta hai.", ur: "ہمراہ رقم واپس نہیں دلا سکتا، نہ آپ کی طرف سے کسی سے رابطہ کر سکتا ہے۔" })}
             </p>
           </div>

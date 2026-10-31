@@ -98,8 +98,9 @@ export async function POST(request: Request) {
       };
       return Response.json(task);
     } catch (error) {
-      if (!(error instanceof AiUnavailableError)) throw error;
-      return Response.json({ ...genericTask(goal, lang), notice: error.message });
+      console.warn("[humraah] Tasks AI call failed, falling back to generic task:", error);
+      const notice = error instanceof AiUnavailableError ? error.message : "Live AI limit reached, using built-in safety engine.";
+      return Response.json({ ...genericTask(goal, lang), notice });
     }
   } catch (error) {
     return errorResponse(error);

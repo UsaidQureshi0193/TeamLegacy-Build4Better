@@ -152,7 +152,7 @@ export default function AssistantPage() {
               messages.map((m) =>
                 m.role === "user" ? (
                   <div key={m.id} className="flex justify-end">
-                    <div className={cn("max-w-[85%] rounded-2xl rounded-br-md bg-primary px-4 py-2.5 text-on-primary", lang === "ur" && "urdu")}>
+                    <div className={cn("max-w-[85%] rounded-3xl rounded-br-md bg-gradient-to-r from-primary to-[#0e8a7d] px-5 py-3 text-on-primary shadow-md", lang === "ur" && "urdu")}>
                       <p className="whitespace-pre-wrap leading-relaxed">{m.content}</p>
                     </div>
                   </div>
@@ -173,8 +173,8 @@ export default function AssistantPage() {
             )}
             {busy && (
               <div className="flex items-center gap-3">
-                <span className="flex size-8 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden>
-                  <Bot className="size-4" />
+                <span className="flex size-9 items-center justify-center rounded-2xl bg-primary-soft text-primary shadow-soft" aria-hidden>
+                  <Bot className="size-4.5" />
                 </span>
                 <Spinner label={tx({ en: "HUMRAAH is thinking…", roman: "HUMRAAH soch raha hai…", ur: "ہمراہ سوچ رہا ہے…" })} />
               </div>
@@ -189,13 +189,13 @@ export default function AssistantPage() {
           )}
 
           <form
-            className="border-t border-line p-3 sm:p-4"
+            className="border-t border-line/80 bg-surface/50 p-3.5 sm:p-5 backdrop-blur-sm"
             onSubmit={(e) => {
               e.preventDefault();
               void ask(input);
             }}
           >
-            <div className="flex items-end gap-2">
+            <div className="flex items-end gap-2.5">
               {stt && !empty && <CompactMic onTranscript={(text) => void ask(text)} />}
               <label className="flex-1">
                 <span className="sr-only">{tx({ en: "Type your message", roman: "Apna paigham likhein", ur: "اپنا پیغام لکھیں" })}</span>
@@ -213,14 +213,14 @@ export default function AssistantPage() {
                   maxLength={4000}
                   dir="auto"
                   placeholder={tx({ en: "Type here… e.g. “How do I fill an online form?”", roman: "Yahan likhein… jaise “Online form kaise bharun?”", ur: "یہاں لکھیں…" })}
-                  className="max-h-40 min-h-12 w-full resize-none rounded-xl border border-line bg-surface-2 px-4 py-3 text-base text-fg placeholder:text-subtle focus:border-primary focus:outline-none"
+                  className="max-h-40 min-h-12 w-full resize-none rounded-2xl border border-line bg-surface-2 px-4.5 py-3 text-base text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15 transition-all shadow-inner"
                 />
               </label>
-              <Button type="submit" size="lg" icon={Send} disabled={!input.trim()} loading={busy} aria-label="Send" className="h-12 px-4">
+              <Button type="submit" size="lg" icon={Send} disabled={!input.trim()} loading={busy} aria-label="Send" className="h-12 px-5 rounded-2xl shadow-sm">
                 <span className="hidden sm:inline">{tx({ en: "Send", roman: "Bhejein", ur: "بھیجیں" })}</span>
               </Button>
             </div>
-            <p className="mt-2 flex items-center gap-1.5 text-xs text-subtle">
+            <p className="mt-2.5 flex items-center gap-1.5 text-xs text-subtle">
               <ShieldCheck className="size-3.5 text-success" aria-hidden />
               {tx({ en: "Never type an OTP, PIN or password here.", roman: "Yahan kabhi OTP, PIN ya password na likhein.", ur: "یہاں کبھی او ٹی پی، پن یا پاس ورڈ نہ لکھیں۔" })}
             </p>
@@ -274,11 +274,13 @@ function CompactMic({ onTranscript }: { onTranscript: (text: string) => void }) 
         aria-label={listening ? "Stop listening" : "Speak"}
         title={error ?? undefined}
         className={cn(
-          "relative flex size-12 items-center justify-center rounded-xl text-white transition-colors cursor-pointer",
-          listening ? "bg-danger" : "bg-primary hover:bg-primary-strong",
+          "relative flex size-12 items-center justify-center rounded-2xl text-white transition-all duration-200 cursor-pointer",
+          listening
+            ? "bg-gradient-to-tr from-danger to-[#ff5364] shadow-md shadow-danger/40 ring-4 ring-danger/30"
+            : "bg-gradient-to-tr from-primary to-[#23d1bf] shadow-md shadow-primary/30 hover:scale-105 active:scale-95 ring-2 ring-primary/20",
         )}
       >
-        {listening && <span className="absolute inset-0 rounded-xl bg-danger/40 animate-pulse-ring" aria-hidden />}
+        {listening && <span className="absolute inset-0 rounded-2xl bg-danger/40 animate-pulse-ring" aria-hidden />}
         {listening ? <span className="size-4 rounded-sm bg-white" /> : <MicIcon />}
       </button>
     </div>
@@ -310,48 +312,48 @@ function AssistantBubble({
   const reply = m.reply;
   const urdu = reply?.language === "ur";
   return (
-    <div className="flex gap-3">
-      <span className="mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary" aria-hidden>
-        <Bot className="size-4" />
+    <div className="flex gap-3.5">
+      <span className="mt-1 flex size-9 shrink-0 items-center justify-center rounded-2xl bg-primary-soft text-primary shadow-soft" aria-hidden>
+        <Bot className="size-4.5" />
       </span>
       <div className="min-w-0 max-w-[92%] flex-1 sm:max-w-[85%]">
-        <div className="rounded-2xl rounded-tl-md bg-surface-2 px-4 py-3">
+        <div className="rounded-3xl rounded-tl-md border border-line/90 bg-surface-2/95 px-5 py-4 shadow-sm backdrop-blur-sm">
           <div className="mb-2 flex flex-wrap items-center gap-2">
             {reply && <ModeBadge mode={reply.mode} />}
             {m.simpler && <Badge tone="lavender" icon={Sparkles}>{t("common.simpler")}</Badge>}
           </div>
-          <p dir="auto" className={cn("whitespace-pre-wrap leading-relaxed text-fg", urdu && "urdu text-right")}>{m.content}</p>
-          {reply?.notice && <p className="mt-2 text-xs font-medium text-warning">{reply.notice}</p>}
+          <p dir="auto" className={cn("whitespace-pre-wrap leading-relaxed text-fg text-[0.95rem]", urdu && "urdu text-right text-base")}>{m.content}</p>
+          {reply?.notice && <p className="mt-2 text-xs font-semibold text-warning">{reply.notice}</p>}
           {!!reply?.redactions && (
             <p className="mt-2 flex items-center gap-1.5 text-xs text-muted">
-              <ShieldCheck className="size-3.5" aria-hidden />
+              <ShieldCheck className="size-3.5 text-success" aria-hidden />
               {tx({ en: `${reply.redactions} sensitive number(s) were hidden before analysis.`, roman: `${reply.redactions} hassas number(s) jaanch se pehle chhupa diye gaye.`, ur: `${reply.redactions} حساس نمبر چھپا دیے گئے۔` })}
             </p>
           )}
         </div>
 
         {reply && reply.actions.length > 0 && (
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2.5 flex flex-wrap gap-2">
             {reply.actions.map((a, i) => (
-              <Button key={`${a.module}-${i}`} size="sm" variant={a.module === "emergency" ? "danger" : i === 0 ? "soft" : "secondary"} onClick={() => onAction(a)}>
-                {a.label} <ArrowRight className="size-4" aria-hidden />
+              <Button key={`${a.module}-${i}`} size="sm" variant={a.module === "emergency" ? "danger" : i === 0 ? "soft" : "secondary"} onClick={() => onAction(a)} className="rounded-xl shadow-soft">
+                {a.label} <ArrowRight className="size-3.5" aria-hidden />
               </Button>
             ))}
           </div>
         )}
 
-        <div className="mt-1.5 flex flex-wrap items-center gap-0.5" role="group" aria-label="Patient voice controls">
-          <Button size="sm" variant="ghost" icon={speaking ? VolumeX : Volume2} onClick={() => (speaking ? onStop() : onSpeak())}>
+        <div className="mt-2 flex flex-wrap items-center gap-1" role="group" aria-label="Patient voice controls">
+          <Button size="sm" variant="ghost" icon={speaking ? VolumeX : Volume2} onClick={() => (speaking ? onStop() : onSpeak())} className="rounded-xl">
             {speaking ? t("common.stop") : t("common.listen")}
           </Button>
-          <Button size="sm" variant="ghost" icon={Repeat} onClick={() => onSpeak()}>
+          <Button size="sm" variant="ghost" icon={Repeat} onClick={() => onSpeak()} className="rounded-xl">
             {t("common.repeat")}
           </Button>
-          <Button size="sm" variant="ghost" icon={Turtle} onClick={() => onSpeak(0.7)}>
+          <Button size="sm" variant="ghost" icon={Turtle} onClick={() => onSpeak(0.7)} className="rounded-xl">
             {tx({ en: "Slower", roman: "Aahista", ur: "آہستہ" })}
           </Button>
           {isLast && m.askedWith && !m.simpler && (
-            <Button size="sm" variant="ghost" icon={Sparkles} onClick={onSimpler} disabled={busy}>
+            <Button size="sm" variant="ghost" icon={Sparkles} onClick={onSimpler} disabled={busy} className="rounded-xl">
               {t("common.simpler")}
             </Button>
           )}

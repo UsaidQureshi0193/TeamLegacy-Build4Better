@@ -41,8 +41,8 @@ const GROUPS: NavItem["group"][] = ["nav.understand", "nav.protect", "nav.learn"
 export function Logo({ compact }: { compact?: boolean }) {
   const { tx } = useT();
   return (
-    <Link href="/" className="flex items-center gap-3" aria-label="HUMRAAH home">
-      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)]">
+    <Link href="/" className="group flex items-center gap-3" aria-label="HUMRAAH home">
+      <span className="relative flex size-10 items-center justify-center rounded-2xl bg-[linear-gradient(135deg,#18B9A8,#16A36A)] shadow-md shadow-primary/30 transition-transform duration-200 group-hover:scale-105">
         <svg viewBox="0 0 32 32" className="size-6" aria-hidden>
           <path d="M9 7v18M23 7v18M9 16h14" stroke="#04211e" strokeWidth="3.4" strokeLinecap="round" />
           <circle cx="16" cy="16" r="2.6" fill="#F4B544" />
@@ -50,7 +50,7 @@ export function Logo({ compact }: { compact?: boolean }) {
       </span>
       {!compact && (
         <span className="leading-none">
-          <span className="block font-display text-lg font-extrabold tracking-[0.08em]">HUMRAAH</span>
+          <span className="block font-display text-lg font-extrabold tracking-[0.08em] group-hover:text-primary transition-colors">HUMRAAH</span>
           <span className="mt-0.5 block text-[10.5px] font-semibold uppercase tracking-[0.16em] text-subtle">{tx({ en: "Digital companion", roman: "Digital saathi", ur: "ڈیجیٹل ساتھی" })}</span>
         </span>
       )}
@@ -66,11 +66,11 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   const { t } = useT();
   return (
-    <nav aria-label="Main" className="flex flex-col gap-4">
+    <nav aria-label="Main" className="flex flex-col gap-5">
       {GROUPS.map((g) => (
         <div key={g}>
-          <p className="mb-1 px-3 text-[11px] font-semibold uppercase tracking-wider text-subtle">{t(g)}</p>
-          <ul className="flex flex-col gap-0.5">
+          <p className="mb-1.5 px-3.5 text-[11px] font-bold uppercase tracking-wider text-subtle">{t(g)}</p>
+          <ul className="flex flex-col gap-1">
             {NAV.filter((n) => n.group === g).map((n) => {
               const active = isActive(pathname, n.href);
               const danger = n.href === "/emergency";
@@ -81,12 +81,21 @@ function SideNav({ onNavigate }: { onNavigate?: () => void }) {
                     onClick={onNavigate}
                     aria-current={active ? "page" : undefined}
                     className={cn(
-                      "group flex items-center gap-3 rounded-lg px-3 py-2 text-[0.95rem] font-medium transition-colors",
-                      active ? "bg-primary-soft text-fg" : "text-muted hover:bg-surface-2 hover:text-fg",
+                      "group relative flex items-center gap-3.5 rounded-xl px-3.5 py-2.5 text-[0.93rem] font-medium transition-all duration-150",
+                      active
+                        ? "bg-primary-soft text-primary font-bold shadow-soft"
+                        : "text-muted hover:bg-surface-2 hover:text-fg",
                     )}
                   >
-                    <n.icon className={cn("size-5 shrink-0", active ? "text-primary" : danger ? "text-danger" : "text-subtle group-hover:text-primary")} aria-hidden />
-                    {t(n.key)}
+                    {active && <span className="absolute start-0 top-2 bottom-2 w-1 rounded-full bg-primary" aria-hidden />}
+                    <n.icon
+                      className={cn(
+                        "size-5 shrink-0 transition-transform duration-150 group-hover:scale-110",
+                        active ? "text-primary" : danger ? "text-danger" : "text-subtle group-hover:text-primary",
+                      )}
+                      aria-hidden
+                    />
+                    <span className="truncate">{t(n.key)}</span>
                   </Link>
                 </li>
               );
@@ -386,13 +395,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { t } = useT();
 
   return (
-    <div className="ambient min-h-dvh">
+    <div className="ambient relative min-h-dvh overflow-x-hidden">
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-4 focus:top-4 focus:z-[100] focus:rounded-xl focus:bg-primary focus:px-4 focus:py-2 focus:text-on-primary">
         Skip to content
       </a>
 
+      {/* Floating background ambient aurora orbs */}
+      <div className="pointer-events-none fixed -right-28 -top-28 size-[520px] rounded-full bg-primary/15 blur-[130px] animate-float-slow" aria-hidden />
+      <div className="pointer-events-none fixed -left-28 bottom-20 size-[450px] rounded-full bg-info/10 blur-[140px] animate-float" aria-hidden />
+      <div className="pointer-events-none fixed right-1/4 bottom-1/3 size-[350px] rounded-full bg-lavender/5 blur-[120px]" aria-hidden />
+
       {/* Desktop sidebar */}
-      <aside className="fixed inset-y-0 start-0 z-40 hidden w-[17rem] flex-col border-e border-line bg-surface px-4 py-5 lg:flex">
+      <aside className="fixed inset-y-0 start-0 z-40 hidden w-[17rem] flex-col border-e border-line bg-surface/95 backdrop-blur-md px-4 py-5 lg:flex">
         <div className="px-2">
           <Logo />
         </div>
@@ -434,8 +448,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <SearchBox />
             </div>
             <div className="ms-auto flex items-center gap-2">
-              <Link href="/emergency" className="hidden h-11 items-center gap-2 rounded-2xl bg-danger-soft px-3.5 text-sm font-bold text-danger hover:brightness-105 md:flex">
-                <LifeBuoy className="size-5" aria-hidden /> SOS
+              <Link href="/emergency" className="hidden h-11 items-center gap-2.5 rounded-2xl border border-rose-500/25 bg-danger-soft px-3.5 text-sm font-bold text-danger hover:brightness-105 transition-all shadow-soft md:flex">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-danger opacity-75" />
+                  <span className="relative inline-flex size-2 rounded-full bg-danger" />
+                </span>
+                <LifeBuoy className="size-4.5" aria-hidden /> SOS
               </Link>
               <QuickSettings />
               <Notifications />

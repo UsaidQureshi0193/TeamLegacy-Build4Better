@@ -40,8 +40,9 @@ export async function POST(request: Request) {
       });
       return Response.json({ ...ai, mode: "live" } satisfies ExplainResult);
     } catch (error) {
-      if (!(error instanceof AiUnavailableError)) throw error;
-      return Response.json({ ...demoExplain(element, context, lang), mode: "demo", notice: error.message } satisfies ExplainResult);
+      console.warn("[humraah] Vision explain call failed, falling back to demo engine:", error);
+      const notice = error instanceof AiUnavailableError ? error.message : "Live AI limit reached, using built-in safety engine.";
+      return Response.json({ ...demoExplain(element, context, lang), mode: "demo", notice } satisfies ExplainResult);
     }
   } catch (error) {
     return errorResponse(error);
