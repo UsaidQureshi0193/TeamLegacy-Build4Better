@@ -196,12 +196,15 @@ export default function VisionPage() {
                     );
                   })}
                 {busy && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
-                    <div className="rounded-xl bg-elevated px-5 py-4">
-                      <Spinner label={phase === "ocr" ? tx({ en: "Reading the text…", roman: "Text parh raha hoon…", ur: "متن پڑھ رہا ہوں…" }) : tx({ en: "Understanding the screen…", roman: "Screen samajh raha hoon…", ur: "اسکرین سمجھ رہا ہوں…" })} />
-                      {phase === "ocr" && <ProgressBar value={ocrProgress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
+                  <>
+                    <div className="pointer-events-none absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-lime to-transparent shadow-[0_0_15px_#c6ff00,0_0_30px_#c6ff00] animate-scan-laser z-20" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 backdrop-blur-[2px] z-10">
+                      <div className="rounded-2xl border border-white/10 bg-surface/90 px-6 py-5 shadow-float backdrop-blur-md">
+                        <Spinner label={phase === "ocr" ? tx({ en: "Reading the text…", roman: "Text parh raha hoon…", ur: "متن پڑھ رہا ہوں…" }) : tx({ en: "Understanding the screen…", roman: "Screen samajh raha hoon…", ur: "اسکرین سمجھ رہا ہوں…" })} />
+                        {phase === "ocr" && <ProgressBar value={ocrProgress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
               {result && boxes.length > 0 && (

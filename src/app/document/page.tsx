@@ -119,16 +119,19 @@ export default function DocumentPage() {
         <div className="grid gap-4 lg:grid-cols-[minmax(0,360px)_1fr]">
           <div className="space-y-4">
             <Card className="p-3">
-              <div className="relative">
+              <div className="relative overflow-hidden rounded-xl">
                 {/* eslint-disable-next-line @next/next/no-img-element -- local data URL preview */}
                 <img src={image} alt={tx({ en: "Your document", roman: "Aap ka document", ur: "آپ کی دستاویز" })} className="block max-h-[60vh] w-full rounded-xl object-contain" />
                 {busy && (
-                  <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-navy/40">
-                    <div className="rounded-xl bg-elevated px-5 py-4">
-                      <Spinner label={phase === "ocr" ? tx({ en: "Reading the document…", roman: "Document parh raha hoon…", ur: "دستاویز پڑھ رہا ہوں…" }) : tx({ en: "Understanding it…", roman: "Samajh raha hoon…", ur: "سمجھ رہا ہوں…" })} />
-                      {phase === "ocr" && <ProgressBar value={progress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
+                  <>
+                    <div className="pointer-events-none absolute inset-x-0 h-1 bg-gradient-to-r from-transparent via-lime to-transparent shadow-[0_0_15px_#c6ff00,0_0_30px_#c6ff00] animate-scan-laser z-20" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-xl bg-black/40 backdrop-blur-[2px] z-10">
+                      <div className="rounded-2xl border border-white/10 bg-surface/90 px-6 py-5 shadow-float backdrop-blur-md">
+                        <Spinner label={phase === "ocr" ? tx({ en: "Reading the document…", roman: "Document parh raha hoon…", ur: "دستاویز پڑھ رہا ہوں…" }) : tx({ en: "Understanding it…", roman: "Samajh raha hoon…", ur: "سمجھ رہا ہوں…" })} />
+                        {phase === "ocr" && <ProgressBar value={progress * 100} className="mt-3 w-52" label={tx({ en: "Reading progress", roman: "Parhne ki progress", ur: "پڑھنے کی پیش رفت" })} />}
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             </Card>

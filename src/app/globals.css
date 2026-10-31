@@ -328,3 +328,77 @@ html[lang="ur"] .uppercase {
   animation-iteration-count: 1 !important;
   transition-duration: 0.001ms !important;
 }
+
+/* Loading placeholder (see <Skeleton/>). */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%);
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.4s linear infinite;
+}
+@keyframes skeleton-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+
+/* Soft entrance when navigating between pages (app/template.tsx). */
+.page-enter {
+  animation: page-enter 0.35s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes page-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Fade the bottom of a stack of preview cards (hero mock-ups). */
+.fade-bottom {
+  -webkit-mask-image: linear-gradient(to bottom, #000 72%, transparent);
+  mask-image: linear-gradient(to bottom, #000 72%, transparent);
+}
+
+/* Futuristic Cyber Scan Laser */
+@keyframes scan-laser {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 98%;
+    opacity: 0;
+  }
+}
+
+.animate-scan-laser {
+  position: absolute;
+  animation: scan-laser 2.2s ease-in-out infinite;
+}
+
+/* Button & Badge Shimmer */
+@keyframes button-shimmer {
+  0% {
+    transform: translateX(-150%);
+  }
+  100% {
+    transform: translateX(150%);
+  }
+}
+
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+  transform: translateX(-150%);
+  animation: button-shimmer 3.2s ease-in-out infinite;
+  pointer-events: none;
+}
+

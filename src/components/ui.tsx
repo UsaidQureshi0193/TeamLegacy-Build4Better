@@ -22,11 +22,11 @@ type Size = "sm" | "md" | "lg" | "xl";
 
 const VARIANTS: Record<Variant, string> = {
   // Lime fill + carbon text: the Elevate call-to-action.
-  primary: "bg-lime text-on-lime font-bold shadow-soft hover:brightness-95 active:scale-[0.98]",
-  secondary: "bg-surface text-fg border border-line hover:border-line-strong hover:bg-surface-2 active:scale-[0.98]",
-  ghost: "text-muted hover:text-fg hover:bg-surface-2 active:scale-[0.98]",
-  danger: "bg-danger text-white hover:brightness-110 active:scale-[0.98]",
-  soft: "bg-primary-soft text-primary hover:bg-surface-3 active:scale-[0.98]",
+  primary: "bg-lime text-on-lime font-bold shadow-[0_2px_12px_rgba(198,255,0,0.25)] hover:shadow-[0_4px_20px_rgba(198,255,0,0.4)] hover:brightness-105 active:scale-[0.97]",
+  secondary: "bg-surface text-fg border border-line shadow-sm hover:border-line-strong hover:bg-surface-2 hover:shadow-md active:scale-[0.97]",
+  ghost: "text-muted hover:text-fg hover:bg-surface-2 active:scale-[0.97]",
+  danger: "bg-gradient-to-r from-danger to-rose-600 text-white font-semibold shadow-[0_2px_12px_rgba(196,36,42,0.3)] hover:brightness-110 active:scale-[0.97]",
+  soft: "bg-primary-soft text-primary font-semibold hover:bg-primary-soft/80 active:scale-[0.97]",
 };
 const SIZES: Record<Size, string> = {
   sm: "h-9 px-4 text-sm gap-1.5 rounded-full",
@@ -35,7 +35,7 @@ const SIZES: Record<Size, string> = {
   xl: "min-h-14 px-7 text-lg gap-3 rounded-full",
 };
 const BUTTON_BASE =
-  "inline-flex items-center justify-center font-semibold transition-all duration-150 select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
+  "inline-flex items-center justify-center font-semibold transition-all duration-200 select-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
@@ -70,7 +70,7 @@ export function ButtonLink({ href, variant = "primary", size = "md", icon: Icon,
 /** Plain white surface. `glow` gives the one main card on a page a slightly stronger edge. */
 export function Card({ className, children, glow, as: Tag = "div", ...rest }: React.HTMLAttributes<HTMLDivElement> & { glow?: boolean; as?: "div" | "section" | "article" }) {
   return (
-    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface shadow-card transition-all duration-200", glow ? "border-line-strong" : "border-line", className)} {...rest}>
+    <Tag className={cn("rounded-[var(--radius-lg)] border bg-surface/95 backdrop-blur-sm shadow-card transition-all duration-300", glow ? "border-primary/40 shadow-[0_0_25px_rgba(198,255,0,0.08)]" : "border-line", className)} {...rest}>
       {children}
     </Tag>
   );
@@ -98,17 +98,17 @@ export function Section({ title, description, action, children, className }: { t
 export function ActionCard({ href, onClick, icon, tone = "teal", title, description, meta, className, disabled }: { href?: string; onClick?: () => void; icon: LucideIcon; tone?: Tone; title: string; description?: string; meta?: React.ReactNode; className?: string; disabled?: boolean }) {
   const body = (
     <>
-      <IconTile icon={icon} tone={tone} size="md" />
+      <IconTile icon={icon} tone={tone} size="md" className="transition-transform duration-300 group-hover:scale-110" />
       <span className="min-w-0 flex-1">
-        <span className="block font-display font-semibold leading-snug text-fg ">{title}</span>
-        {description && <span className="mt-1 block text-sm text-muted leading-relaxed">{description}</span>}
+        <span className="block font-display font-semibold leading-snug text-fg group-hover:text-primary transition-colors">{title}</span>
+        {description && <span className="mt-1 block text-sm text-muted leading-relaxed line-clamp-2">{description}</span>}
         {meta && <span className="mt-2 block">{meta}</span>}
       </span>
-      <ChevronRight className="mt-1 size-4.5 shrink-0 text-subtle transition-transform duration-200 group-hover:translate-x-1 group-hover:text-primary rtl:rotate-180" aria-hidden />
+      <ChevronRight className="mt-1 size-4.5 shrink-0 text-subtle transition-all duration-300 group-hover:translate-x-1.5 group-hover:text-primary rtl:rotate-180" aria-hidden />
     </>
   );
   const cls = cn(
-    "group flex w-full items-start gap-4 rounded-[var(--radius-lg)] border border-line bg-surface p-4 sm:p-5 text-start shadow-card card-hover cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
+    "group flex w-full items-start gap-4 rounded-[var(--radius-lg)] border border-line bg-surface p-4 sm:p-5 text-start shadow-card hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60",
     className,
   );
   return href ? (
@@ -242,10 +242,15 @@ export function Notice({ tone = "info", title, children, className, icon }: { to
 }
 
 export function ProgressBar({ value, tone = "teal", className, label }: { value: number; tone?: "teal" | "amber" | "danger"; className?: string; label?: string }) {
-  const fill = tone === "amber" ? "bg-amber" : tone === "danger" ? "bg-danger" : "bg-lime";
+  const fill =
+    tone === "amber"
+      ? "bg-gradient-to-r from-amber to-orange-500 shadow-[0_0_12px_rgba(245,158,11,0.4)]"
+      : tone === "danger"
+        ? "bg-gradient-to-r from-danger to-rose-600 shadow-[0_0_12px_rgba(196,36,42,0.4)]"
+        : "bg-gradient-to-r from-lime via-[#9ee600] to-emerald-400 shadow-[0_0_12px_rgba(198,255,0,0.4)]";
   return (
-    <div className={cn("h-2 w-full overflow-hidden rounded-full bg-surface-3", className)} role="progressbar" aria-valuenow={Math.round(value)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
-      <div className={cn("h-full rounded-full transition-[width] duration-500", fill)} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+    <div className={cn("h-2.5 w-full overflow-hidden rounded-full bg-surface-3 shadow-inner", className)} role="progressbar" aria-valuenow={Math.round(value)} aria-valuemin={0} aria-valuemax={100} aria-label={label}>
+      <div className={cn("h-full rounded-full transition-[width] duration-500 ease-out", fill)} style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
     </div>
   );
 }
@@ -256,13 +261,30 @@ export function ScoreRing({ value, size = 120, stroke = 10, label, sub }: { valu
   const v = value ?? 0;
   return (
     <div className="relative inline-flex items-center justify-center" style={{ width: size, height: size }}>
-      <svg width={size} height={size} className="-rotate-90" aria-hidden>
+      <svg width={size} height={size} className="-rotate-90 drop-shadow-sm" aria-hidden>
+        <defs>
+          <linearGradient id="scoreRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#c6ff00" />
+            <stop offset="100%" stopColor="#2563eb" />
+          </linearGradient>
+        </defs>
         <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--surface-3)" strokeWidth={stroke} fill="none" />
-        <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--chart)" strokeWidth={stroke} fill="none" strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c - (c * v) / 100} style={{ transition: "stroke-dashoffset 700ms ease-out" }} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          stroke="url(#scoreRingGrad)"
+          strokeWidth={stroke}
+          fill="none"
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c - (c * v) / 100}
+          style={{ transition: "stroke-dashoffset 900ms cubic-bezier(0.16, 1, 0.3, 1)" }}
+        />
       </svg>
       <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
         <span className="font-display text-3xl font-extrabold tracking-tight">{value === null ? "—" : value}</span>
-        {label && <span className="text-[11px] font-medium text-subtle">{label}</span>}
+        {label && <span className="text-[11px] font-semibold uppercase tracking-wider text-subtle">{label}</span>}
         {sub && <span className="text-[11px] text-subtle">{sub}</span>}
       </div>
     </div>

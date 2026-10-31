@@ -196,7 +196,7 @@ function SearchBox() {
             if (e.key === "Enter" && results.pages[0]) go(results.pages[0].href);
           }}
           placeholder={t("top.search")}
-          className="h-11 w-full rounded-full border border-line bg-surface ps-10 pe-14 text-sm text-fg placeholder:text-subtle focus:border-primary focus:outline-none focus:ring-4 focus:ring-primary/15"
+          className="h-11 w-full rounded-full border border-line bg-surface/80 ps-10 pe-14 text-sm text-fg placeholder:text-subtle transition-all duration-200 focus:border-primary focus:bg-surface focus:outline-none focus:ring-4 focus:ring-primary/15 shadow-sm"
           role="combobox"
           aria-expanded={open}
           aria-controls="search-results"
@@ -435,8 +435,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       <div className="lg:ps-[17rem]">
         <header className="sticky top-0 z-30 px-3 pt-3 sm:px-5 lg:px-7">
-          <div className="glass mx-auto flex h-16 max-w-[1400px] items-center gap-3 rounded-full border border-line px-3 shadow-float sm:px-4">
-            <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-full border border-line bg-surface text-muted lg:hidden cursor-pointer">
+          <div className="glass mx-auto flex h-16 max-w-[1400px] items-center gap-3 rounded-full border border-line/80 px-3 shadow-[0_8px_32px_rgba(0,0,0,0.06)] ring-1 ring-black/5 dark:ring-white/10 sm:px-4 transition-all duration-300">
+            <button onClick={() => setDrawer(true)} aria-label="Open menu" className="flex size-11 items-center justify-center rounded-full border border-line bg-surface text-muted hover:text-fg hover:bg-surface-2 transition-colors lg:hidden cursor-pointer">
               <Menu className="size-5" />
             </button>
             <div className="lg:hidden">
